@@ -1,10 +1,12 @@
 import {
-  bulkReturnDetections,
-  bulkReturnReviewCandidates,
-  bulkReturnStockBefore,
-  checkoutScanCatalog,
   teams,
 } from '@/lib/mock-data'
+import {
+  officialBulkReturnDetections,
+  officialCheckoutScanCatalog,
+  officialReviewCandidates,
+  officialStockBefore,
+} from '@/lib/official-catalog'
 import type { BulkReturnItem, CheckoutItem, ReviewCandidate } from '@/lib/types'
 
 export function getTeams() {
@@ -12,19 +14,19 @@ export function getTeams() {
 }
 
 export function getCheckoutScanCatalog(): CheckoutItem[] {
-  return checkoutScanCatalog
+  return officialCheckoutScanCatalog
 }
 
 export function detectItems(): BulkReturnItem[] {
-  return bulkReturnDetections.map(({ top, left, width, height, labelSide, ...item }) => item)
+  return officialBulkReturnDetections.map(({ top, left, width, height, labelSide, ...item }) => item)
 }
 
 export function getBulkReturnDetectionBoxes() {
-  return bulkReturnDetections
+  return officialBulkReturnDetections
 }
 
 export function getBulkReturnReviewCandidates(): ReviewCandidate[] {
-  return bulkReturnReviewCandidates
+  return officialReviewCandidates
 }
 
 export function confirmDetection(item: BulkReturnItem, candidate: ReviewCandidate): BulkReturnItem {
@@ -38,7 +40,7 @@ export function confirmDetection(item: BulkReturnItem, candidate: ReviewCandidat
 }
 
 export function getBulkReturnStockBefore() {
-  return bulkReturnStockBefore
+  return officialStockBefore
 }
 
 export function previewBulkReturnStockUpdate(items: BulkReturnItem[]) {
@@ -48,7 +50,7 @@ export function previewBulkReturnStockUpdate(items: BulkReturnItem[]) {
   }, {})
 
   return Object.entries(returnedByName).map(([name, qty]) => {
-    const before = bulkReturnStockBefore[name] ?? 0
+    const before = officialStockBefore[name] ?? 0
     return { name, before, after: before + qty, returned: qty }
   })
 }

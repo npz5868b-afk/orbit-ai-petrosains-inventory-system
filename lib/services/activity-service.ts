@@ -11,7 +11,7 @@ export function getActivityStatusMeta() {
   return activityStatusMeta
 }
 
-export function filterActivities(filter: ActivityFilter): ActivityRecord[] {
-  if (filter === 'all') return activities
-  return activities.filter((activity) => activity.type === filter)
+export function filterActivities(filter: ActivityFilter, source: ActivityRecord[] = activities): ActivityRecord[] {
+  if (filter === 'all') return source
+  return source.filter((activity) => activity.type === filter)
 }

@@ -1,0 +1,100 @@
+[
+  {
+    "id": "electronics-led-colour",
+    "classes": [
+      "E018",
+      "E019"
+    ],
+    "risk": "Same package; colour is the main cue."
+  },
+  {
+    "id": "electronics-n20-motors",
+    "classes": [
+      "E008",
+      "E010"
+    ],
+    "risk": "Small metal gear motors share housing and scale."
+  },
+  {
+    "id": "electronics-rocker-switches",
+    "classes": [
+      "E022",
+      "E023"
+    ],
+    "risk": "Similar black switch bodies; pin count may be hidden."
+  },
+  {
+    "id": "electronics-jumper-wires",
+    "classes": [
+      "E026",
+      "E027"
+    ],
+    "risk": "Connector gender is a small end-point cue."
+  },
+  {
+    "id": "lab-beakers",
+    "classes": [
+      "L003",
+      "L004"
+    ],
+    "risk": "Same transparent form at different capacity."
+  },
+  {
+    "id": "lab-conical-flasks",
+    "classes": [
+      "L005",
+      "L006"
+    ],
+    "risk": "Same transparent form at different capacity."
+  },
+  {
+    "id": "lab-pipettes",
+    "classes": [
+      "L007",
+      "L008"
+    ],
+    "risk": "Capacity markings are small and may be occluded."
+  },
+  {
+    "id": "lab-syringes",
+    "classes": [
+      "L014",
+      "L015"
+    ],
+    "risk": "Capacity markings and scale are the main cues."
+  },
+  {
+    "id": "lab-gloves",
+    "classes": [
+      "L011",
+      "L012"
+    ],
+    "risk": "Packaging dominates many views; LN2 glove shape differs when unpacked."
+  },
+  {
+    "id": "markers",
+    "classes": [
+      "S002",
+      "S011"
+    ],
+    "risk": "Marker silhouettes are similar; label text matters."
+  },
+  {
+    "id": "adhesives",
+    "classes": [
+      "C011",
+      "C019",
+      "C024",
+      "T004"
+    ],
+    "risk": "Glue products share wording and may appear packaged together."
+  },
+  {
+    "id": "cutting-tools",
+    "classes": [
+      "T001",
+      "T006"
+    ],
+    "risk": "Both are handheld cutting tools in cluttered scenes."
+  }
+]

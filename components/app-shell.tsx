@@ -1,6 +1,8 @@
 'use client'
 
 import { getSystemOverview } from '@/lib/services/system-service'
+import { fetchStoresFromApi } from '@/lib/api-client'
+import { flushOfflineQueue } from '@/lib/offline-queue'
 import { cn } from '@/lib/utils'
 import {
   Activity,
@@ -12,6 +14,7 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useEffect, useState } from 'react'
 import { AnimatedBackground } from './animated-background'
 
 const NAV = [
@@ -50,7 +53,16 @@ function Logo() {
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
-  const { facts, stores } = getSystemOverview()
+  const overview = getSystemOverview()
+  const { facts } = overview
+  const [stores, setStores] = useState(overview.stores)
+  useEffect(() => {
+    fetchStoresFromApi().then(setStores).catch(() => undefined)
+    const sync = () => flushOfflineQueue().catch(() => undefined)
+    sync()
+    window.addEventListener('online', sync)
+    return () => window.removeEventListener('online', sync)
+  }, [])
   const onlineStores = stores.filter((store) => store.status === 'online').length
 
   return (
