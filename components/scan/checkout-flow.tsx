@@ -1,7 +1,11 @@
 'use client'
 
 import { GlassCard, StatusPill } from '@/components/ui-kit'
-import { teams } from '@/lib/mock-data'
+import {
+  checkoutItems,
+  getCheckoutScanCatalog,
+  getTeams,
+} from '@/lib/services/scan-service'
 import { cn } from '@/lib/utils'
 import {
   ArrowRight,
@@ -17,17 +21,13 @@ import { useState } from 'react'
 
 type Step = 0 | 1 | 2 | 3 | 4
 
-const catalog = [
-  { name: 'Arduino Uno', code: 'ELC-0421', confidence: 98 },
-  { name: 'Ultrasonic Sensor', code: 'SNS-1180', confidence: 95 },
-  { name: 'Precision Screwdriver', code: 'TL-0092', confidence: 92 },
-]
-
-type CartItem = { name: string; code: string; qty: number }
+type CartItem = { itemName: string; itemCode: string; qty: number }
 
 const STEP_LABELS = ['Assign', 'Scan', 'Review', 'Confirm', 'Done']
 
 export function CheckoutFlow({ onExit }: { onExit: () => void }) {
+  const teams = getTeams()
+  const catalog = getCheckoutScanCatalog()
   const [step, setStep] = useState<Step>(0)
   const [who, setWho] = useState<string | null>(null)
   const [scanned, setScanned] = useState(0)
@@ -37,28 +37,39 @@ export function CheckoutFlow({ onExit }: { onExit: () => void }) {
 
   function addToCart() {
     setCart((prev) => {
-      const found = prev.find((c) => c.code === current.code)
+      const found = prev.find((c) => c.itemCode === current.itemCode)
       if (found) {
-        return prev.map((c) => (c.code === current.code ? { ...c, qty: c.qty + 1 } : c))
+        return prev.map((c) =>
+          c.itemCode === current.itemCode ? { ...c, qty: c.qty + 1 } : c,
+        )
       }
-      return [...prev, { name: current.name, code: current.code, qty: 1 }]
+      return [...prev, { itemName: current.itemName, itemCode: current.itemCode, qty: 1 }]
     })
     setScanned((s) => s + 1)
   }
 
-  function setQty(code: string, delta: number) {
+  function setQty(itemCode: string, delta: number) {
     setCart((prev) =>
       prev
-        .map((c) => (c.code === code ? { ...c, qty: Math.max(0, c.qty + delta) } : c))
+        .map((c) => (c.itemCode === itemCode ? { ...c, qty: Math.max(0, c.qty + delta) } : c))
         .filter((c) => c.qty > 0),
     )
+  }
+
+  function goBack() {
+    setStep((currentStep) => Math.max(0, currentStep - 1) as Step)
+  }
+
+  function confirmCheckout() {
+    checkoutItems(cart.map((item) => ({ itemCode: item.itemCode, quantity: item.qty })))
+    setStep(3)
   }
 
   const totalItems = cart.reduce((s, c) => s + c.qty, 0)
 
   return (
     <div>
-      <div className="mb-5 flex items-center justify-between">
+      <div className="mb-5 flex items-center justify-between gap-4">
         <div>
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-cyan">
             Check Out
@@ -67,12 +78,22 @@ export function CheckoutFlow({ onExit }: { onExit: () => void }) {
             {['Select User or Team', 'Scan Item', 'Check-out Summary', 'Confirm Check-out', 'Complete'][step]}
           </h2>
         </div>
-        <button
-          onClick={onExit}
-          className="rounded-lg border border-border bg-secondary/60 px-3 py-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
-        >
-          Cancel
-        </button>
+        <div className="flex shrink-0 items-center gap-2">
+          {step > 0 && step < 4 && (
+            <button
+              onClick={goBack}
+              className="rounded-lg border border-border bg-secondary/60 px-3 py-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+            >
+              Back
+            </button>
+          )}
+          <button
+            onClick={onExit}
+            className="rounded-lg border border-border bg-secondary/60 px-3 py-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+          >
+            Cancel
+          </button>
+        </div>
       </div>
 
       {/* stepper */}
@@ -163,8 +184,8 @@ export function CheckoutFlow({ onExit }: { onExit: () => void }) {
                 </span>
                 <StatusPill label={`${current.confidence}% match`} tone="success" />
               </div>
-              <p className="mt-2 font-display text-lg font-semibold">{current.name}</p>
-              <p className="text-sm text-muted-foreground">Code {current.code}</p>
+              <p className="mt-2 font-display text-lg font-semibold">{current.itemName}</p>
+              <p className="text-sm text-muted-foreground">Code {current.itemCode}</p>
               <button
                 onClick={addToCart}
                 className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-cyan/15 px-4 py-2.5 text-sm font-semibold text-cyan transition-colors hover:bg-cyan/25"
@@ -193,24 +214,26 @@ export function CheckoutFlow({ onExit }: { onExit: () => void }) {
               ) : (
                 cart.map((c) => (
                   <div
-                    key={c.code}
+                    key={c.itemCode}
                     className="animate-rise flex items-center gap-3 rounded-xl border border-border bg-secondary/40 p-3"
                   >
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-medium">{c.name}</p>
-                      <p className="text-xs text-muted-foreground">{c.code}</p>
+                      <p className="truncate text-sm font-medium">{c.itemName}</p>
+                      <p className="text-xs text-muted-foreground">{c.itemCode}</p>
                     </div>
                     <div className="flex items-center gap-2">
                       <button
-                        onClick={() => setQty(c.code, -1)}
-                        className="grid h-7 w-7 place-items-center rounded-lg border border-border text-muted-foreground hover:text-foreground"
+                        aria-label={`Remove one ${c.itemName}`}
+                        onClick={() => setQty(c.itemCode, -1)}
+                        className="grid h-9 w-9 place-items-center rounded-lg border border-border text-muted-foreground hover:text-foreground"
                       >
                         <Minus className="h-3.5 w-3.5" />
                       </button>
                       <span className="w-5 text-center text-sm font-semibold">{c.qty}</span>
                       <button
-                        onClick={() => setQty(c.code, 1)}
-                        className="grid h-7 w-7 place-items-center rounded-lg border border-border text-muted-foreground hover:text-foreground"
+                        aria-label={`Add one ${c.itemName}`}
+                        onClick={() => setQty(c.itemCode, 1)}
+                        className="grid h-9 w-9 place-items-center rounded-lg border border-border text-muted-foreground hover:text-foreground"
                       >
                         <Plus className="h-3.5 w-3.5" />
                       </button>
@@ -242,12 +265,12 @@ export function CheckoutFlow({ onExit }: { onExit: () => void }) {
           <div className="mt-4 flex flex-col gap-2">
             {cart.map((c) => (
               <div
-                key={c.code}
+                key={c.itemCode}
                 className="flex items-center justify-between rounded-xl border border-border bg-secondary/40 p-3.5"
               >
                 <div>
-                  <p className="text-sm font-medium">{c.name}</p>
-                  <p className="text-xs text-muted-foreground">{c.code}</p>
+                  <p className="text-sm font-medium">{c.itemName}</p>
+                  <p className="text-xs text-muted-foreground">{c.itemCode}</p>
                 </div>
                 <span className="text-sm text-muted-foreground">Qty {c.qty}</span>
               </div>
@@ -258,7 +281,7 @@ export function CheckoutFlow({ onExit }: { onExit: () => void }) {
             <span className="font-display text-2xl font-bold text-cyan">{totalItems}</span>
           </div>
           <button
-            onClick={() => setStep(3)}
+            onClick={confirmCheckout}
             className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-cyan to-teal px-5 py-3.5 text-sm font-semibold text-primary-foreground transition-all hover:shadow-[0_0_30px_-4px_var(--cyan)]"
           >
             Confirm Check-out

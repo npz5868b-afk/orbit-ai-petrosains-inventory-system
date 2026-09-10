@@ -37,8 +37,9 @@ export function StatusPill({
   return (
     <span
       className={cn(
-        'inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium',
+        'inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium backdrop-blur-md',
         'border-current/25 bg-current/10',
+        pulse && 'status-soft-pulse',
         toneText[tone],
         className,
       )}
@@ -70,7 +71,7 @@ export function GlassCard({
     <div
       className={cn(
         strong ? 'glass-strong' : 'glass',
-        'rounded-2xl',
+        'premium-card rounded-2xl',
         className,
       )}
       {...props}
@@ -118,6 +119,11 @@ export function CountUp({
   useEffect(() => {
     const node = ref.current
     if (!node) return
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      started.current = true
+      setDisplay(value)
+      return
+    }
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting && !started.current) {

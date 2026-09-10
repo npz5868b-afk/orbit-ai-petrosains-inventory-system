@@ -1,18 +1,46 @@
 'use client'
 
 import { GlassCard, StatusPill } from '@/components/ui-kit'
-import { statusMeta, type InventoryItem } from '@/lib/mock-data'
+import {
+  getDemoKindLabel,
+  getInventoryActions,
+  getInventoryStatusMeta,
+} from '@/lib/services/inventory-service'
+import type { InventoryItem } from '@/lib/types'
 import { cn } from '@/lib/utils'
-import { ArrowLeft, MapPin, PackageCheck, ScanLine, Users } from 'lucide-react'
+import {
+  ArrowLeft,
+  MapPin,
+  Minus,
+  PackageCheck,
+  Plus,
+  ScanLine,
+  TriangleAlert,
+  Users,
+} from 'lucide-react'
 import Link from 'next/link'
+import { useState } from 'react'
 
 export function ItemDetail({ item }: { item: InventoryItem }) {
+  const [actionMessage, setActionMessage] = useState<string | null>(null)
   const total = item.available + item.checkedOut + item.damaged
+  const statusMeta = getInventoryStatusMeta()
+  const actions = getInventoryActions(item)
   const segments = [
     { label: 'Available', value: item.available, tone: 'success' as const, color: 'var(--success)' },
     { label: 'Checked out', value: item.checkedOut, tone: 'cyan' as const, color: 'var(--cyan)' },
     { label: 'Damaged', value: item.damaged, tone: 'danger' as const, color: 'var(--danger)' },
   ]
+
+  function runMockAction(label: string) {
+    const messages: Record<string, string> = {
+      'Report Missing': 'Marked for review. No inventory changes were made.',
+      'Report Damage': 'Damage report saved for review. No inventory changes were made.',
+      'Use Stock': 'Stock use is ready for review. No inventory changes were made.',
+      'Add Stock': 'Stock addition is ready for review. No inventory changes were made.',
+    }
+    setActionMessage(messages[label] ?? 'Action saved for review. No inventory changes were made.')
+  }
 
   return (
     <div>
@@ -42,7 +70,7 @@ export function ItemDetail({ item }: { item: InventoryItem }) {
             <MapPin className="h-4 w-4" />
             {item.location} · {item.rack}
           </span>
-          <span className="capitalize">{item.kind}</span>
+          <span>{getDemoKindLabel(item.kind)}</span>
         </div>
       </div>
 
@@ -70,7 +98,7 @@ export function ItemDetail({ item }: { item: InventoryItem }) {
             ) : null,
           )}
         </div>
-        <div className="mt-4 grid grid-cols-3 gap-3">
+        <div className="mt-4 grid gap-3 sm:grid-cols-3">
           {segments.map((s) => (
             <div key={s.label} className="rounded-xl border border-border bg-secondary/40 p-3">
               <div className="flex items-center gap-2">
@@ -144,24 +172,62 @@ export function ItemDetail({ item }: { item: InventoryItem }) {
       </div>
 
       {/* actions */}
-      <div className="mt-6 flex flex-col gap-2.5 sm:flex-row">
-        <Link
-          href="/scan?flow=check-out"
-          className={cn(
-            'inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-cyan to-teal px-5 py-3.5 text-sm font-semibold text-primary-foreground transition-all hover:shadow-[0_0_30px_-4px_var(--cyan)]',
-          )}
-        >
-          <ScanLine className="h-4 w-4" />
-          Check Out This Item
-        </Link>
-        <Link
-          href="/scan?flow=bulk-return"
-          className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl border border-border bg-secondary/60 px-5 py-3.5 text-sm font-medium transition-colors hover:text-violet"
-        >
-          <PackageCheck className="h-4 w-4" />
-          Return Items
-        </Link>
+      <div className="mt-6 grid gap-2.5 sm:grid-cols-2 lg:grid-cols-4">
+        {actions.map((action, index) => {
+          const primary = index === 0
+          const label =
+            action.label === 'Check Out'
+              ? 'Check Out This Item'
+              : action.label === 'Return'
+                ? 'Return Items'
+                : action.label
+          const Icon =
+            action.label === 'Check Out'
+              ? ScanLine
+              : action.label === 'Return'
+                ? PackageCheck
+                : action.label === 'Use Stock'
+                  ? Minus
+                  : action.label === 'Add Stock'
+                    ? Plus
+                    : TriangleAlert
+
+          if (action.kind === 'link') {
+            return (
+              <Link
+                key={action.label}
+                href={action.href}
+                className={cn(
+                  'inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3.5 text-sm font-semibold transition-all',
+                  primary
+                    ? 'bg-gradient-to-r from-cyan to-teal text-primary-foreground hover:shadow-[0_0_30px_-4px_var(--cyan)]'
+                    : 'border border-border bg-secondary/60 text-foreground hover:text-violet',
+                )}
+              >
+                <Icon className="h-4 w-4" />
+                {label}
+              </Link>
+            )
+          }
+
+          return (
+            <button
+              key={action.label}
+              onClick={() => runMockAction(action.label)}
+              className="inline-flex items-center justify-center gap-2 rounded-xl border border-border bg-secondary/60 px-5 py-3.5 text-sm font-medium transition-colors hover:text-warning"
+            >
+              <Icon className="h-4 w-4" />
+              {label}
+            </button>
+          )
+        })}
       </div>
+
+      {actionMessage && (
+        <GlassCard className="mt-3 animate-rise p-3 text-sm text-muted-foreground">
+          {actionMessage}
+        </GlassCard>
+      )}
     </div>
   )
 }

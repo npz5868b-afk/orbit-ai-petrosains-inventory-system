@@ -1,5 +1,6 @@
 'use client'
 
+import { getSystemOverview } from '@/lib/services/system-service'
 import { cn } from '@/lib/utils'
 import {
   Activity,
@@ -29,10 +30,11 @@ function isActive(pathname: string, href: string) {
 function Logo() {
   return (
     <Link href="/" className="flex items-center gap-3">
-      <span className="relative grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-cyan/25 to-violet/25 glow-cyan">
-        <span className="absolute inset-0 rounded-xl border border-cyan/40" />
-        <span className="h-4 w-4 rounded-full border-2 border-cyan bg-transparent shadow-[0_0_12px_var(--cyan)]" />
-        <span className="absolute h-1.5 w-1.5 rounded-full bg-violet shadow-[0_0_10px_var(--violet)]" />
+      <span className="relative grid h-10 w-10 place-items-center overflow-hidden rounded-xl bg-gradient-to-br from-cyan/25 via-card/70 to-violet/25 glow-cyan">
+        <span className="absolute inset-0 rounded-xl border border-cyan/35" />
+        <span className="logo-orbit-ring absolute inset-2 rounded-full border border-cyan/20 border-t-cyan/70 border-r-violet/55" />
+        <span className="logo-core-breathe h-4 w-4 rounded-full border-2 border-cyan bg-transparent shadow-[0_0_12px_var(--cyan)]" />
+        <span className="absolute h-1.5 w-1.5 translate-x-3 rounded-full bg-violet shadow-[0_0_10px_var(--violet)]" />
       </span>
       <span className="leading-tight">
         <span className="block font-display text-base font-bold tracking-[0.18em] text-foreground">
@@ -48,13 +50,15 @@ function Logo() {
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
+  const { facts, stores } = getSystemOverview()
+  const onlineStores = stores.filter((store) => store.status === 'online').length
 
   return (
-    <div className="min-h-screen">
+    <div className="relative isolate min-h-screen overflow-x-hidden">
       <AnimatedBackground />
 
       {/* Desktop sidebar */}
-      <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 flex-col border-r border-sidebar-border bg-sidebar p-5 backdrop-blur-2xl lg:flex">
+      <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 flex-col border-r border-sidebar-border bg-sidebar/90 p-5 shadow-[18px_0_60px_-48px_var(--cyan)] backdrop-blur-2xl lg:flex">
         <div className="px-1 py-2">
           <Logo />
         </div>
@@ -67,7 +71,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  'group relative flex items-center gap-3 rounded-xl px-3.5 py-3 text-sm font-medium transition-all duration-300',
+                  'group relative flex items-center gap-3 rounded-xl px-3.5 py-3 text-sm font-medium transition-all duration-300 hover:bg-foreground/[0.03]',
                   active
                     ? 'text-foreground'
                     : 'text-muted-foreground hover:text-foreground',
@@ -90,33 +94,36 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
         <div className="glass rounded-xl p-3.5">
           <div className="flex items-center gap-2 text-sm font-medium text-success">
-            <Wifi className="h-4 w-4" />
+            <span className="relative grid h-6 w-6 place-items-center rounded-full bg-success/10">
+              <span className="absolute h-2 w-2 rounded-full bg-success/40 status-soft-pulse" />
+              <Wifi className="relative h-4 w-4" />
+            </span>
             Online
           </div>
           <p className="mt-1 text-xs text-muted-foreground">
-            3 of 4 stores synced. Everything is up to date.
+            {onlineStores} of {facts.activeStorageLocations} stores connected. Changes sync later.
           </p>
         </div>
       </aside>
 
       {/* Mobile top bar */}
-      <header className="sticky top-0 z-30 flex items-center justify-between border-b border-sidebar-border bg-sidebar px-4 py-3 backdrop-blur-2xl lg:hidden">
+      <header className="sticky top-0 z-30 flex items-center justify-between border-b border-sidebar-border bg-sidebar/90 px-4 py-3 shadow-[0_16px_44px_-34px_var(--cyan)] backdrop-blur-2xl lg:hidden">
         <Logo />
-        <span className="flex items-center gap-1.5 rounded-full border border-success/25 bg-success/10 px-2.5 py-1 text-xs font-medium text-success">
+        <span className="status-soft-pulse flex items-center gap-1.5 rounded-full border border-success/25 bg-success/10 px-2.5 py-1 text-xs font-medium text-success">
           <Wifi className="h-3.5 w-3.5" />
           Online
         </span>
       </header>
 
       {/* Main content */}
-      <main className="lg:pl-64">
-        <div className="mx-auto w-full max-w-6xl px-4 pb-28 pt-6 sm:px-6 lg:px-10 lg:pt-10">
+      <main className="px-4 sm:px-6 lg:pl-64 lg:pr-0">
+        <div className="mx-auto w-[calc(100vw-2rem)] max-w-6xl pb-28 pt-6 sm:w-[calc(100vw-3rem)] lg:w-auto lg:px-10 lg:pt-10">
           {children}
         </div>
       </main>
 
       {/* Mobile bottom nav */}
-      <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-sidebar-border bg-sidebar px-2 py-2 backdrop-blur-2xl lg:hidden">
+      <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-sidebar-border bg-sidebar/90 px-2 py-2 shadow-[0_-18px_50px_-42px_var(--cyan)] backdrop-blur-2xl lg:hidden">
         <div className="mx-auto flex max-w-md items-center justify-around">
           {NAV.map((item) => {
             const active = isActive(pathname, item.href)

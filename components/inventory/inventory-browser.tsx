@@ -1,13 +1,19 @@
 'use client'
 
 import { GlassCard, StatusPill } from '@/components/ui-kit'
-import { inventory, statusMeta, type ItemStatus } from '@/lib/mock-data'
+import {
+  getInventoryFacts,
+  getInventoryStatusMeta,
+  searchInventory,
+} from '@/lib/services/inventory-service'
+import type { InventoryStatus } from '@/lib/types'
 import { cn } from '@/lib/utils'
 import { ChevronRight, MapPin, Search } from 'lucide-react'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import { useMemo, useState } from 'react'
 
-const FILTERS: { key: 'all' | ItemStatus; label: string }[] = [
+const FILTERS: { key: 'all' | InventoryStatus; label: string }[] = [
   { key: 'all', label: 'All' },
   { key: 'available', label: 'Available' },
   { key: 'checked-out', label: 'Checked Out' },
@@ -15,20 +21,15 @@ const FILTERS: { key: 'all' | ItemStatus; label: string }[] = [
 ]
 
 export function InventoryBrowser() {
+  const params = useSearchParams()
+  const initialFilter = params.get('filter') === 'attention' ? 'attention' : 'all'
   const [query, setQuery] = useState('')
-  const [filter, setFilter] = useState<'all' | ItemStatus>('all')
+  const [filter, setFilter] = useState<'all' | InventoryStatus>(initialFilter)
+  const facts = getInventoryFacts()
+  const statusMeta = getInventoryStatusMeta()
 
   const results = useMemo(() => {
-    return inventory.filter((item) => {
-      const matchesFilter = filter === 'all' || item.status === filter
-      const q = query.trim().toLowerCase()
-      const matchesQuery =
-        !q ||
-        item.name.toLowerCase().includes(q) ||
-        item.code.toLowerCase().includes(q) ||
-        item.location.toLowerCase().includes(q)
-      return matchesFilter && matchesQuery
-    })
+    return searchInventory(query, filter)
   }, [query, filter])
 
   return (
@@ -38,7 +39,7 @@ export function InventoryBrowser() {
           Find Inventory
         </h1>
         <p className="mt-2 text-muted-foreground">
-          Search items across all stores. {inventory.length} item types available.
+          Search items across all stores. {facts.itemTypes} item types available.
         </p>
       </div>
 

@@ -1,27 +1,30 @@
-export type ItemStatus = 'available' | 'checked-out' | 'attention'
-export type ItemKind = 'reusable' | 'consumable'
+import type {
+  ActivityRecord,
+  AttentionItem,
+  BulkReturnDetection,
+  CheckoutItem,
+  HomeStat,
+  InventoryItem,
+  InventoryStatus,
+  OfflineState,
+  RecoveryState,
+  ReviewCandidate,
+  StatusMeta,
+  StoreLocation,
+} from './types'
 
-export type InventoryItem = {
-  id: string
-  name: string
-  code: string
-  kind: ItemKind
-  available: number
-  checkedOut: number
-  damaged: number
-  location: string
-  rack: string
-  lastSeen: string
-  status: ItemStatus
-  distribution: { store: string; qty: number }[]
-  users: { name: string; qty: number }[]
-}
+export const officialChallengeFacts = {
+  itemTypes: 109,
+  categories: 5,
+  activeStorageLocations: 4,
+} as const
 
 export const inventory: InventoryItem[] = [
   {
     id: 'arduino-uno',
     name: 'Arduino Uno',
     code: 'ELC-0421',
+    category: 'Electronics',
     kind: 'reusable',
     available: 9,
     checkedOut: 4,
@@ -44,6 +47,7 @@ export const inventory: InventoryItem[] = [
     id: 'ultrasonic-sensor',
     name: 'Ultrasonic Sensor',
     code: 'SNS-1180',
+    category: 'Sensors',
     kind: 'reusable',
     available: 14,
     checkedOut: 6,
@@ -62,6 +66,7 @@ export const inventory: InventoryItem[] = [
     id: 'ir-sensor',
     name: 'IR Sensor',
     code: 'SNS-1204',
+    category: 'Sensors',
     kind: 'reusable',
     available: 3,
     checkedOut: 8,
@@ -82,6 +87,7 @@ export const inventory: InventoryItem[] = [
     id: 'screwdriver',
     name: 'Precision Screwdriver',
     code: 'TL-0092',
+    category: 'Tools',
     kind: 'reusable',
     available: 22,
     checkedOut: 3,
@@ -101,6 +107,7 @@ export const inventory: InventoryItem[] = [
     id: 'jumper-wires',
     name: 'Jumper Wires (40pc)',
     code: 'CBL-3310',
+    category: 'Cables',
     kind: 'consumable',
     available: 48,
     checkedOut: 0,
@@ -119,6 +126,7 @@ export const inventory: InventoryItem[] = [
     id: 'breadboard',
     name: 'Breadboard 830pt',
     code: 'ELC-0510',
+    category: 'Electronics',
     kind: 'reusable',
     available: 0,
     checkedOut: 16,
@@ -134,6 +142,7 @@ export const inventory: InventoryItem[] = [
     id: 'soldering-iron',
     name: 'Soldering Iron',
     code: 'TL-0145',
+    category: 'Workshop',
     kind: 'reusable',
     available: 5,
     checkedOut: 2,
@@ -151,6 +160,7 @@ export const inventory: InventoryItem[] = [
     id: 'multimeter',
     name: 'Digital Multimeter',
     code: 'TL-0201',
+    category: 'Tools',
     kind: 'reusable',
     available: 7,
     checkedOut: 1,
@@ -168,61 +178,55 @@ export const inventory: InventoryItem[] = [
 ]
 
 export const statusMeta: Record<
-  ItemStatus,
-  { label: string; tone: 'success' | 'warning' | 'danger' | 'cyan' }
+  InventoryStatus,
+  StatusMeta
 > = {
   available: { label: 'Available', tone: 'success' },
   'checked-out': { label: 'Checked Out', tone: 'cyan' },
   attention: { label: 'Need Attention', tone: 'warning' },
 }
 
-export const homeStats = [
-  { label: 'Item Types', value: 128, tone: 'cyan' as const },
+export const homeStats: HomeStat[] = [
+  { label: 'Item Types', value: officialChallengeFacts.itemTypes, tone: 'cyan' },
   { label: 'Checked Out', value: 41, tone: 'violet' as const },
   { label: 'Need Attention', value: 3, tone: 'warning' as const },
   { label: 'Offline Stores', value: 1, tone: 'danger' as const },
 ]
 
-export const needsAttention = [
+export const needsAttention: AttentionItem[] = [
   {
     id: 'a1',
     title: '1 return needs review',
     detail: 'Bulk return · Store 1 · uncertain item',
     action: 'Review',
-    tone: 'warning' as const,
+    href: '/scan?flow=bulk-return&stage=review',
+    tone: 'warning',
   },
   {
     id: 'a2',
     title: '2 items overdue',
     detail: 'IR Sensor, Breadboard · Team Prototyping',
     action: 'View Items',
-    tone: 'danger' as const,
+    href: '/inventory?filter=attention',
+    tone: 'danger',
   },
   {
     id: 'a3',
     title: 'Store 3 offline',
     detail: 'Last sync 3 hours ago · 4 changes waiting',
     action: 'Check Status',
-    tone: 'warning' as const,
+    href: '/system',
+    tone: 'warning',
   },
 ]
 
-export type Activity = {
-  id: string
-  type: 'check-out' | 'return' | 'issue'
-  title: string
-  time: string
-  store: string
-  user: string
-  qty: number
-  status: 'synced' | 'offline' | 'review'
-  transactionId: string
-  items: { name: string; qty: number }[]
-  aiSummary: string
-  online: boolean
+export const activityStatusMeta: Record<ActivityRecord['status'], StatusMeta> = {
+  synced: { label: 'Synced', tone: 'success' },
+  offline: { label: 'Saved Offline', tone: 'warning' },
+  review: { label: 'Review Needed', tone: 'warning' },
 }
 
-export const activities: Activity[] = [
+export const activities: ActivityRecord[] = [
   {
     id: 't-1042',
     type: 'return',
@@ -232,13 +236,14 @@ export const activities: Activity[] = [
     user: 'Team Robotics',
     qty: 7,
     status: 'synced',
+    syncStatus: 'up-to-date',
     transactionId: 'TXN-2048-1042',
     items: [
       { name: 'Arduino Uno', qty: 3 },
-      { name: 'Ultrasonic Sensor', qty: 2 },
-      { name: 'Jumper Wires (40pc)', qty: 2 },
+      { name: 'Ultrasonic Sensor', qty: 3 },
+      { name: 'Precision Screwdriver', qty: 1 },
     ],
-    aiSummary: 'All 7 items identified with high confidence. No manual review needed.',
+    aiSummary: 'Six items were ready. One item was reviewed before confirmation.',
     online: true,
   },
   {
@@ -250,6 +255,7 @@ export const activities: Activity[] = [
     user: 'Aisha R.',
     qty: 2,
     status: 'synced',
+    syncStatus: 'up-to-date',
     transactionId: 'TXN-2048-1041',
     items: [
       { name: 'Digital Multimeter', qty: 1 },
@@ -267,6 +273,7 @@ export const activities: Activity[] = [
     user: 'Daniel K.',
     qty: 2,
     status: 'review',
+    syncStatus: 'online',
     transactionId: 'TXN-2048-1040',
     items: [{ name: 'IR Sensor', qty: 2 }],
     aiSummary: 'Damage report flagged for supervisor review.',
@@ -281,6 +288,7 @@ export const activities: Activity[] = [
     user: 'Team Prototyping',
     qty: 4,
     status: 'offline',
+    syncStatus: 'saved-offline',
     transactionId: 'TXN-2048-1039',
     items: [
       { name: 'Breadboard 830pt', qty: 2 },
@@ -298,6 +306,7 @@ export const activities: Activity[] = [
     user: 'Team Robotics',
     qty: 6,
     status: 'synced',
+    syncStatus: 'up-to-date',
     transactionId: 'TXN-2047-1038',
     items: [
       { name: 'Ultrasonic Sensor', qty: 4 },
@@ -308,11 +317,11 @@ export const activities: Activity[] = [
   },
 ]
 
-export const stores = [
-  { name: 'Store 1', area: 'Main Lab', status: 'online' as const, lastSync: 'Just now', items: 512 },
-  { name: 'Store 2', area: 'Workshop', status: 'online' as const, lastSync: '2 min ago', items: 344 },
-  { name: 'Store 3', area: 'Annex', status: 'offline' as const, lastSync: '3 hours ago', items: 210 },
-  { name: 'Store 4', area: 'Storage', status: 'online' as const, lastSync: '5 min ago', items: 168 },
+export const stores: StoreLocation[] = [
+  { id: 'store-1', name: 'Store 1', area: 'Main Lab', status: 'online', lastSync: 'Just now', items: 512 },
+  { id: 'store-2', name: 'Store 2', area: 'Workshop', status: 'online', lastSync: '2 min ago', items: 344 },
+  { id: 'store-3', name: 'Store 3', area: 'Annex', status: 'offline', lastSync: '3 hours ago', items: 210 },
+  { id: 'store-4', name: 'Store 4', area: 'Storage', status: 'online', lastSync: '5 min ago', items: 168 },
 ]
 
 export const teams = [
@@ -323,10 +332,158 @@ export const teams = [
   'Daniel K.',
 ]
 
+export const checkoutScanCatalog: CheckoutItem[] = [
+  { itemName: 'Arduino Uno', itemCode: 'ELC-0421', confidence: 98 },
+  { itemName: 'Ultrasonic Sensor', itemCode: 'SNS-1180', confidence: 95 },
+  { itemName: 'Precision Screwdriver', itemCode: 'TL-0092', confidence: 92 },
+]
+
 // Items surfaced during the bulk-return scan demo
-export const scannedItems = [
-  { id: 's1', name: 'Arduino Uno', code: 'ELC-0421', qty: 3, confidence: 98, status: 'ready' as const },
-  { id: 's2', name: 'Ultrasonic Sensor', code: 'SNS-1180', qty: 2, confidence: 95, status: 'ready' as const },
-  { id: 's3', name: 'Precision Screwdriver', code: 'TL-0092', qty: 1, confidence: 91, status: 'ready' as const },
-  { id: 's4', name: 'Unknown Sensor', code: '—', qty: 1, confidence: 54, status: 'review' as const },
+export const bulkReturnDetections: BulkReturnDetection[] = [
+  {
+    id: 's1',
+    itemName: 'Arduino Uno',
+    itemCode: 'ELC-0421',
+    quantity: 3,
+    confidence: 96,
+    status: 'ready',
+    top: '15%',
+    left: '8%',
+    width: '31%',
+    height: '25%',
+  },
+  {
+    id: 's2',
+    itemName: 'Ultrasonic Sensor',
+    itemCode: 'SNS-1180',
+    quantity: 2,
+    confidence: 91,
+    status: 'ready',
+    top: '23%',
+    left: '56%',
+    width: '31%',
+    height: '31%',
+    labelSide: 'right',
+  },
+  {
+    id: 's3',
+    itemName: 'Precision Screwdriver',
+    itemCode: 'TL-0092',
+    quantity: 1,
+    confidence: 95,
+    status: 'ready',
+    top: '58%',
+    left: '14%',
+    width: '27%',
+    height: '27%',
+  },
+  {
+    id: 's4',
+    itemName: 'Ultrasonic Sensor',
+    itemCode: 'SNS-1180',
+    quantity: 1,
+    confidence: 54,
+    status: 'review',
+    top: '57%',
+    left: '58%',
+    width: '28%',
+    height: '29%',
+    labelSide: 'right',
+  },
+]
+
+export const bulkReturnReviewCandidates: ReviewCandidate[] = [
+  { id: 'ultrasonic', itemName: 'Ultrasonic Sensor', itemCode: 'SNS-1180', confidence: 54 },
+  { id: 'ir', itemName: 'IR Sensor', itemCode: 'SNS-1204', confidence: 39 },
+]
+
+export const bulkReturnStockBefore: Record<string, number> = {
+  'Arduino Uno': 9,
+  'Ultrasonic Sensor': 14,
+  'Precision Screwdriver': 22,
+  'IR Sensor': 3,
+}
+
+export const offlineStates: OfflineState[] = [
+  {
+    label: 'Online',
+    message: 'Everything is Up to Date.',
+    status: 'online',
+    tone: 'success',
+  },
+  {
+    label: 'Offline Mode',
+    message: 'You can continue working. Changes will sync later.',
+    status: 'offline',
+    tone: 'warning',
+  },
+  {
+    label: 'Saved Offline',
+    message: 'This change is saved on this device.',
+    status: 'saved-offline',
+    tone: 'warning',
+  },
+  {
+    label: 'Syncing',
+    message: 'Updating store records now.',
+    status: 'syncing',
+    tone: 'cyan',
+  },
+  {
+    label: 'Connection Restored',
+    message: 'Your saved changes are syncing.',
+    status: 'restored',
+    tone: 'success',
+  },
+  {
+    label: 'Everything is Up to Date',
+    message: 'All stores are current.',
+    status: 'up-to-date',
+    tone: 'success',
+  },
+]
+
+export const recoveryStates: RecoveryState[] = [
+  {
+    title: 'Camera Not Available',
+    message: 'We could not open the camera on this device.',
+    inventoryChanged: false,
+    actions: ['Try Again', 'Choose Item Manually'],
+    tone: 'warning',
+  },
+  {
+    title: 'We Could Not Identify the Item',
+    message: 'No inventory changes were made.',
+    inventoryChanged: false,
+    actions: ['Try Again', 'Choose Item Manually'],
+    tone: 'warning',
+  },
+  {
+    title: 'Detection Failed',
+    message: 'The scan stopped before ORBIT could confirm the items.',
+    inventoryChanged: false,
+    actions: ['Scan Again'],
+    tone: 'danger',
+  },
+  {
+    title: 'No Inventory Found',
+    message: 'Try a different search or clear your filters.',
+    inventoryChanged: false,
+    actions: ['Clear Search'],
+    tone: 'cyan',
+  },
+  {
+    title: 'Sync Failed',
+    message: 'Your changes are saved offline and will sync later.',
+    inventoryChanged: false,
+    actions: ['Try Again'],
+    tone: 'danger',
+  },
+  {
+    title: 'Unknown Item',
+    message: 'No inventory changes were made.',
+    inventoryChanged: false,
+    actions: ['Choose Item Manually', 'Scan Again'],
+    tone: 'warning',
+  },
 ]

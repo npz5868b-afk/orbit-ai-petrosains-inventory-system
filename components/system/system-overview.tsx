@@ -1,19 +1,31 @@
 'use client'
 
 import { GlassCard, StatusPill } from '@/components/ui-kit'
-import { stores } from '@/lib/mock-data'
+import { getSystemOverview } from '@/lib/services/system-service'
 import { cn } from '@/lib/utils'
 import {
+  CheckCircle2,
   Cpu,
+  Info,
   MapPin,
+  PackageCheck,
   RefreshCw,
   Sparkles,
+  TriangleAlert,
   Wifi,
   WifiOff,
 } from 'lucide-react'
+import { useState } from 'react'
 
 export function SystemOverview() {
+  const { facts, stores, offlineStates, recoveryStates } = getSystemOverview()
+  const [syncState, setSyncState] = useState<'idle' | 'syncing' | 'done'>('idle')
   const online = stores.filter((s) => s.status === 'online').length
+
+  function syncAll() {
+    setSyncState('syncing')
+    window.setTimeout(() => setSyncState('done'), 900)
+  }
 
   return (
     <div>
@@ -41,22 +53,29 @@ export function SystemOverview() {
           <div>
             <p className="font-display text-lg font-semibold">You are online</p>
             <p className="text-sm text-muted-foreground">
-              {online} of {stores.length} stores connected and syncing
+              {online} of {facts.activeStorageLocations} active storage locations connected
             </p>
+            {syncState === 'done' && (
+              <p className="mt-1 text-sm text-success">Everything is up to date.</p>
+            )}
           </div>
         </div>
-        <button className="inline-flex items-center justify-center gap-2 rounded-xl border border-border bg-secondary/60 px-4 py-2.5 text-sm font-medium transition-colors hover:text-cyan">
-          <RefreshCw className="h-4 w-4" />
-          Sync all now
+        <button
+          onClick={syncAll}
+          disabled={syncState === 'syncing'}
+          className="inline-flex items-center justify-center gap-2 rounded-xl border border-border bg-secondary/60 px-4 py-2.5 text-sm font-medium transition-colors hover:text-cyan disabled:opacity-60"
+        >
+          <RefreshCw className={cn('h-4 w-4', syncState === 'syncing' && 'animate-spin')} />
+          {syncState === 'syncing' ? 'Syncing' : 'Sync all now'}
         </button>
       </GlassCard>
 
       {/* stores */}
-      <h2 className="mt-8 animate-rise font-display text-lg font-semibold">Stores</h2>
+      <h2 className="mt-8 animate-rise font-display text-lg font-semibold">Store Status</h2>
       <div className="mt-4 grid gap-3 sm:grid-cols-2">
         {stores.map((s, i) => (
           <GlassCard
-            key={s.name}
+            key={s.id}
             className="animate-rise p-5"
             style={{ animationDelay: `${120 + i * 60}ms` }}
           >
@@ -104,7 +123,40 @@ export function SystemOverview() {
         ))}
       </div>
 
-      {/* offline-first explainer */}
+      {/* sync status */}
+      <h2 className="mt-8 animate-rise font-display text-lg font-semibold">Sync Status</h2>
+      <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {offlineStates.map((state, i) => (
+          <GlassCard
+            key={state.label}
+            className="animate-rise p-4"
+            style={{ animationDelay: `${260 + i * 45}ms` }}
+          >
+            <div className="flex items-start gap-3">
+              <span
+                className={cn(
+                  'mt-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-xl',
+                  state.tone === 'success' && 'bg-success/15 text-success',
+                  state.tone === 'warning' && 'bg-warning/15 text-warning',
+                  state.tone === 'danger' && 'bg-danger/15 text-danger',
+                  state.tone === 'cyan' && 'bg-cyan/15 text-cyan',
+                )}
+              >
+                {state.status === 'offline' || state.status === 'saved-offline' ? (
+                  <WifiOff className="h-4 w-4" />
+                ) : (
+                  <Wifi className="h-4 w-4" />
+                )}
+              </span>
+              <div className="min-w-0">
+                <p className="font-medium">{state.label}</p>
+                <p className="mt-1 text-sm text-muted-foreground">{state.message}</p>
+              </div>
+            </div>
+          </GlassCard>
+        ))}
+      </div>
+
       <div className="mt-8 grid gap-5 lg:grid-cols-2">
         <GlassCard className="animate-rise p-6" style={{ animationDelay: '360ms' }}>
           <span className="grid h-11 w-11 place-items-center rounded-xl bg-cyan/15 text-cyan">
@@ -128,7 +180,7 @@ export function SystemOverview() {
           <span className="grid h-11 w-11 place-items-center rounded-xl bg-violet/15 text-violet">
             <Cpu className="h-5 w-5" />
           </span>
-          <h3 className="mt-4 font-display text-lg font-semibold">How the AI helps</h3>
+          <h3 className="mt-4 font-display text-lg font-semibold">AI Details</h3>
           <ul className="mt-3 space-y-2.5 text-sm text-muted-foreground">
             {[
               'Recognizes many items at once from a single camera view',
@@ -142,6 +194,64 @@ export function SystemOverview() {
               </li>
             ))}
           </ul>
+        </GlassCard>
+      </div>
+
+      <div className="mt-8 grid gap-5 lg:grid-cols-[0.85fr_1.15fr]">
+        <GlassCard className="animate-rise p-6" style={{ animationDelay: '480ms' }}>
+          <span className="grid h-11 w-11 place-items-center rounded-xl bg-success/15 text-success">
+            <Info className="h-5 w-5" />
+          </span>
+          <h3 className="mt-4 font-display text-lg font-semibold">App Information</h3>
+          <div className="mt-4 grid gap-2 text-sm">
+            <div className="flex items-center justify-between rounded-xl border border-border bg-secondary/35 px-3 py-2.5">
+              <span className="text-muted-foreground">Item Types</span>
+              <span className="font-semibold">{facts.itemTypes}</span>
+            </div>
+            <div className="flex items-center justify-between rounded-xl border border-border bg-secondary/35 px-3 py-2.5">
+              <span className="text-muted-foreground">Categories</span>
+              <span className="font-semibold">{facts.categories}</span>
+            </div>
+            <div className="flex items-center justify-between rounded-xl border border-border bg-secondary/35 px-3 py-2.5">
+              <span className="text-muted-foreground">Active storage locations</span>
+              <span className="font-semibold">{facts.activeStorageLocations}</span>
+            </div>
+          </div>
+        </GlassCard>
+
+        <GlassCard className="animate-rise p-6" style={{ animationDelay: '540ms' }}>
+          <span className="grid h-11 w-11 place-items-center rounded-xl bg-warning/15 text-warning">
+            <TriangleAlert className="h-5 w-5" />
+          </span>
+          <h3 className="mt-4 font-display text-lg font-semibold">Recovery States</h3>
+          <div className="mt-4 grid gap-2">
+            {recoveryStates.map((state) => (
+              <div
+                key={state.title}
+                className="rounded-xl border border-border bg-secondary/30 p-3"
+              >
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <p className="font-medium">{state.title}</p>
+                  <StatusPill
+                    label={state.inventoryChanged ? 'Inventory changed' : 'No inventory changes'}
+                    tone={state.inventoryChanged ? 'warning' : 'success'}
+                  />
+                </div>
+                <p className="mt-1 text-sm text-muted-foreground">{state.message}</p>
+                <div className="mt-2 flex flex-wrap gap-1.5">
+                  {state.actions.map((action) => (
+                    <span
+                      key={action}
+                      className="inline-flex items-center gap-1 rounded-full border border-border bg-secondary/45 px-2.5 py-1 text-xs text-muted-foreground"
+                    >
+                      <PackageCheck className="h-3 w-3" />
+                      {action}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
         </GlassCard>
       </div>
     </div>

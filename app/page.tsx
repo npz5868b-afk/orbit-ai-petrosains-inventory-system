@@ -1,6 +1,6 @@
 import { AppShell } from '@/components/app-shell'
 import { CountUp, GlassCard, SectionHeading, StatusPill } from '@/components/ui-kit'
-import { homeStats, needsAttention } from '@/lib/mock-data'
+import { getHomeStats, getNeedsAttention } from '@/lib/services/inventory-service'
 import { cn } from '@/lib/utils'
 import {
   ArrowRight,
@@ -20,6 +20,9 @@ const toneAccent: Record<string, string> = {
 }
 
 export default function HomePage() {
+  const homeStats = getHomeStats()
+  const needsAttention = getNeedsAttention()
+
   return (
     <AppShell>
       {/* Hero / branding */}
@@ -29,7 +32,8 @@ export default function HomePage() {
           Smart Inventory Operations
         </div>
         <h1 className="mt-3 font-display text-4xl font-bold tracking-tight text-balance sm:text-5xl">
-          Welcome back to <span className="text-glow-cyan text-cyan">ORBIT AI</span>
+          Welcome back to{' '}
+          <span className="text-glow-cyan block text-cyan sm:inline">ORBIT AI</span>
         </h1>
         <p className="mt-3 max-w-xl text-pretty text-base text-muted-foreground sm:text-lg">
           Scan, track and manage inventory with speed and clarity — for Petrosains.
@@ -42,18 +46,24 @@ export default function HomePage() {
           {/* Bulk Return — hero card, spans wider on large screens */}
           <Link
             href="/scan?flow=bulk-return"
-            className="group relative order-first overflow-hidden rounded-3xl border border-violet/30 p-7 glow-violet lg:col-span-2 lg:row-span-1 animate-rise"
+            className="group flagship-breathe premium-hover relative isolate order-first overflow-hidden rounded-3xl border border-violet/30 p-7 lg:col-span-2 lg:row-span-1 animate-rise"
             style={{ animationDelay: '60ms' }}
           >
-            <div className="absolute inset-0 bg-gradient-to-br from-violet/25 via-card/60 to-cyan/15" />
+            <div className="absolute inset-0 bg-gradient-to-br from-violet/28 via-card/72 to-cyan/18" />
+            <div className="absolute inset-0 opacity-25 [background-image:linear-gradient(90deg,oklch(0.8_0.14_205/0.28)_1px,transparent_1px),linear-gradient(oklch(0.8_0.14_205/0.18)_1px,transparent_1px)] [background-size:46px_46px]" />
+            <div className="absolute inset-x-8 top-6 h-px bg-gradient-to-r from-transparent via-cyan/60 to-transparent opacity-70 transition-transform duration-500 group-hover:translate-x-3" />
             <div
-              className="absolute -right-10 -top-10 h-48 w-48 rounded-full opacity-60 blur-2xl"
+              className="absolute -right-8 -top-12 h-56 w-56 rounded-full opacity-70 blur-3xl"
               style={{ background: 'radial-gradient(circle, var(--violet), transparent 65%)' }}
+            />
+            <div
+              className="absolute -bottom-20 left-12 h-56 w-56 rounded-full opacity-50 blur-3xl"
+              style={{ background: 'radial-gradient(circle, var(--cyan), transparent 68%)' }}
             />
             <div className="relative flex h-full flex-col">
               <div className="flex items-center justify-between">
                 <StatusPill label="Most used" tone="violet" pulse />
-                <span className="grid h-12 w-12 place-items-center rounded-2xl border border-violet/40 bg-violet/15">
+                <span className="grid h-12 w-12 place-items-center rounded-2xl border border-violet/40 bg-violet/15 shadow-[0_0_26px_-12px_var(--violet)]">
                   <PackageCheck className="h-6 w-6 text-violet" />
                 </span>
               </div>
@@ -64,7 +74,7 @@ export default function HomePage() {
                 Scan multiple returned items at once. The camera detects everything
                 in view and updates inventory in seconds.
               </p>
-              <span className="mt-6 inline-flex w-fit items-center gap-2 rounded-xl bg-gradient-to-r from-violet to-cyan px-5 py-3 text-sm font-semibold text-primary-foreground transition-all group-hover:shadow-[0_0_34px_-4px_var(--violet)]">
+              <span className="cta-sheen mt-6 inline-flex w-fit items-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold text-primary-foreground transition-all group-hover:shadow-[0_0_34px_-4px_var(--violet)]">
                 Start Bulk Return
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
               </span>
@@ -152,10 +162,13 @@ export default function HomePage() {
                 <p className="truncate font-medium">{n.title}</p>
                 <p className="truncate text-sm text-muted-foreground">{n.detail}</p>
               </div>
-              <button className="inline-flex shrink-0 items-center gap-1 rounded-lg border border-border bg-secondary/60 px-3 py-2 text-sm font-medium text-foreground transition-colors hover:border-cyan/40 hover:text-cyan">
+              <Link
+                href={n.href}
+                className="inline-flex shrink-0 items-center gap-1 rounded-lg border border-border bg-secondary/60 px-3 py-2 text-sm font-medium text-foreground transition-colors hover:border-cyan/40 hover:text-cyan"
+              >
                 {n.action}
                 <ChevronRight className="h-4 w-4" />
-              </button>
+              </Link>
             </GlassCard>
           ))}
         </div>
@@ -184,9 +197,10 @@ function ActionCard({
   return (
     <Link
       href={href}
-      className="group animate-rise relative flex flex-col overflow-hidden rounded-3xl glass p-6 transition-all duration-300 hover:-translate-y-1 hover:glow-cyan"
+      className="group animate-rise premium-hover relative flex flex-col overflow-hidden rounded-3xl glass p-6"
       style={{ animationDelay: delay }}
     >
+      <span className="absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-cyan/35 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
       <span
         className={cn(
           'grid h-12 w-12 place-items-center rounded-2xl border',
