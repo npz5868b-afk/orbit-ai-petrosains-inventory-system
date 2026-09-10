@@ -1,24 +1,30 @@
 import {
-  homeStats,
-  inventory,
-  needsAttention,
-  officialChallengeFacts,
   statusMeta,
-  stores,
 } from '@/lib/mock-data'
+import {
+  officialFacts,
+  officialHomeStats,
+  officialInventory,
+  officialNeedsAttention,
+  officialStores,
+} from '@/lib/official-catalog'
 import type { InventoryItem, InventoryStatus, ItemKind } from '@/lib/types'
 
 export function getInventory() {
-  return inventory
+  return officialInventory
 }
 
 export function getInventoryItem(id: string) {
-  return inventory.find((item) => item.id === id)
+  return officialInventory.find((item) => item.id === id)
 }
 
-export function searchInventory(query: string, filter: 'all' | InventoryStatus = 'all') {
+export function searchInventory(
+  query: string,
+  filter: 'all' | InventoryStatus = 'all',
+  source: InventoryItem[] = officialInventory,
+) {
   const q = query.trim().toLowerCase()
-  return inventory.filter((item) => {
+  return source.filter((item) => {
     const matchesFilter = filter === 'all' || item.status === filter
     const matchesQuery =
       !q ||
@@ -31,15 +37,15 @@ export function searchInventory(query: string, filter: 'all' | InventoryStatus =
 }
 
 export function getInventoryFacts() {
-  return officialChallengeFacts
+  return officialFacts
 }
 
 export function getHomeStats() {
-  return homeStats
+  return officialHomeStats
 }
 
 export function getNeedsAttention() {
-  return needsAttention
+  return officialNeedsAttention
 }
 
 export function getInventoryStatusMeta() {
@@ -47,7 +53,7 @@ export function getInventoryStatusMeta() {
 }
 
 export function getStoreStatuses() {
-  return stores
+  return officialStores
 }
 
 export function getInventoryActions(item: Pick<InventoryItem, 'kind'>) {
@@ -68,7 +74,7 @@ export function getInventoryActions(item: Pick<InventoryItem, 'kind'>) {
 
 export function getAvailableCategories() {
   const categories = new Set<string>()
-  inventory.forEach((item) => categories.add(item.category))
+  officialInventory.forEach((item) => categories.add(item.category))
   return [...categories]
 }
 

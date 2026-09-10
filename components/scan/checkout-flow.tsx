@@ -2,10 +2,11 @@
 
 import { GlassCard, StatusPill } from '@/components/ui-kit'
 import {
-  checkoutItems,
   getCheckoutScanCatalog,
   getTeams,
 } from '@/lib/services/scan-service'
+import { itemIdFromCode } from '@/lib/official-catalog'
+import { submitOrQueue } from '@/lib/offline-queue'
 import { cn } from '@/lib/utils'
 import {
   ArrowRight,
@@ -17,7 +18,7 @@ import {
   Users,
 } from 'lucide-react'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 
 type Step = 0 | 1 | 2 | 3 | 4
 
@@ -32,6 +33,9 @@ export function CheckoutFlow({ onExit }: { onExit: () => void }) {
   const [who, setWho] = useState<string | null>(null)
   const [scanned, setScanned] = useState(0)
   const [cart, setCart] = useState<CartItem[]>([])
+  const [submitState, setSubmitState] = useState<'idle' | 'submitting' | 'synced' | 'saved-offline'>('idle')
+  const [error, setError] = useState<string | null>(null)
+  const transactionId = useRef<string | null>(null)
 
   const current = catalog[scanned % catalog.length]
 
@@ -60,9 +64,30 @@ export function CheckoutFlow({ onExit }: { onExit: () => void }) {
     setStep((currentStep) => Math.max(0, currentStep - 1) as Step)
   }
 
-  function confirmCheckout() {
-    checkoutItems(cart.map((item) => ({ itemCode: item.itemCode, quantity: item.qty })))
-    setStep(3)
+  async function confirmCheckout() {
+    if (submitState === 'submitting' || !who) return
+    setSubmitState('submitting')
+    setError(null)
+    transactionId.current ??= crypto.randomUUID()
+    try {
+      const items = cart.map((item) => {
+        const itemId = itemIdFromCode(item.itemCode)
+        if (!itemId) throw new Error(`Official item ${item.itemCode} is not mapped`)
+        return { item_id: itemId, quantity: item.qty, unit: 'unit' }
+      })
+      const result = await submitOrQueue('checkout', {
+        client_transaction_id: transactionId.current,
+        store_id: 'store-1',
+        user_name: who,
+        items,
+        notes: null,
+      })
+      setSubmitState(result.state)
+      setStep(3)
+    } catch (cause) {
+      setSubmitState('idle')
+      setError(cause instanceof Error ? cause.message : 'Check-out could not be completed')
+    }
   }
 
   const totalItems = cart.reduce((s, c) => s + c.qty, 0)
@@ -282,10 +307,12 @@ export function CheckoutFlow({ onExit }: { onExit: () => void }) {
           </div>
           <button
             onClick={confirmCheckout}
+            disabled={submitState === 'submitting'}
             className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-cyan to-teal px-5 py-3.5 text-sm font-semibold text-primary-foreground transition-all hover:shadow-[0_0_30px_-4px_var(--cyan)]"
           >
-            Confirm Check-out
+            {submitState === 'submitting' ? 'Saving…' : 'Confirm Check-out'}
           </button>
+          {error && <p className="mt-3 text-sm text-danger">{error}</p>}
         </GlassCard>
       )}
 
@@ -301,7 +328,11 @@ export function CheckoutFlow({ onExit }: { onExit: () => void }) {
               <Sparkles className="h-7 w-7" />
             </span>
           </div>
-          <p className="mt-4 font-medium">Assigning items to {who}...</p>
+          <p className="mt-4 font-medium">
+            {submitState === 'saved-offline'
+              ? 'Saved on this device. It will sync when the connection returns.'
+              : `Items assigned to ${who}. Inventory was updated once.`}
+          </p>
           <button
             onClick={() => setStep(4)}
             className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-cyan to-teal px-5 py-3 text-sm font-semibold text-primary-foreground transition-all hover:shadow-[0_0_30px_-4px_var(--cyan)]"
@@ -325,7 +356,7 @@ export function CheckoutFlow({ onExit }: { onExit: () => void }) {
           </div>
           <h3 className="mt-5 font-display text-2xl font-bold">Check-out Complete</h3>
           <p className="mt-1 text-sm text-muted-foreground">
-            {totalItems} items assigned to {who}.
+            {totalItems} items assigned to {who}. {submitState === 'saved-offline' ? 'Saved Offline.' : 'Synced.'}
           </p>
           <div className="mt-6 flex flex-col gap-2.5 sm:flex-row">
             <button

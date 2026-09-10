@@ -3,11 +3,11 @@
 import { GlassCard, StatusPill } from '@/components/ui-kit'
 import {
   filterActivities,
-  getActivities,
   getActivityStatusMeta,
   type ActivityFilter,
 } from '@/lib/services/activity-service'
 import type { ActivityRecord } from '@/lib/types'
+import { fetchActivitiesFromApi } from '@/lib/api-client'
 import { cn } from '@/lib/utils'
 import {
   ChevronDown,
@@ -19,7 +19,7 @@ import {
   Undo2,
 } from 'lucide-react'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 const typeMeta = {
   'check-out': { icon: ScanLine, tone: 'cyan' as const, bg: 'bg-cyan/15 text-cyan' },
@@ -29,14 +29,21 @@ const typeMeta = {
 
 export function ActivityTimeline() {
   const [filter, setFilter] = useState<ActivityFilter>('all')
-  const activities = getActivities()
-  const list = filterActivities(filter)
+  const [activities, setActivities] = useState<ActivityRecord[]>([])
+  const list = filterActivities(filter, activities)
   const filters: { key: ActivityFilter; label: string }[] = [
     { key: 'all', label: 'All' },
     { key: 'check-out', label: 'Check-outs' },
     { key: 'return', label: 'Returns' },
     { key: 'issue', label: 'Issues' },
   ]
+
+  useEffect(() => {
+    const refresh = () => fetchActivitiesFromApi().then(setActivities).catch(() => undefined)
+    refresh()
+    window.addEventListener('orbit:inventory-updated', refresh)
+    return () => window.removeEventListener('orbit:inventory-updated', refresh)
+  }, [])
 
   return (
     <div>
@@ -71,7 +78,11 @@ export function ActivityTimeline() {
       </div>
 
       <div className="mt-6 flex flex-col gap-3">
-        {list.map((a, i) => (
+        {list.length === 0 ? (
+          <GlassCard className="p-10 text-center text-sm text-muted-foreground">
+            No activity yet. Complete a check-out or return to create the first audit record.
+          </GlassCard>
+        ) : list.map((a, i) => (
           <ActivityCard key={a.id} activity={a} delay={i * 60} />
         ))}
       </div>

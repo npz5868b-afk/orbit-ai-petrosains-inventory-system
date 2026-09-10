@@ -1,0 +1,2 @@
+# Install only after reviewed object-detection annotations are available.
+ultralytics==8.3.199

@@ -7,8 +7,15 @@ import {
   detectItems,
   getBulkReturnReviewCandidates,
   previewBulkReturnStockUpdate,
-  returnItems,
 } from '@/lib/services/scan-service'
+import {
+  notifyInventoryUpdated,
+  resolveScanReview,
+  startBulkScan,
+  type ApiScan,
+  type TransactionResponse,
+} from '@/lib/api-client'
+import { submitOrQueue } from '@/lib/offline-queue'
 import type { BulkReturnItem, ReviewCandidate } from '@/lib/types'
 import { cn } from '@/lib/utils'
 import {
@@ -27,6 +34,7 @@ import { useEffect, useRef, useState } from 'react'
 import { CameraView } from './camera-view'
 
 type Stage = 'camera' | 'scanning' | 'found' | 'review' | 'summary' | 'updated'
+const BULK_RETURN_STATE_KEY = 'orbit-ai:bulk-return-state:v1'
 
 export function BulkReturnFlow({
   onExit,
@@ -35,9 +43,17 @@ export function BulkReturnFlow({
   onExit: () => void
   initialStage?: Stage
 }) {
-  const detectedItems = detectItems()
-  const reviewCandidates = getBulkReturnReviewCandidates()
-  const defaultReviewCandidate = reviewCandidates[0]!
+  const initialDetections = detectItems()
+  const initialReviewCandidates = getBulkReturnReviewCandidates()
+  const [detectedItems, setDetectedItems] = useState(initialDetections)
+  const [reviewCandidates, setReviewCandidates] = useState(initialReviewCandidates)
+  const defaultReviewCandidate = reviewCandidates[0] ?? initialReviewCandidates[0]!
+  const [scan, setScan] = useState<ApiScan | null>(null)
+  const [transactionResult, setTransactionResult] = useState<TransactionResponse | null>(null)
+  const [submitState, setSubmitState] = useState<'idle' | 'submitting' | 'synced' | 'saved-offline'>('idle')
+  const [error, setError] = useState<string | null>(null)
+  const [hydrated, setHydrated] = useState(false)
+  const transactionId = useRef<string | null>(null)
   const [stage, setStage] = useState<Stage>(initialStage)
   const [revealed, setRevealed] = useState(initialStage === 'review' ? detectedItems.length : 0)
   const [confirmedReviewCandidate, setConfirmedReviewCandidate] =
@@ -48,24 +64,136 @@ export function BulkReturnFlow({
     return () => timers.current.forEach(clearTimeout)
   }, [])
 
+  useEffect(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem(BULK_RETURN_STATE_KEY) ?? 'null')
+      if (saved?.scan && saved?.stage && saved.stage !== 'scanning') {
+        setScan(saved.scan)
+        setDetectedItems(saved.detectedItems ?? initialDetections)
+        setReviewCandidates(saved.reviewCandidates ?? initialReviewCandidates)
+        setConfirmedReviewCandidate(saved.confirmedReviewCandidate ?? initialReviewCandidates[0])
+        setTransactionResult(saved.transactionResult ?? null)
+        setSubmitState(saved.submitState ?? 'idle')
+        setRevealed(saved.detectedItems?.length ?? 0)
+        setStage(saved.stage)
+      }
+    } catch {
+      localStorage.removeItem(BULK_RETURN_STATE_KEY)
+    }
+    setHydrated(true)
+  }, [])
+
+  useEffect(() => {
+    if (!hydrated || stage === 'camera' || stage === 'scanning') return
+    localStorage.setItem(BULK_RETURN_STATE_KEY, JSON.stringify({
+      stage,
+      scan,
+      detectedItems,
+      reviewCandidates,
+      confirmedReviewCandidate,
+      transactionResult,
+      submitState,
+    }))
+  }, [hydrated, stage, scan, detectedItems, reviewCandidates, confirmedReviewCandidate, transactionResult, submitState])
+
+  function exitFlow() {
+    localStorage.removeItem(BULK_RETURN_STATE_KEY)
+    onExit()
+  }
+
   function clearScanTimers() {
     timers.current.forEach(clearTimeout)
     timers.current = []
   }
 
-  function startScan() {
+  async function startScan() {
     clearScanTimers()
     setStage('scanning')
     setRevealed(0)
     setConfirmedReviewCandidate(defaultReviewCandidate)
-    detectedItems.forEach((_, i) => {
-      timers.current.push(
-        setTimeout(() => setRevealed(i + 1), 700 + i * 900),
+    setError(null)
+    try {
+      const nextScan = await startBulkScan('mixed')
+      setScan(nextScan)
+      const nextItems: BulkReturnItem[] = nextScan.items
+        .filter((item) => item.status !== 'rejected')
+        .map((item) => ({
+          id: item.detection_id,
+          itemCode: item.item?.sku ?? 'UNKNOWN',
+          itemName: item.item?.name ?? 'Unknown item',
+          quantity: item.quantity,
+          confidence: Math.round(item.confidence * 100),
+          status: item.status === 'review_needed' ? 'review' : item.status === 'resolved' ? 'reviewed' : 'ready',
+        }))
+      const reviewLine = nextScan.items.find((item) => item.status === 'review_needed')
+      const candidates = reviewLine?.possible_matches.map((candidate) => ({
+        id: candidate.item_id,
+        itemCode: candidate.sku,
+        itemName: candidate.name,
+        confidence: Math.round(candidate.confidence * 100),
+      })) ?? []
+      setDetectedItems(nextItems)
+      if (candidates.length) setReviewCandidates(candidates)
+      nextItems.forEach((_, i) => {
+        timers.current.push(setTimeout(() => setRevealed(i + 1), 300 + i * 450))
+      })
+      timers.current.push(setTimeout(() => setStage('found'), 300 + nextItems.length * 450 + 300))
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'The scan could not be processed')
+      setStage('camera')
+    }
+  }
+
+  async function confirmReview(candidate: ReviewCandidate) {
+    const reviewLine = scan?.items.find((item) => item.status === 'review_needed')
+    if (!scan || !reviewLine) return
+    setError(null)
+    try {
+      const updated = await resolveScanReview(
+        scan.scan_session_id,
+        reviewLine.detection_id,
+        candidate.id,
+        reviewLine.quantity,
       )
-    })
-    timers.current.push(
-      setTimeout(() => setStage('found'), 700 + detectedItems.length * 900 + 500),
-    )
+      setScan(updated)
+      setDetectedItems((items) => items.map((item) =>
+        item.id === reviewLine.detection_id ? confirmDetection(item, candidate) : item,
+      ))
+      setConfirmedReviewCandidate(candidate)
+      setStage('summary')
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'Review could not be saved')
+    }
+  }
+
+  async function confirmReturn() {
+    if (!scan || submitState === 'submitting') return
+    setSubmitState('submitting')
+    setError(null)
+    transactionId.current ??= crypto.randomUUID()
+    try {
+      const included = scan.items.filter((item) => item.status !== 'rejected')
+      const result = await submitOrQueue('return', {
+        client_transaction_id: transactionId.current,
+        scan_session_id: scan.scan_session_id,
+        store_id: 'store-1',
+        user_name: 'Demo User',
+        items: included.map((item) => ({
+          detection_id: item.detection_id,
+          item_id: item.item!.id,
+          quantity: item.quantity,
+          unit: 'unit',
+          condition: 'good' as const,
+        })),
+      })
+      setSubmitState(result.state)
+      setTransactionResult(result.response ?? null)
+      notifyInventoryUpdated()
+      setStage('updated')
+    } catch (cause) {
+      setSubmitState('idle')
+      setError(cause instanceof Error ? cause.message : 'The return could not be completed')
+    }
   }
 
   const revealedCount = stage === 'camera' ? 0 : revealed
@@ -79,8 +207,13 @@ export function BulkReturnFlow({
     <div>
       <FlowHeader
         stage={stage}
-        onExit={onExit}
+        onExit={exitFlow}
       />
+      {error && (
+        <div className="mb-4 rounded-xl border border-danger/30 bg-danger/10 p-3 text-sm text-danger">
+          {error}
+        </div>
+      )}
 
       {(stage === 'camera' || stage === 'scanning' || stage === 'found') && (
         <div className="grid gap-5 lg:grid-cols-[1.45fr_0.95fr]">
@@ -214,12 +347,11 @@ export function BulkReturnFlow({
       {stage === 'review' && (
         <ReviewNeeded
           candidates={reviewCandidates}
-          onConfirm={(candidate) => {
-            setConfirmedReviewCandidate(candidate)
-            setStage('summary')
-          }}
+          whyReasons={scan?.items.find((item) => item.status === 'review_needed')?.why ?? ['Confidence is below the ready threshold']}
+          onConfirm={confirmReview}
           onScanAgain={() => {
             clearScanTimers()
+            localStorage.removeItem(BULK_RETURN_STATE_KEY)
             setRevealed(0)
             setStage('camera')
           }}
@@ -230,12 +362,18 @@ export function BulkReturnFlow({
         <ReturnSummary
           total={totalItems}
           items={confirmedItems}
-          onConfirm={() => setStage('updated')}
+          onConfirm={confirmReturn}
+          submitting={submitState === 'submitting'}
         />
       )}
 
       {stage === 'updated' && (
-        <InventoryUpdated onExit={onExit} items={confirmedItems} />
+        <InventoryUpdated
+          onExit={exitFlow}
+          items={confirmedItems}
+          transactionResult={transactionResult}
+          savedOffline={submitState === 'saved-offline'}
+        />
       )}
     </div>
   )
@@ -288,11 +426,13 @@ function FlowHeader({ stage, onExit }: { stage: Stage; onExit: () => void }) {
 
 function ReviewNeeded({
   candidates,
+  whyReasons,
   onConfirm,
   onScanAgain,
 }: {
   candidates: ReviewCandidate[]
-  onConfirm: (candidate: ReviewCandidate) => void
+  whyReasons: string[]
+  onConfirm: (candidate: ReviewCandidate) => void | Promise<void>
   onScanAgain: () => void
 }) {
   const [why, setWhy] = useState(false)
@@ -390,9 +530,7 @@ function ReviewNeeded({
           </button>
           {why && (
             <ul className="animate-rise mt-2 space-y-1.5 rounded-xl border border-border bg-secondary/20 p-4 text-sm text-muted-foreground">
-              <li>Similar shape detected</li>
-              <li>Label was partly hidden</li>
-              <li>Image confidence was low</li>
+              {whyReasons.map((reason) => <li key={reason}>{reason}</li>)}
             </ul>
           )}
 
@@ -428,10 +566,12 @@ function ReturnSummary({
   total,
   items,
   onConfirm,
+  submitting,
 }: {
   total: number
   items: BulkReturnItem[]
-  onConfirm: () => void
+  onConfirm: () => void | Promise<void>
+  submitting: boolean
 }) {
   const reviewedCount = items.filter((item) => item.status === 'reviewed').length
 
@@ -477,11 +617,12 @@ function ReturnSummary({
       </div>
 
       <button
-        onClick={onConfirm}
+        onClick={() => void onConfirm()}
+        disabled={submitting}
         className="cta-sheen mt-5 inline-flex w-full items-center justify-center gap-2 rounded-xl px-5 py-3.5 text-sm font-semibold text-primary-foreground transition-all hover:shadow-[0_0_34px_-4px_var(--violet)]"
       >
         <PackageCheck className="h-5 w-5" />
-        Confirm Return
+        {submitting ? 'Saving Return…' : 'Confirm Return'}
       </button>
     </GlassCard>
   )
@@ -490,12 +631,23 @@ function ReturnSummary({
 function InventoryUpdated({
   onExit,
   items,
+  transactionResult,
+  savedOffline,
 }: {
   onExit: () => void
   items: BulkReturnItem[]
+  transactionResult: TransactionResponse | null
+  savedOffline: boolean
 }) {
-  const stockRows = previewBulkReturnStockUpdate(items)
-  const result = returnItems(items)
+  const stockRows = transactionResult
+    ? transactionResult.changes.map((change) => ({
+        name: change.name,
+        before: change.quantity_before,
+        after: change.quantity_after,
+        returned: change.quantity_returned ?? 0,
+      }))
+    : previewBulkReturnStockUpdate(items)
+  const totalItems = transactionResult?.total_items_returned ?? items.reduce((sum, item) => sum + item.quantity, 0)
 
   return (
     <div className="mx-auto max-w-2xl">
@@ -513,28 +665,28 @@ function InventoryUpdated({
           Inventory Updated
         </h3>
         <p className="mt-1 text-sm text-muted-foreground">
-          Everything synced successfully.
+          {savedOffline ? 'Saved Offline. This return will sync automatically.' : 'Everything synced successfully.'}
         </p>
 
         <div className="mt-6 grid gap-3 sm:grid-cols-3">
           <div className="rounded-xl border border-success/20 bg-success/[0.055] p-3">
             <p className="font-display text-xl font-bold text-success">
-              <CountUp value={result.totalItems} />
+              <CountUp value={totalItems} />
             </p>
             <p className="mt-0.5 text-xs text-muted-foreground">items returned</p>
           </div>
           <div className="rounded-xl border border-border bg-secondary/40 p-3">
             <p className="font-display text-xl font-bold text-cyan">
-              <CountUp value={result.reviewRemaining} />
+              <CountUp value={0} />
             </p>
             <p className="mt-0.5 text-xs text-muted-foreground">items need review</p>
           </div>
           <div className="rounded-xl border border-border bg-secondary/40 p-3">
             <p className="flex items-center justify-center gap-1.5 font-display text-xl font-bold text-cyan">
               <Clock3 className="h-4 w-4" />
-              8.4s
+              {savedOffline ? 'Queued' : 'Synced'}
             </p>
-            <p className="mt-0.5 text-xs text-muted-foreground">completed in</p>
+            <p className="mt-0.5 text-xs text-muted-foreground">transaction status</p>
           </div>
         </div>
 

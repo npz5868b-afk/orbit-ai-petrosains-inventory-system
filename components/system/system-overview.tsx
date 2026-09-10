@@ -2,6 +2,8 @@
 
 import { GlassCard, StatusPill } from '@/components/ui-kit'
 import { getSystemOverview } from '@/lib/services/system-service'
+import { fetchStoresFromApi } from '@/lib/api-client'
+import { flushOfflineQueue, getPendingOperations } from '@/lib/offline-queue'
 import { cn } from '@/lib/utils'
 import {
   CheckCircle2,
@@ -15,16 +17,44 @@ import {
   Wifi,
   WifiOff,
 } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 export function SystemOverview() {
-  const { facts, stores, offlineStates, recoveryStates } = getSystemOverview()
+  const overview = getSystemOverview()
+  const { facts, offlineStates, recoveryStates } = overview
+  const [stores, setStores] = useState(overview.stores)
+  const [pendingCount, setPendingCount] = useState(0)
+  const [conflictCount, setConflictCount] = useState(0)
   const [syncState, setSyncState] = useState<'idle' | 'syncing' | 'done'>('idle')
   const online = stores.filter((s) => s.status === 'online').length
 
-  function syncAll() {
+  useEffect(() => {
+    const refresh = () => {
+      const pending = getPendingOperations()
+      setPendingCount(pending.length)
+      setConflictCount(pending.filter((operation) => operation.status === 'conflict').length)
+      fetchStoresFromApi().then(setStores).catch(() => undefined)
+    }
+    refresh()
+    window.addEventListener('online', refresh)
+    window.addEventListener('orbit:queue-changed', refresh)
+    return () => {
+      window.removeEventListener('online', refresh)
+      window.removeEventListener('orbit:queue-changed', refresh)
+    }
+  }, [])
+
+  async function syncAll() {
     setSyncState('syncing')
-    window.setTimeout(() => setSyncState('done'), 900)
+    try {
+      await flushOfflineQueue()
+      setPendingCount(getPendingOperations().length)
+      setConflictCount(getPendingOperations().filter((operation) => operation.status === 'conflict').length)
+      setStores(await fetchStoresFromApi())
+      setSyncState('done')
+    } catch {
+      setSyncState('idle')
+    }
   }
 
   return (
@@ -57,6 +87,12 @@ export function SystemOverview() {
             </p>
             {syncState === 'done' && (
               <p className="mt-1 text-sm text-success">Everything is up to date.</p>
+            )}
+            {pendingCount > 0 && (
+              <p className="mt-1 text-sm text-warning">{pendingCount} operation(s) saved on this device.</p>
+            )}
+            {conflictCount > 0 && (
+              <p className="mt-1 text-sm text-danger">{conflictCount} sync conflict(s) need review before retrying.</p>
             )}
           </div>
         </div>

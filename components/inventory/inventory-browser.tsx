@@ -2,16 +2,18 @@
 
 import { GlassCard, StatusPill } from '@/components/ui-kit'
 import {
+  getInventory,
   getInventoryFacts,
   getInventoryStatusMeta,
   searchInventory,
 } from '@/lib/services/inventory-service'
+import { fetchInventoryFromApi } from '@/lib/api-client'
 import type { InventoryStatus } from '@/lib/types'
 import { cn } from '@/lib/utils'
 import { ChevronRight, MapPin, Search } from 'lucide-react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 const FILTERS: { key: 'all' | InventoryStatus; label: string }[] = [
   { key: 'all', label: 'All' },
@@ -25,12 +27,36 @@ export function InventoryBrowser() {
   const initialFilter = params.get('filter') === 'attention' ? 'attention' : 'all'
   const [query, setQuery] = useState('')
   const [filter, setFilter] = useState<'all' | InventoryStatus>(initialFilter)
+  const [items, setItems] = useState(getInventory())
+  const [loadState, setLoadState] = useState<'loading' | 'live' | 'offline'>('loading')
   const facts = getInventoryFacts()
   const statusMeta = getInventoryStatusMeta()
 
+  useEffect(() => {
+    let active = true
+    const refresh = () => {
+      fetchInventoryFromApi()
+        .then((next) => {
+          if (active) {
+            setItems(next)
+            setLoadState('live')
+          }
+        })
+        .catch(() => {
+          if (active) setLoadState('offline')
+        })
+    }
+    refresh()
+    window.addEventListener('orbit:inventory-updated', refresh)
+    return () => {
+      active = false
+      window.removeEventListener('orbit:inventory-updated', refresh)
+    }
+  }, [])
+
   const results = useMemo(() => {
-    return searchInventory(query, filter)
-  }, [query, filter])
+    return searchInventory(query, filter, items)
+  }, [query, filter, items])
 
   return (
     <div>
@@ -40,6 +66,9 @@ export function InventoryBrowser() {
         </h1>
         <p className="mt-2 text-muted-foreground">
           Search items across all stores. {facts.itemTypes} item types available.
+        </p>
+        <p className={cn('mt-1 text-xs', loadState === 'live' ? 'text-success' : loadState === 'offline' ? 'text-warning' : 'text-muted-foreground')}>
+          {loadState === 'live' ? 'Live inventory connected' : loadState === 'offline' ? 'Showing the saved official catalog while offline' : 'Connecting to inventory…'}
         </p>
       </div>
 

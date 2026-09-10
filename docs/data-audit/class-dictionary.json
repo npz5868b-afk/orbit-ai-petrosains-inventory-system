@@ -1,0 +1,983 @@
+[
+  {
+    "class_index": 0,
+    "official_sku": "C001",
+    "item_id": "item-c001",
+    "name": "Tracing paper",
+    "category": "Craft Materials & STEM Kits",
+    "source_folder": "C001_tracing paper",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 1,
+    "official_sku": "C002",
+    "item_id": "item-c002",
+    "name": "Paper cup",
+    "category": "Craft Materials & STEM Kits",
+    "source_folder": "C002_paper cup",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 2,
+    "official_sku": "C003",
+    "item_id": "item-c003",
+    "name": "Thread",
+    "category": "Craft Materials & STEM Kits",
+    "source_folder": "C003_thread",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 3,
+    "official_sku": "C004",
+    "item_id": "item-c004",
+    "name": "Needle",
+    "category": "Craft Materials & STEM Kits",
+    "source_folder": "C004_needle",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 4,
+    "official_sku": "C005",
+    "item_id": "item-c005",
+    "name": "Yarn",
+    "category": "Craft Materials & STEM Kits",
+    "source_folder": "C005_yarn",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 5,
+    "official_sku": "C006",
+    "item_id": "item-c006",
+    "name": "Air clay",
+    "category": "Craft Materials & STEM Kits",
+    "source_folder": "C006_air clay",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 6,
+    "official_sku": "C007",
+    "item_id": "item-c007",
+    "name": "Acrylic standee A4 landscape/portrait",
+    "category": "Craft Materials & STEM Kits",
+    "source_folder": "C007_acrylic standee A4 landscape-portrait ",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 7,
+    "official_sku": "C008",
+    "item_id": "item-c008",
+    "name": "Acrylic table label",
+    "category": "Craft Materials & STEM Kits",
+    "source_folder": "C008_acrylic table label",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 8,
+    "official_sku": "C009",
+    "item_id": "item-c009",
+    "name": "Popsicle stick",
+    "category": "Craft Materials & STEM Kits",
+    "source_folder": "C009_popsicle stick",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 9,
+    "official_sku": "C010",
+    "item_id": "item-c010",
+    "name": "Fabbxible PLA filament",
+    "category": "Craft Materials & STEM Kits",
+    "source_folder": "C010_Fabbxible PLA filament",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 10,
+    "official_sku": "C011",
+    "item_id": "item-c011",
+    "name": "Glue stick",
+    "category": "Craft Materials & STEM Kits",
+    "source_folder": "C011_glue stick ",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 11,
+    "official_sku": "C012",
+    "item_id": "item-c012",
+    "name": "Pipe cleaner",
+    "category": "Craft Materials & STEM Kits",
+    "source_folder": "C012_pipe cleaner",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 12,
+    "official_sku": "C013",
+    "item_id": "item-c013",
+    "name": "Pom pom",
+    "category": "Craft Materials & STEM Kits",
+    "source_folder": "C013_pom pom",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 13,
+    "official_sku": "C014",
+    "item_id": "item-c014",
+    "name": "A4 colored paper",
+    "category": "Craft Materials & STEM Kits",
+    "source_folder": "C014_A4 colored paper",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 14,
+    "official_sku": "C015",
+    "item_id": "item-c015",
+    "name": "Ribbon",
+    "category": "Craft Materials & STEM Kits",
+    "source_folder": "C015_ribbon",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 15,
+    "official_sku": "C016",
+    "item_id": "item-c016",
+    "name": "Balloons",
+    "category": "Craft Materials & STEM Kits",
+    "source_folder": "C016_balloons",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 16,
+    "official_sku": "C017",
+    "item_id": "item-c017",
+    "name": "Key ring",
+    "category": "Craft Materials & STEM Kits",
+    "source_folder": "C017_key ring",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 17,
+    "official_sku": "C019",
+    "item_id": "item-c019",
+    "name": "Glue gun stick",
+    "category": "Craft Materials & STEM Kits",
+    "source_folder": "C018_glue gun stick",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 18,
+    "official_sku": "C020",
+    "item_id": "item-c020",
+    "name": "Melty beads",
+    "category": "Craft Materials & STEM Kits",
+    "source_folder": "C019_melty beads",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 19,
+    "official_sku": "C021",
+    "item_id": "item-c021",
+    "name": "Tongue depressor",
+    "category": "Craft Materials & STEM Kits",
+    "source_folder": "C020_tongue depressor",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 20,
+    "official_sku": "C022",
+    "item_id": "item-c022",
+    "name": "Clothespin",
+    "category": "Craft Materials & STEM Kits",
+    "source_folder": "C021_clothespin",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 21,
+    "official_sku": "C023",
+    "item_id": "item-c023",
+    "name": "Googly eye",
+    "category": "Craft Materials & STEM Kits",
+    "source_folder": "C022_googly eyes",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 22,
+    "official_sku": "C024",
+    "item_id": "item-c024",
+    "name": "Liquid glue",
+    "category": "Craft Materials & STEM Kits",
+    "source_folder": "C023_liquid glue",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 23,
+    "official_sku": "E001",
+    "item_id": "item-e001",
+    "name": "Arduino Uno",
+    "category": "Electronics & Robotics",
+    "source_folder": "E001_Arduino Uno",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 24,
+    "official_sku": "E002",
+    "item_id": "item-e002",
+    "name": "Arduino Nano",
+    "category": "Electronics & Robotics",
+    "source_folder": "E002_Arduino Nano",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 25,
+    "official_sku": "E003",
+    "item_id": "item-e003",
+    "name": "Motor Shield",
+    "category": "Electronics & Robotics",
+    "source_folder": "E003_Motor Shield",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 26,
+    "official_sku": "E004",
+    "item_id": "item-e004",
+    "name": "Breadboard",
+    "category": "Electronics & Robotics",
+    "source_folder": "E004_Breadboard",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 27,
+    "official_sku": "E005",
+    "item_id": "item-e005",
+    "name": "Gas Detector MQ6",
+    "category": "Electronics & Robotics",
+    "source_folder": "E005_Gas Sensor MQ6",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 28,
+    "official_sku": "E006",
+    "item_id": "item-e006",
+    "name": "NodeMCU",
+    "category": "Electronics & Robotics",
+    "source_folder": "E006_NodeMCU",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 29,
+    "official_sku": "E007",
+    "item_id": "item-e007",
+    "name": "HC-SR04 Ultrasonic Sensor",
+    "category": "Electronics & Robotics",
+    "source_folder": "E007_HC-SR04 Ultrasonic Sensor",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 30,
+    "official_sku": "E008",
+    "item_id": "item-e008",
+    "name": "N20 Mini Micro Metal Gear",
+    "category": "Electronics & Robotics",
+    "source_folder": "E008_N20 Mini Micro Metal Gear",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 31,
+    "official_sku": "E009",
+    "item_id": "item-e009",
+    "name": "DC Motor 3V",
+    "category": "Electronics & Robotics",
+    "source_folder": "E009_DC Motor 3V",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 32,
+    "official_sku": "E010",
+    "item_id": "item-e010",
+    "name": "N20 Micro Metal Gear Motor",
+    "category": "Electronics & Robotics",
+    "source_folder": "E010_N20 Micro Metal Gear Motor",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 33,
+    "official_sku": "E011",
+    "item_id": "item-e011",
+    "name": "DHT11 Temperature and humidity sensor",
+    "category": "Electronics & Robotics",
+    "source_folder": "E011_DHT11 Temperature and humidity",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 34,
+    "official_sku": "E012",
+    "item_id": "item-e012",
+    "name": "Infrared (IR) Proximity Sensor module",
+    "category": "Electronics & Robotics",
+    "source_folder": "E012_Infrared (IR) Proximity Sensor module",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 35,
+    "official_sku": "E013",
+    "item_id": "item-e013",
+    "name": "Sound Sensor",
+    "category": "Electronics & Robotics",
+    "source_folder": "E013_Sound Sensor",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 36,
+    "official_sku": "E014",
+    "item_id": "item-e014",
+    "name": "LilyPad coin cell battery holder",
+    "category": "Electronics & Robotics",
+    "source_folder": "E014_Lilypad Coin Cell Battery Holder",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 37,
+    "official_sku": "E015",
+    "item_id": "item-e015",
+    "name": "Micro:bit",
+    "category": "Electronics & Robotics",
+    "source_folder": "E015_Micro_bit",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 38,
+    "official_sku": "E016",
+    "item_id": "item-e016",
+    "name": "CR2032 battery holder",
+    "category": "Electronics & Robotics",
+    "source_folder": "E016_CR2032 battery holder",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 39,
+    "official_sku": "E017",
+    "item_id": "item-e017",
+    "name": "RC522 RFID Card Reader",
+    "category": "Electronics & Robotics",
+    "source_folder": "E017_RC522 RFID Card Reader",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 40,
+    "official_sku": "E018",
+    "item_id": "item-e018",
+    "name": "LED Red",
+    "category": "Electronics & Robotics",
+    "source_folder": "E018_LED Red",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 41,
+    "official_sku": "E019",
+    "item_id": "item-e019",
+    "name": "LED Blue",
+    "category": "Electronics & Robotics",
+    "source_folder": "E019_LED Blue",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 42,
+    "official_sku": "E020",
+    "item_id": "item-e020",
+    "name": "MAX30102 heart rate and Pulse oximeter Sensor",
+    "category": "Electronics & Robotics",
+    "source_folder": "E020_MAX30102 Heart Rate and Pulse Oximetry Sensor",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 43,
+    "official_sku": "E021",
+    "item_id": "item-e021",
+    "name": "Soil Moisture Level Sensor",
+    "category": "Electronics & Robotics",
+    "source_folder": "E021_Soil Moisture Level Sensor",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 44,
+    "official_sku": "E022",
+    "item_id": "item-e022",
+    "name": "Rocker Switch 6pin",
+    "category": "Electronics & Robotics",
+    "source_folder": "E022_Rocker Switch 6pin",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 45,
+    "official_sku": "E023",
+    "item_id": "item-e023",
+    "name": "Rocker Switch 2pin (Black)",
+    "category": "Electronics & Robotics",
+    "source_folder": "E023_Rocker Switch 2pin (Black)",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 46,
+    "official_sku": "E024",
+    "item_id": "item-e024",
+    "name": "Light Dependent Resistor (LDR)",
+    "category": "Electronics & Robotics",
+    "source_folder": "E024_Light Dependent Resistor (LDR)",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 47,
+    "official_sku": "E025",
+    "item_id": "item-e025",
+    "name": "Resistor 220Ω",
+    "category": "Electronics & Robotics",
+    "source_folder": "E025_Resistor 220Ω",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 48,
+    "official_sku": "E026",
+    "item_id": "item-e026",
+    "name": "Jumper Wire M-M",
+    "category": "Electronics & Robotics",
+    "source_folder": "E026_Jumper Wire M-M",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 49,
+    "official_sku": "E027",
+    "item_id": "item-e027",
+    "name": "Jumper Wire M-F",
+    "category": "Electronics & Robotics",
+    "source_folder": "E027_Jumper Wire M-F",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 50,
+    "official_sku": "E028",
+    "item_id": "item-e028",
+    "name": "HC-SR501 PIR Motion Sensor",
+    "category": "Electronics & Robotics",
+    "source_folder": "E028_HC-SR501 PIR Motion Sensor",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 51,
+    "official_sku": "E029",
+    "item_id": "item-e029",
+    "name": "Maker Line Sensor",
+    "category": "Electronics & Robotics",
+    "source_folder": "E029_Maker Line Sensor",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 52,
+    "official_sku": "E030",
+    "item_id": "item-e030",
+    "name": "16×2 LCD Display",
+    "category": "Electronics & Robotics",
+    "source_folder": "E030_16×2 LCD Display",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 53,
+    "official_sku": "L001",
+    "item_id": "item-l001",
+    "name": "Test tube",
+    "category": "Laboratory & Science Supplies",
+    "source_folder": "L001_test tubes",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 54,
+    "official_sku": "L002",
+    "item_id": "item-l002",
+    "name": "Test tube rack",
+    "category": "Laboratory & Science Supplies",
+    "source_folder": "L002_test tubes rack",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 55,
+    "official_sku": "L003",
+    "item_id": "item-l003",
+    "name": "Beaker 250ml",
+    "category": "Laboratory & Science Supplies",
+    "source_folder": "L003_beakers 250ml",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 56,
+    "official_sku": "L004",
+    "item_id": "item-l004",
+    "name": "Beaker 1000ml",
+    "category": "Laboratory & Science Supplies",
+    "source_folder": "L004_beakers 1000ml",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 57,
+    "official_sku": "L005",
+    "item_id": "item-l005",
+    "name": "Conical flask 1000ml",
+    "category": "Laboratory & Science Supplies",
+    "source_folder": "L005_conical flask 1000ML",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 58,
+    "official_sku": "L006",
+    "item_id": "item-l006",
+    "name": "Conical flask 5000ml",
+    "category": "Laboratory & Science Supplies",
+    "source_folder": "L006_conical flask 5000ml",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 59,
+    "official_sku": "L007",
+    "item_id": "item-l007",
+    "name": "Pipettes 5ml",
+    "category": "Laboratory & Science Supplies",
+    "source_folder": "L007_pipettes 5ml",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 60,
+    "official_sku": "L008",
+    "item_id": "item-l008",
+    "name": "Pipettes 10ml",
+    "category": "Laboratory & Science Supplies",
+    "source_folder": "L008_pipettes 10ml",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 61,
+    "official_sku": "L009",
+    "item_id": "item-l009",
+    "name": "Electric thermometer",
+    "category": "Laboratory & Science Supplies",
+    "source_folder": "L009_ electric thermometer ",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 62,
+    "official_sku": "L010",
+    "item_id": "item-l010",
+    "name": "Thermometer",
+    "category": "Laboratory & Science Supplies",
+    "source_folder": "L010_thermometer ",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 63,
+    "official_sku": "L011",
+    "item_id": "item-l011",
+    "name": "Gloves",
+    "category": "Laboratory & Science Supplies",
+    "source_folder": "L011_gloves",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 64,
+    "official_sku": "L012",
+    "item_id": "item-l012",
+    "name": "Glove LN2",
+    "category": "Laboratory & Science Supplies",
+    "source_folder": "L012_gloves LN",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 65,
+    "official_sku": "L013",
+    "item_id": "item-l013",
+    "name": "Petri dishes",
+    "category": "Laboratory & Science Supplies",
+    "source_folder": "L013_petri dishes",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 66,
+    "official_sku": "L014",
+    "item_id": "item-l014",
+    "name": "Syringes 10ml",
+    "category": "Laboratory & Science Supplies",
+    "source_folder": "L014_syringes 10ml",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 67,
+    "official_sku": "L015",
+    "item_id": "item-l015",
+    "name": "Syringes 60ml",
+    "category": "Laboratory & Science Supplies",
+    "source_folder": "L015_syringes 60ml",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 68,
+    "official_sku": "L016",
+    "item_id": "item-l016",
+    "name": "Volumetric flask",
+    "category": "Laboratory & Science Supplies",
+    "source_folder": "L016_volumetric flask",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 69,
+    "official_sku": "L017",
+    "item_id": "item-l017",
+    "name": "Bunsen burner",
+    "category": "Laboratory & Science Supplies",
+    "source_folder": "L017_bunsen burner",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 70,
+    "official_sku": "L018",
+    "item_id": "item-l018",
+    "name": "Glass rod",
+    "category": "Laboratory & Science Supplies",
+    "source_folder": "L018_glass rod",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 71,
+    "official_sku": "L019",
+    "item_id": "item-l019",
+    "name": "Safety Goggle",
+    "category": "Laboratory & Science Supplies",
+    "source_folder": "L019_Safety Goggle",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 72,
+    "official_sku": "L020",
+    "item_id": "item-l020",
+    "name": "Potassium Iodide",
+    "category": "Laboratory & Science Supplies",
+    "source_folder": "L020_Potassium Iodide",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 73,
+    "official_sku": "L021",
+    "item_id": "item-l021",
+    "name": "Methylated spirit solution 95%",
+    "category": "Laboratory & Science Supplies",
+    "source_folder": "L021_Methylated Spirit Solution 95_",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 74,
+    "official_sku": "L022",
+    "item_id": "item-l022",
+    "name": "Copper (II) Chloride 2-Hydrate",
+    "category": "Laboratory & Science Supplies",
+    "source_folder": "L022_Copper (II) Chloride 2-Hydrate",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 75,
+    "official_sku": "L023",
+    "item_id": "item-l023",
+    "name": "Hydrogen Peroxide Solution 6%",
+    "category": "Laboratory & Science Supplies",
+    "source_folder": "L023_Hydrogen Peroxide Solution 6_",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 76,
+    "official_sku": "L024",
+    "item_id": "item-l024",
+    "name": "Strontium Chloride 6-Hydrate AR",
+    "category": "Laboratory & Science Supplies",
+    "source_folder": "L024_Strontium Chloride 6-Hydrate AR",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 77,
+    "official_sku": "L025",
+    "item_id": "item-l025",
+    "name": "Lithium Chloride",
+    "category": "Laboratory & Science Supplies",
+    "source_folder": "L025_Lithium Chloride",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 78,
+    "official_sku": "L026",
+    "item_id": "item-l026",
+    "name": "Universal indicator",
+    "category": "Laboratory & Science Supplies",
+    "source_folder": "L026_universal indicator",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 79,
+    "official_sku": "S001",
+    "item_id": "item-s001",
+    "name": "Pen",
+    "category": "Stationery & Office Supplies",
+    "source_folder": "S001_Pen",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 80,
+    "official_sku": "S002",
+    "item_id": "item-s002",
+    "name": "Permanent marker",
+    "category": "Stationery & Office Supplies",
+    "source_folder": "S002_PermanentMarker",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 81,
+    "official_sku": "S003",
+    "item_id": "item-s003",
+    "name": "Ruler",
+    "category": "Stationery & Office Supplies",
+    "source_folder": "S003_Ruler",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 82,
+    "official_sku": "S004",
+    "item_id": "item-s004",
+    "name": "Paper",
+    "category": "Stationery & Office Supplies",
+    "source_folder": "S004_Paper",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 83,
+    "official_sku": "S005",
+    "item_id": "item-s005",
+    "name": "Sticky note",
+    "category": "Stationery & Office Supplies",
+    "source_folder": "S005_StickyNote",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 84,
+    "official_sku": "S006",
+    "item_id": "item-s006",
+    "name": "Stapler",
+    "category": "Stationery & Office Supplies",
+    "source_folder": "S006_Stapler",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 85,
+    "official_sku": "S007",
+    "item_id": "item-s007",
+    "name": "Binder clip",
+    "category": "Stationery & Office Supplies",
+    "source_folder": "S007_BinderClip",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 86,
+    "official_sku": "S008",
+    "item_id": "item-s008",
+    "name": "Tack-it",
+    "category": "Stationery & Office Supplies",
+    "source_folder": "S008_TackIt",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 87,
+    "official_sku": "S009",
+    "item_id": "item-s009",
+    "name": "Correction tape",
+    "category": "Stationery & Office Supplies",
+    "source_folder": "S009_CorrectionTape",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 88,
+    "official_sku": "S010",
+    "item_id": "item-s010",
+    "name": "Paper clip",
+    "category": "Stationery & Office Supplies",
+    "source_folder": "S010_PaperClip",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 89,
+    "official_sku": "S011",
+    "item_id": "item-s011",
+    "name": "Whiteboard marker",
+    "category": "Stationery & Office Supplies",
+    "source_folder": "S011_WhiteboardMarker",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 90,
+    "official_sku": "S012",
+    "item_id": "item-s012",
+    "name": "Sellotape",
+    "category": "Stationery & Office Supplies",
+    "source_folder": "S012_Sellotape",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 91,
+    "official_sku": "S013",
+    "item_id": "item-s013",
+    "name": "Clipboard",
+    "category": "Stationery & Office Supplies",
+    "source_folder": "S013_ClipBoard",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 92,
+    "official_sku": "S014",
+    "item_id": "item-s014",
+    "name": "Pendrive",
+    "category": "Stationery & Office Supplies",
+    "source_folder": "S014_Pendrive",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 93,
+    "official_sku": "S015",
+    "item_id": "item-s015",
+    "name": "Eraser",
+    "category": "Stationery & Office Supplies",
+    "source_folder": "S015_Eraser",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 94,
+    "official_sku": "T001",
+    "item_id": "item-t001",
+    "name": "Scissor",
+    "category": "Tools & Equipment",
+    "source_folder": "T001_Scissor",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 95,
+    "official_sku": "T002",
+    "item_id": "item-t002",
+    "name": "Plier",
+    "category": "Tools & Equipment",
+    "source_folder": "T002_Plier",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 96,
+    "official_sku": "T003",
+    "item_id": "item-t003",
+    "name": "Screwdriver",
+    "category": "Tools & Equipment",
+    "source_folder": "T003_Screwdriver",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 97,
+    "official_sku": "T004",
+    "item_id": "item-t004",
+    "name": "Glue gun",
+    "category": "Tools & Equipment",
+    "source_folder": "T004_GlueGun",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 98,
+    "official_sku": "T005",
+    "item_id": "item-t005",
+    "name": "Measure Tape",
+    "category": "Tools & Equipment",
+    "source_folder": "T005_MeasuringTape",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 99,
+    "official_sku": "T006",
+    "item_id": "item-t006",
+    "name": "Cutter",
+    "category": "Tools & Equipment",
+    "source_folder": "T006_Cutter",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 100,
+    "official_sku": "T007",
+    "item_id": "item-t007",
+    "name": "Cutting Mat",
+    "category": "Tools & Equipment",
+    "source_folder": "T007_CuttingMat",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 101,
+    "official_sku": "T008",
+    "item_id": "item-t008",
+    "name": "Solder Pen",
+    "category": "Tools & Equipment",
+    "source_folder": "T008_SolderPen",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 102,
+    "official_sku": "T009",
+    "item_id": "item-t009",
+    "name": "Solder Wire",
+    "category": "Tools & Equipment",
+    "source_folder": "T009_SolderWire",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 103,
+    "official_sku": "T010",
+    "item_id": "item-t010",
+    "name": "Smoke Absorber",
+    "category": "Tools & Equipment",
+    "source_folder": "T010_SmokeAbsorber",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 104,
+    "official_sku": "T011",
+    "item_id": "item-t011",
+    "name": "Hammer",
+    "category": "Tools & Equipment",
+    "source_folder": "T011_Hammer",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 105,
+    "official_sku": "T012",
+    "item_id": "item-t012",
+    "name": "Mallet",
+    "category": "Tools & Equipment",
+    "source_folder": "T012_Mallet",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 106,
+    "official_sku": "T013",
+    "item_id": "item-t013",
+    "name": "Screw Phillips",
+    "category": "Tools & Equipment",
+    "source_folder": "T013_ScrewPhillips",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 107,
+    "official_sku": "T014",
+    "item_id": "item-t014",
+    "name": "Spanner",
+    "category": "Tools & Equipment",
+    "source_folder": "T014_Spanner",
+    "mapping_method": "image_reference"
+  },
+  {
+    "class_index": 108,
+    "official_sku": "T015",
+    "item_id": "item-t015",
+    "name": "Caliper",
+    "category": "Tools & Equipment",
+    "source_folder": "T015_Caliper",
+    "mapping_method": "image_reference"
+  }
+]

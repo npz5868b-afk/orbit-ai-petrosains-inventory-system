@@ -7,6 +7,7 @@ import {
   getInventoryStatusMeta,
 } from '@/lib/services/inventory-service'
 import type { InventoryItem } from '@/lib/types'
+import { fetchInventoryItemFromApi } from '@/lib/api-client'
 import { cn } from '@/lib/utils'
 import {
   ArrowLeft,
@@ -19,9 +20,10 @@ import {
   Users,
 } from 'lucide-react'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
-export function ItemDetail({ item }: { item: InventoryItem }) {
+export function ItemDetail({ item: initialItem }: { item: InventoryItem }) {
+  const [item, setItem] = useState(initialItem)
   const [actionMessage, setActionMessage] = useState<string | null>(null)
   const total = item.available + item.checkedOut + item.damaged
   const statusMeta = getInventoryStatusMeta()
@@ -31,6 +33,13 @@ export function ItemDetail({ item }: { item: InventoryItem }) {
     { label: 'Checked out', value: item.checkedOut, tone: 'cyan' as const, color: 'var(--cyan)' },
     { label: 'Damaged', value: item.damaged, tone: 'danger' as const, color: 'var(--danger)' },
   ]
+
+  useEffect(() => {
+    const refresh = () => fetchInventoryItemFromApi(initialItem.id).then(setItem).catch(() => undefined)
+    refresh()
+    window.addEventListener('orbit:inventory-updated', refresh)
+    return () => window.removeEventListener('orbit:inventory-updated', refresh)
+  }, [initialItem.id])
 
   function runMockAction(label: string) {
     const messages: Record<string, string> = {
