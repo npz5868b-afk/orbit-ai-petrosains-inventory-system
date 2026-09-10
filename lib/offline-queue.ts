@@ -83,14 +83,42 @@ export async function submitOrQueue(
 export async function flushOfflineQueue() {
   const queue = readQueue()
   if (!queue.length) return { synced: 0, remaining: 0 }
-  const response = await syncOperations(getDeviceId(), queue)
-  const resultById = new Map(response.results.map((result) => [result.client_transaction_id, result]))
+
+  const operations = queue.map(({ client_transaction_id, type, created_offline_at, payload }) => ({
+    client_transaction_id,
+    type,
+    created_offline_at,
+    payload,
+  }))
+
+  const response = await syncOperations(getDeviceId(), operations)
+
+  const resultById = new Map(
+    response.results.map((result) => [result.client_transaction_id, result])
+  )
+
   const remaining = queue.flatMap((entry) => {
     const result = resultById.get(entry.client_transaction_id)
-    if (result?.status === 'applied' || result?.status === 'duplicate') return []
-    return [{ ...entry, status: result?.status === 'conflict' ? 'conflict' as const : 'failed' as const, message: result?.message }]
+
+    if (result?.status === 'applied' || result?.status === 'duplicate') {
+      return []
+    }
+
+    return [{
+      ...entry,
+      status: result?.status === 'conflict' ? 'conflict' as const : 'failed' as const,
+      message: result?.message,
+    }]
   })
+
   writeQueue(remaining)
-  if (remaining.length < queue.length) notifyInventoryUpdated()
-  return { synced: queue.length - remaining.length, remaining: remaining.length }
+
+  if (remaining.length < queue.length) {
+    notifyInventoryUpdated()
+  }
+
+  return {
+    synced: queue.length - remaining.length,
+    remaining: remaining.length,
+  }
 }
