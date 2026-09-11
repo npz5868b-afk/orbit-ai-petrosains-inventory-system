@@ -1,3 +1,4 @@
+
 from __future__ import annotations
 
 import hashlib
@@ -165,22 +166,57 @@ def _match_payload(row: sqlite3.Row, confidence: float) -> dict:
 
 
 def _scan_response(db: sqlite3.Connection, scan_id: str) -> dict:
-    scan = db.execute("SELECT * FROM scan_sessions WHERE id = ?", (scan_id,)).fetchone()
+    scan = db.execute(
+        "SELECT * FROM scan_sessions WHERE id = ?",
+        (scan_id,),
+    ).fetchone()
+
     if not scan:
-        raise not_found("SCAN_NOT_FOUND", f"Scan session {scan_id!r} was not found")
-    detections = db.execute("SELECT * FROM detections WHERE scan_session_id = ? ORDER BY rowid", (scan_id,)).fetchall()
+        raise not_found(
+            "SCAN_NOT_FOUND",
+            f"Scan session {scan_id!r} was not found",
+        )
+
+    detections = db.execute(
+        "SELECT * FROM detections WHERE scan_session_id = ? ORDER BY rowid",
+        (scan_id,),
+    ).fetchall()
+
     items = []
+
     for detection in detections:
         item = None
+
         if detection["inventory_item_id"]:
             item_row = db.execute(
                 "SELECT id, sku, name, image_url FROM inventory_items WHERE id = ?",
                 (detection["inventory_item_id"],),
             ).fetchone()
+
             if item_row:
                 item = dict(item_row)
+
         status = detection["status"]
-        frontend_status = "review_needed" if status in {"review", "unknown"} else status
+        frontend_status = (
+            "review_needed"
+            if status in {"review", "unknown"}
+            else status
+        )
+
+        bbox = json_value(detection["bbox"])
+        raw_metadata = json_value(detection["raw_metadata"], {})
+
+        individual_bboxes = []
+
+        if isinstance(raw_metadata, dict):
+            individual_bboxes = raw_metadata.get(
+                "individual_bboxes",
+                [],
+            )
+
+        if not individual_bboxes and bbox:
+            individual_bboxes = [bbox]
+
         items.append(
             {
                 "detection_id": detection["id"],
@@ -188,29 +224,57 @@ def _scan_response(db: sqlite3.Connection, scan_id: str) -> dict:
                 "quantity": detection["quantity"],
                 "confidence": detection["confidence"],
                 "status": frontend_status,
-                "bbox": json_value(detection["bbox"]),
-                "possible_matches": json_value(detection["possible_matches"], []),
-                "why": json_value(detection["why"], []),
+                "bbox": bbox,
+                "bboxes": individual_bboxes,
+                "possible_matches": json_value(
+                    detection["possible_matches"],
+                    [],
+                ),
+                "why": json_value(
+                    detection["why"],
+                    [],
+                ),
             }
         )
-    review_lines = sum(1 for item in items if item["status"] == "review_needed")
+
+    review_lines = sum(
+        1
+        for item in items
+        if item["status"] == "review_needed"
+    )
+
     return {
         "scan_session_id": scan["id"],
         "client_scan_id": scan["client_scan_id"],
-        "status": "review_needed" if scan["status"] == "review" else scan["status"],
+        "status": (
+            "review_needed"
+            if scan["status"] == "review"
+            else scan["status"]
+        ),
         "store_id": scan["store_id"],
         "detector_version": scan["detector_version"],
         "processing_time_ms": scan["processing_time_ms"],
         "expires_at": scan["expires_at"],
         "items": items,
         "summary": {
-            "detected_quantity": sum(item["quantity"] for item in items if item["status"] != "rejected"),
-            "ready_lines": sum(1 for item in items if item["status"] in {"ready", "resolved"}),
+            "detected_quantity": sum(
+                item["quantity"]
+                for item in items
+                if item["status"] != "rejected"
+            ),
+            "ready_lines": sum(
+                1
+                for item in items
+                if item["status"] in {"ready", "resolved"}
+            ),
             "review_lines": review_lines,
-            "rejected_lines": sum(1 for item in items if item["status"] == "rejected"),
+            "rejected_lines": sum(
+                1
+                for item in items
+                if item["status"] == "rejected"
+            ),
         },
     }
-
 
 def create_scan(db_path: Path, settings: Settings, detector: Detector, request: ScanRequest, image: bytes | None) -> dict:
     start = time.perf_counter()

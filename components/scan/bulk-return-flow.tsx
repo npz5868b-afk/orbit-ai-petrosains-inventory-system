@@ -52,6 +52,7 @@ export function BulkReturnFlow({
   const [transactionResult, setTransactionResult] = useState<TransactionResponse | null>(null)
   const [submitState, setSubmitState] = useState<'idle' | 'submitting' | 'synced' | 'saved-offline'>('idle')
   const [error, setError] = useState<string | null>(null)
+  const [scanImageUrl, setScanImageUrl] = useState<string | null>(null)
   const [hydrated, setHydrated] = useState(false)
   const transactionId = useRef<string | null>(null)
   const [stage, setStage] = useState<Stage>(initialStage)
@@ -106,14 +107,15 @@ export function BulkReturnFlow({
     timers.current = []
   }
 
-  async function startScan() {
+  async function startScan(image: File) {
+    setScanImageUrl(URL.createObjectURL(image))
     clearScanTimers()
     setStage('scanning')
     setRevealed(0)
     setConfirmedReviewCandidate(defaultReviewCandidate)
     setError(null)
     try {
-      const nextScan = await startBulkScan('mixed')
+      const nextScan = await startBulkScan(image)
       setScan(nextScan)
       const nextItems: BulkReturnItem[] = nextScan.items
         .filter((item) => item.status !== 'rejected')
@@ -219,11 +221,13 @@ export function BulkReturnFlow({
         <div className="grid gap-5 lg:grid-cols-[1.45fr_0.95fr]">
           <div className="relative">
             <CameraView
-              active={stage === 'scanning' || stage === 'found'}
-              revealed={revealedCount}
-              count={revealedCount}
-              frozen={stage === 'found'}
-            />
+  active={stage === 'scanning' || stage === 'found'}
+  revealed={revealedCount}
+  count={scan?.summary.detected_quantity ?? revealedCount}
+  frozen={stage === 'found'}
+  imageUrl={scanImageUrl}
+  detections={scan?.items ?? []}
+/>
             {stage === 'camera' && (
               <div className="absolute inset-0 grid place-items-center rounded-2xl bg-[oklch(0.075_0.018_264/0.62)] p-6 backdrop-blur-sm">
                 <div className="animate-rise flex max-w-xs flex-col items-center text-center">
@@ -233,14 +237,23 @@ export function BulkReturnFlow({
                   <p className="mt-4 text-sm text-muted-foreground">
                     Point the camera at returned items.
                   </p>
-                  <button
-                    onClick={startScan}
-                    className="group cta-sheen mt-5 inline-flex items-center gap-2.5 rounded-xl px-6 py-3.5 text-sm font-semibold text-primary-foreground transition-all hover:shadow-[0_0_34px_-4px_var(--violet)]"
-                  >
-                    <Camera className="h-5 w-5" />
-                    Start Camera
-                    <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-                  </button>
+                  <label className="group cta-sheen mt-5 inline-flex cursor-pointer items-center gap-2.5 rounded-xl px-6 py-3.5 text-sm font-semibold text-primary-foreground transition-all hover:shadow-[0_0_34px_-4px_var(--violet)]">
+  <Camera className="h-5 w-5" />
+  Start Camera
+  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+
+  <input
+    type="file"
+    accept="image/*"
+    capture="environment"
+    className="hidden"
+    onChange={(event) => {
+      const image = event.target.files?.[0]
+      if (image) void startScan(image)
+      event.currentTarget.value = ''
+    }}
+  />
+</label>
                 </div>
               </div>
             )}
@@ -251,7 +264,7 @@ export function BulkReturnFlow({
             <div className="flex items-center justify-between">
               <h3 className="font-display text-base font-semibold">Items Found</h3>
               <span className="text-sm text-muted-foreground">
-                {revealedCount} detected
+                {scan?.summary.detected_quantity ?? revealedCount} detected
               </span>
             </div>
 
@@ -355,7 +368,8 @@ export function BulkReturnFlow({
             setRevealed(0)
             setStage('camera')
           }}
-        />
+          imageUrl={scanImageUrl}
+/>
       )}
 
       {stage === 'summary' && (
@@ -429,11 +443,13 @@ function ReviewNeeded({
   whyReasons,
   onConfirm,
   onScanAgain,
+  imageUrl,
 }: {
   candidates: ReviewCandidate[]
   whyReasons: string[]
   onConfirm: (candidate: ReviewCandidate) => void | Promise<void>
   onScanAgain: () => void
+  imageUrl?: string | null
 }) {
   const [why, setWhy] = useState(false)
   const [choice, setChoice] = useState(candidates[0]?.id ?? '')
@@ -457,17 +473,31 @@ function ReviewNeeded({
           </div>
 
           <div className="mt-5 overflow-hidden rounded-2xl border border-warning/25 bg-warning/[0.045] p-3">
-            <div className="relative aspect-[4/3] overflow-hidden rounded-xl border border-border bg-[oklch(0.1_0.02_264)]">
-              <div className="absolute inset-0 bg-[radial-gradient(90%_75%_at_50%_42%,oklch(0.82_0.15_78/0.16),transparent_70%)]" />
-              <div className="absolute left-1/2 top-1/2 h-24 w-36 -translate-x-1/2 -translate-y-1/2 rounded-[1.25rem] border border-warning/35 bg-secondary/70 shadow-[0_0_30px_-18px_var(--warning)]" />
-              <div className="absolute left-[42%] top-[38%] h-5 w-16 rounded-full border border-warning/40 bg-warning/10" />
+            <div className="relative aspect-[4/3] overflow-hidden rounded-xl border border-warning/25 bg-[oklch(0.1_0.02_264)]">
+              {imageUrl ? (
+                <img
+                  src={imageUrl}
+                  alt="Captured item for review"
+                  className="absolute inset-0 h-full w-full object-contain"
+                />
+              ) : (
+                <div className="absolute inset-0 grid place-items-center text-sm text-muted-foreground">
+                  Captured image unavailable
+                </div>
+              )}
+
+              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(90%_75%_at_50%_42%,transparent_45%,oklch(0.1_0.02_264/0.18)_100%)]" />
+
               {[
                 'left-4 top-4 border-l-2 border-t-2',
                 'right-4 top-4 border-r-2 border-t-2',
                 'left-4 bottom-4 border-l-2 border-b-2',
                 'right-4 bottom-4 border-r-2 border-b-2',
               ].map((pos) => (
-                <span key={pos} className={cn('absolute h-7 w-7 border-warning/65', pos)} />
+                <span
+                  key={pos}
+                  className={cn('pointer-events-none absolute h-7 w-7 border-warning/75', pos)}
+                />
               ))}
             </div>
             <p className="mt-2 text-xs font-medium uppercase tracking-wide text-warning">

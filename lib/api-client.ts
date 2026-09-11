@@ -17,7 +17,10 @@ export class OrbitApiError extends Error {
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(`${API_BASE}${path}`, {
     ...init,
-    headers: { 'Content-Type': 'application/json', ...(init?.headers ?? {}) },
+    headers:
+  init?.body instanceof FormData
+    ? { ...(init?.headers ?? {}) }
+    : { 'Content-Type': 'application/json', ...(init?.headers ?? {}) },
   })
   const payload = await response.json().catch(() => null)
   if (!response.ok) {
@@ -140,6 +143,7 @@ export type ApiScanItem = {
   confidence: number
   status: 'ready' | 'review_needed' | 'resolved' | 'rejected'
   bbox: { x: number; y: number; w: number; h: number } | null
+  bboxes: { x: number; y: number; w: number; h: number }[]
   possible_matches: { item_id: string; sku: string; name: string; confidence: number }[]
   why: string[]
 }
@@ -153,13 +157,18 @@ export type ApiScan = {
   summary: { detected_quantity: number; ready_lines: number; review_lines: number; rejected_lines: number }
 }
 
-export function startBulkScan(fixture: 'mixed' | 'all_ready' | 'unknown' | 'empty' = 'mixed') {
+export function startBulkScan(image: File) {
+  const formData = new FormData()
+  formData.append('image', image)
+  formData.append('mode', 'bulk_return')
+  formData.append('store_id', 'store-1')
+  formData.append('client_scan_id', crypto.randomUUID())
+
   return request<ApiScan>('/scans', {
     method: 'POST',
-    body: JSON.stringify({ mode: 'bulk_return', store_id: 'store-1', client_scan_id: crypto.randomUUID(), fixture }),
+    body: formData,
   })
 }
-
 export function resolveScanReview(
   scanId: string,
   detectionId: string,
