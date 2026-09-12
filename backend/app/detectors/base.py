@@ -15,6 +15,12 @@ class RawDetection:
     metadata: dict = field(default_factory=dict)
 
 
+class DetectionBatch(list[RawDetection]):
+    def __init__(self, detections: list[RawDetection], timing: dict[str, float]):
+        super().__init__(detections)
+        self.timing = timing
+
+
 class Detector(Protocol):
     version: str
 

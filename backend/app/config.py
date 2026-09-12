@@ -15,6 +15,13 @@ def _float_env(name: str, default: float) -> float:
     return value
 
 
+def _positive_float_env(name: str, default: float) -> float:
+    value = float(os.getenv(name, default))
+    if value <= 0:
+        raise ValueError(f"{name} must be greater than zero")
+    return value
+
+
 @dataclass(frozen=True)
 class Settings:
     database_path: Path
@@ -24,6 +31,10 @@ class Settings:
     max_image_bytes: int
     cors_origins: tuple[str, ...]
     model_weights: str | None
+    ocr_enabled: bool = True
+    ocr_min_confidence: float = 0.50
+    ocr_crop_padding: float = 0.08
+    ocr_timeout_seconds: float = 5.0
 
 
 def get_settings() -> Settings:
@@ -52,4 +63,8 @@ def get_settings() -> Settings:
         max_image_bytes=int(os.getenv("ORBIT_MAX_IMAGE_BYTES", 10 * 1024 * 1024)),
         cors_origins=origins,
         model_weights=os.getenv("ORBIT_MODEL_WEIGHTS") or None,
+        ocr_enabled=os.getenv("ORBIT_OCR_ENABLED", "true").strip().lower() not in {"0", "false", "no"},
+        ocr_min_confidence=_float_env("ORBIT_OCR_MIN_CONFIDENCE", 0.50),
+        ocr_crop_padding=_float_env("ORBIT_OCR_CROP_PADDING", 0.08),
+        ocr_timeout_seconds=_positive_float_env("ORBIT_OCR_TIMEOUT_SECONDS", 5.0),
     )

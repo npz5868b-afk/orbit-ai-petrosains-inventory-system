@@ -23,11 +23,15 @@ yarn-error.log*
 # python
 /.venv/
 /.pytest_cache/
+/.test-cache/
+/.test-tmp/
 **/__pycache__/
 *.py[cod]
 /backend/data/*.db
 /backend/data/*.db-shm
 /backend/data/*.db-wal
+/backend/data/.ultralytics/
+/.benchmark-inputs/
 
 # vercel
 .vercel

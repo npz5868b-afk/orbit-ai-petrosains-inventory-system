@@ -1,2 +1,5 @@
-# Install only after reviewed object-detection annotations are available.
+# Validated Windows CPU stack. Keep these pins to avoid replacing Torch during OCR setup.
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch==2.13.0+cpu
+torchvision==0.28.0+cpu
 ultralytics==8.3.199

@@ -183,6 +183,7 @@ def _scan_response(db: sqlite3.Connection, scan_id: str) -> dict:
     ).fetchall()
 
     items = []
+    scan_timing = None
 
     for detection in detections:
         item = None
@@ -213,6 +214,7 @@ def _scan_response(db: sqlite3.Connection, scan_id: str) -> dict:
                 "individual_bboxes",
                 [],
             )
+            scan_timing = scan_timing or raw_metadata.get("timing")
 
         if not individual_bboxes and bbox:
             individual_bboxes = [bbox]
@@ -234,6 +236,20 @@ def _scan_response(db: sqlite3.Connection, scan_id: str) -> dict:
                     detection["why"],
                     [],
                 ),
+                "ocr": raw_metadata.get("ocr", {
+                    "detected_text": None,
+                    "normalized_sku": None,
+                    "catalog_match": False,
+                    "verification_status": "not_available",
+                    "conflict_with_yolo": False,
+                    "review_required": False,
+                    "candidates": [],
+                    "invalid_candidates": [],
+                    "attempts": [],
+                    "engine": "disabled",
+                    "processing_time_ms": 0.0,
+                    "error": None,
+                }) if isinstance(raw_metadata, dict) else None,
             }
         )
 
@@ -254,6 +270,7 @@ def _scan_response(db: sqlite3.Connection, scan_id: str) -> dict:
         "store_id": scan["store_id"],
         "detector_version": scan["detector_version"],
         "processing_time_ms": scan["processing_time_ms"],
+        "timings": scan_timing,
         "expires_at": scan["expires_at"],
         "items": items,
         "summary": {
@@ -300,6 +317,17 @@ def create_scan(db_path: Path, settings: Settings, detector: Detector, request: 
                 status = "review"
             else:
                 status = "unknown"
+            metadata = result.metadata if isinstance(result.metadata, dict) else {}
+            ocr = metadata.get("ocr", {}) if isinstance(metadata, dict) else {}
+            ocr_status = ocr.get("verification_status") if isinstance(ocr, dict) else None
+            reasons = list(result.why)
+            if ocr_status in {"conflict", "ambiguous"}:
+                status = "review"
+                reasons.append(
+                    "OCR found multiple catalog SKUs"
+                    if ocr_status == "ambiguous"
+                    else "OCR SKU conflicts with the visual prediction"
+                )
             matches = []
             if status != "ready":
                 if mapped:
@@ -308,7 +336,13 @@ def create_scan(db_path: Path, settings: Settings, detector: Detector, request: 
                     alternative = _mapped_item(db, class_key)
                     if alternative:
                         matches.append(_match_payload(alternative, confidence))
-            normalized.append((result, mapped, status, matches))
+                for candidate in ocr.get("candidates", []) if isinstance(ocr, dict) else []:
+                    candidate_sku = candidate.get("sku") if isinstance(candidate, dict) else None
+                    candidate_confidence = candidate.get("confidence", 0.0) if isinstance(candidate, dict) else 0.0
+                    alternative = _mapped_item(db, candidate_sku) if candidate_sku else None
+                    if alternative and all(match["item_id"] != alternative["id"] for match in matches):
+                        matches.append(_match_payload(alternative, float(candidate_confidence)))
+            normalized.append((result, mapped, status, matches, reasons))
         scan_status = "review" if any(entry[2] in {"review", "unknown"} for entry in normalized) else "ready"
         db.execute(
             """
@@ -322,7 +356,7 @@ def create_scan(db_path: Path, settings: Settings, detector: Detector, request: 
                 (now + timedelta(minutes=30)).isoformat().replace("+00:00", "Z"),
             ),
         )
-        for result, mapped, status, matches in normalized:
+        for result, mapped, status, matches, reasons in normalized:
             db.execute(
                 """
                 INSERT INTO detections (id, scan_session_id, predicted_class, inventory_item_id,
@@ -332,10 +366,14 @@ def create_scan(db_path: Path, settings: Settings, detector: Detector, request: 
                 (
                     new_id("det"), scan_id, result.class_key, mapped["id"] if mapped else None,
                     result.quantity, result.confidence, json.dumps(result.bbox) if result.bbox else None,
-                    status, json.dumps(matches), json.dumps(result.why), json.dumps(result.metadata),
+                    status, json.dumps(matches), json.dumps(reasons), json.dumps(result.metadata),
                 ),
             )
-        return _scan_response(db, scan_id)
+        response = _scan_response(db, scan_id)
+        detector_timing = getattr(raw, "timing", None)
+        if detector_timing:
+            response["timings"] = detector_timing
+        return response
 
 
 def get_scan(db_path: Path, scan_id: str) -> dict:

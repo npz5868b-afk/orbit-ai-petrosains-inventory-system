@@ -125,6 +125,11 @@ def create_app(settings: Settings | None = None, detector=None) -> FastAPI:
             "database": database,
             "detector": getattr(detector, "version", "unavailable"),
             "detector_error": detector_error,
+            "ocr": getattr(
+                detector,
+                "ocr_health",
+                {"enabled": False, "available": False, "engine": "unavailable", "error": None},
+            ),
             "version": __version__,
             "timestamp": _utc_now(),
         }

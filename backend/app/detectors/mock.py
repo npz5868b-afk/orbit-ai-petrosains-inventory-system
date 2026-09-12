@@ -6,6 +6,10 @@ from .base import RawDetection
 class MockDetector:
     version = "mock-v1"
 
+    @property
+    def ocr_health(self) -> dict:
+        return {"enabled": False, "available": False, "engine": "disabled", "error": None}
+
     _fixtures = {
         "mixed": [
             RawDetection("T003", 0.96, 3, {"x": 0.08, "y": 0.15, "w": 0.31, "h": 0.25}),

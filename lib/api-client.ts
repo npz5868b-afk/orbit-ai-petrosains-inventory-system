@@ -146,6 +146,17 @@ export type ApiScanItem = {
   bboxes: { x: number; y: number; w: number; h: number }[]
   possible_matches: { item_id: string; sku: string; name: string; confidence: number }[]
   why: string[]
+  ocr?: {
+    detected_text: string | null
+    normalized_sku: string | null
+    catalog_match: boolean
+    verification_status: 'verified' | 'conflict' | 'ambiguous' | 'invalid' | 'not_available' | 'error'
+    conflict_with_yolo: boolean
+    review_required: boolean
+    candidates: { sku: string; confidence: number }[]
+    error: string | null
+    processing_time_ms: number
+  }
 }
 
 export type ApiScan = {
@@ -153,6 +164,12 @@ export type ApiScan = {
   status: 'ready' | 'review_needed' | 'confirmed'
   detector_version: string
   processing_time_ms: number
+  timings?: {
+    yolo_inference_ms: number
+    ocr_processing_ms: number
+    ocr_total_scan_ms: number
+    ai_combined_ms: number
+  } | null
   items: ApiScanItem[]
   summary: { detected_quantity: number; ready_lines: number; review_lines: number; rejected_lines: number }
 }
