@@ -13,6 +13,8 @@ flowchart LR
   API --> D{Detector interface}
   D --> M[Deterministic Mock]
   D --> R[Optional local Ultralytics model]
+  R --> O[RapidOCR on padded YOLO crops]
+  O --> C[109-item catalog verification]
 ```
 
 Inventory never changes from raw AI output. A scan creates reviewable proposals; checkout or return changes stock only after a confirmed, atomic transaction. The browser creates `client_transaction_id` before sending, preserves offline payloads in `localStorage`, and removes them only after the server reports `applied` or `duplicate`.
@@ -41,6 +43,18 @@ pnpm dev
 ```
 
 Open `http://localhost:3000`. API documentation is at `http://127.0.0.1:8000/docs`. Defaults are in `.env.example`; no secret is required for Mock mode.
+
+For the real five-class YOLO + OCR pipeline, install the pinned CPU stacks and set process-local environment variables:
+
+```powershell
+.\.venv\Scripts\python.exe -m pip install -r backend\requirements-ml.txt
+.\.venv\Scripts\python.exe -m pip install -r backend\requirements-ocr.txt
+$env:ORBIT_DETECTOR_MODE="real"
+$env:ORBIT_MODEL_WEIGHTS="backend/models/orbit_ai_5class_yolo11n_best.pt"
+.\.venv\Scripts\python.exe -m uvicorn app.main:app --app-dir backend --port 8000
+```
+
+OCR keeps the original YOLO confidence. A matching catalog SKU is marked `verified`; a conflicting or ambiguous valid SKU forces Review Needed. No readable text, an invalid SKU, an OCR exception, or an OCR timeout falls back to the existing YOLO confidence policy without changing inventory.
 
 ## Test and reset
 
@@ -77,7 +91,9 @@ The normalized inventory seed is `backend/data/inventory_catalog.json`. It keeps
 
 The resource audit under `docs/data-audit/` covers every supplied inventory and storeroom photo without copying the 6.46 GB source set into Git. It records formats, image metrics, duplicate components, fixed class mapping, lookalikes, and a leakage-controlled split.
 
-The official photos currently have image-level folder labels but no bounding boxes, instance counts, negative scenes, or capture-session metadata. They are suitable for exploration and assisted annotation; they are not yet an honest evaluation set for multi-object detection/counting. `backend/app/detectors/real.py` is ready for a local Ultralytics model once reviewed annotations and weights exist. Set `ORBIT_DETECTOR_MODE=real` and `ORBIT_MODEL_WEIGHTS` to swap it in without changing the UI or REST contract.
+The repository includes `backend/models/orbit_ai_5class_yolo11n_best.pt`, which recognizes the validated T003, T005, L003, E018, and E019 prototype classes. The operational catalog still contains 109 items; the model must not be described as recognizing all 109. OCR validates extracted SKU candidates against all 109 catalog entries but never replaces YOLO or updates stock directly.
+
+Measured local CPU performance and reproducible benchmark details are in `docs/performance/performance-report.md`. The benchmark uses three excluded warm-ups followed by 20 measured scans.
 
 ## Five-minute demo path
 
@@ -88,4 +104,4 @@ The official photos currently have image-level folder labels but no bounding box
 5. Double-click/retry the same client transaction to show a replay without another stock change.
 6. Disconnect external internet and continue against the local backend; optionally stop the backend to demonstrate `Saved Offline`, restart it, and use System → Sync all now.
 
-See [backend integration report](docs/backend-integration-report.md), [completion report](docs/phase-completion-report.md), and [data audit](docs/data-audit/audit-report.md).
+See [OCR/build/performance handoff](docs/ocr-performance-handoff.md), [local CPU performance](docs/performance/performance-report.md), [backend integration report](docs/backend-integration-report.md), [completion report](docs/phase-completion-report.md), and [data audit](docs/data-audit/audit-report.md).

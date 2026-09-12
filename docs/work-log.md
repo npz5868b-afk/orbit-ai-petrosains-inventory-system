@@ -7,6 +7,9 @@
 | 2026-09-10 | workspace snapshot | Checkout, scan/review, Bulk Return, idempotency and sync | Atomicity/replay/conflict tests | Complete |
 | 2026-09-10 | workspace snapshot | Official 109-item frontend integration and offline queue | TypeScript, production build, browser E2E | Complete |
 | 2026-09-10 | official ZIPs/workbook | Full 2,788-photo and 30-room-photo audit | All images decoded; generated CSV/JSON/contact sheet | Complete |
+| 2026-09-12 | `09759cb042e475635d1067d4102a4f7421457a04` | Catalog-aware RapidOCR verification after real YOLO detection | OCR scenario and regression tests | Complete |
+| 2026-09-12 | `09759cb042e475635d1067d4102a4f7421457a04` | Real local CPU benchmark with 3 warm-ups and 20 measured scans | JSON, report, annotated evidence and HTTP smoke test | Complete |
+| 2026-09-12 | `09759cb042e475635d1067d4102a4f7421457a04` | Production build validation and local font packaging | `pnpm.cmd build`, 116/116 pages | Complete |
 
 ## Decisions
 
@@ -24,5 +27,4 @@
 
 | Blocker | Evidence | Required input | Status |
 |---|---|---|---|
-| Real detector training/evaluation | No bounding boxes, counts, negatives, license/capture metadata or weights | Reviewed annotation set and target demo hardware | Open, documented |
-| Remote branch/push | Private repo CLI has no credential and source was obtained as commit-matched archive | Repository owner authenticates Git CLI or approves browser/GCM login | Open; local implementation complete |
+| Current OCR/build/performance package | All required implementation, validation and evidence are present on the handoff branch | None | No open blocker |
