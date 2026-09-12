@@ -11,6 +11,7 @@ import {
   ScanLine,
   Settings2,
   Wifi,
+  WifiOff,
 } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -56,14 +57,29 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const overview = getSystemOverview()
   const { facts } = overview
   const [stores, setStores] = useState(overview.stores)
+  const [isOnline, setIsOnline] = useState(true)
   useEffect(() => {
     fetchStoresFromApi().then(setStores).catch(() => undefined)
-    const sync = () => flushOfflineQueue().catch(() => undefined)
-    sync()
-    window.addEventListener('online', sync)
-    return () => window.removeEventListener('online', sync)
+    setIsOnline(navigator.onLine)
+
+    const handleOnline = () => {
+      setIsOnline(true)
+      flushOfflineQueue().catch(() => undefined)
+    }
+    const handleOffline = () => setIsOnline(false)
+
+    if (navigator.onLine) {
+      flushOfflineQueue().catch(() => undefined)
+    }
+    window.addEventListener('online', handleOnline)
+    window.addEventListener('offline', handleOffline)
+    return () => {
+      window.removeEventListener('online', handleOnline)
+      window.removeEventListener('offline', handleOffline)
+    }
   }, [])
   const onlineStores = stores.filter((store) => store.status === 'online').length
+  const ConnectivityIcon = isOnline ? Wifi : WifiOff
 
   return (
     <div className="relative isolate min-h-screen overflow-x-hidden">
@@ -105,12 +121,27 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </nav>
 
         <div className="glass rounded-xl p-3.5">
-          <div className="flex items-center gap-2 text-sm font-medium text-success">
-            <span className="relative grid h-6 w-6 place-items-center rounded-full bg-success/10">
-              <span className="absolute h-2 w-2 rounded-full bg-success/40 status-soft-pulse" />
-              <Wifi className="relative h-4 w-4" />
+          <div
+            className={cn(
+              'flex items-center gap-2 text-sm font-medium',
+              isOnline ? 'text-success' : 'text-warning',
+            )}
+          >
+            <span
+              className={cn(
+                'relative grid h-6 w-6 place-items-center rounded-full',
+                isOnline ? 'bg-success/10' : 'bg-warning/10',
+              )}
+            >
+              <span
+                className={cn(
+                  'absolute h-2 w-2 rounded-full',
+                  isOnline ? 'bg-success/40 status-soft-pulse' : 'bg-warning/40',
+                )}
+              />
+              <ConnectivityIcon className="relative h-4 w-4" />
             </span>
-            Online
+            {isOnline ? 'Online' : 'Offline'}
           </div>
           <p className="mt-1 text-xs text-muted-foreground">
             {onlineStores} of {facts.activeStorageLocations} stores connected. Changes sync later.
@@ -121,9 +152,16 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       {/* Mobile top bar */}
       <header className="sticky top-0 z-30 flex items-center justify-between border-b border-sidebar-border bg-sidebar/90 px-4 py-3 shadow-[0_16px_44px_-34px_var(--cyan)] backdrop-blur-2xl lg:hidden">
         <Logo />
-        <span className="status-soft-pulse flex items-center gap-1.5 rounded-full border border-success/25 bg-success/10 px-2.5 py-1 text-xs font-medium text-success">
-          <Wifi className="h-3.5 w-3.5" />
-          Online
+        <span
+          className={cn(
+            'flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium',
+            isOnline
+              ? 'status-soft-pulse border-success/25 bg-success/10 text-success'
+              : 'border-warning/25 bg-warning/10 text-warning',
+          )}
+        >
+          <ConnectivityIcon className="h-3.5 w-3.5" />
+          {isOnline ? 'Online' : 'Offline'}
         </span>
       </header>
 
