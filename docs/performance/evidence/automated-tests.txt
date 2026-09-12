@@ -1,0 +1,15 @@
+ORBIT AI automated test evidence
+Date: 2026-09-12 (Asia/Kuala_Lumpur)
+Command: .\.venv\Scripts\python.exe -m pytest backend\tests -q -p no:cacheprovider --basetemp .test-tmp\final-20260912
+Exit status: 0
+Result: PASS
+
+....................                                                     [100%]
+20 passed, 1 warning in 6.85s
+
+Warning: Starlette TestClient references a deprecated anyio BlockingPortal
+alias. This is a dependency deprecation warning and did not affect results.
+
+The first final invocation used pytest's default user Temp directory and was
+blocked by local Windows ACLs. Re-running with the repository-local ignored
+--basetemp directory produced the result above.

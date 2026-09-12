@@ -1,0 +1,32 @@
+{
+  "synthetic": true,
+  "purpose": "OCR engine evidence only; not a YOLO camera detection",
+  "result": {
+    "detected_text": "E018",
+    "normalized_sku": "E018",
+    "catalog_match": true,
+    "verification_status": "verified",
+    "conflict_with_yolo": false,
+    "review_required": false,
+    "candidates": [
+      {
+        "sku": "E018",
+        "confidence": 0.9999
+      }
+    ],
+    "invalid_candidates": [],
+    "attempts": [
+      {
+        "detected_text": "E018",
+        "candidates": [
+          "E018"
+        ],
+        "processing_time_ms": 650.159,
+        "error": null
+      }
+    ],
+    "engine": "rapidocr:3.9.2",
+    "processing_time_ms": 667.671,
+    "error": null
+  }
+}

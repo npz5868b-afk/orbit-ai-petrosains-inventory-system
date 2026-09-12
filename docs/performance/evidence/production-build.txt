@@ -1,0 +1,18 @@
+ORBIT AI production build evidence
+Date: 2026-09-12 (Asia/Kuala_Lumpur)
+Command: pnpm.cmd build
+Exit status: 0
+Result: PASS
+Warnings: none
+Errors: none
+
+Next.js 16.3.3 (Turbopack)
+Compiled successfully.
+TypeScript completed successfully.
+Static generation completed: 116/116 pages.
+Routes generated: /, /_not-found, /activity, /inventory,
+/inventory/[id] (109 item paths), /scan, /system.
+
+Build reproducibility fix: Geist, Geist Mono, and Space Grotesk are loaded
+from committed local WOFF2 assets. The successful final build required no
+network access for Google Fonts.

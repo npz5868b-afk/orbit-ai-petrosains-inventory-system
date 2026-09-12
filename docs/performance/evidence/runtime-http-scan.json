@@ -1,0 +1,147 @@
+{
+  "scan_session_id": "scan-decbec46d15a4871aaf0f005afa52866",
+  "client_scan_id": "runtime-8d169fa1d21f414d86a94dafd4723b77",
+  "status": "review_needed",
+  "store_id": "store-1",
+  "detector_version": "ultralytics:orbit_ai_5class_yolo11n_best.pt",
+  "processing_time_ms": 2373,
+  "timings": {
+    "yolo_inference_ms": 186.575,
+    "ocr_processing_ms": 2154.862,
+    "ocr_total_scan_ms": 2154.862,
+    "ai_combined_ms": 2341.437
+  },
+  "expires_at": "2026-09-12T06:38:14.874552Z",
+  "items": [
+    {
+      "detection_id": "det-a44c9fa73c034dc7871e3ced66e83883",
+      "item": {
+        "id": "item-t003",
+        "sku": "T003",
+        "name": "Screwdriver",
+        "image_url": null
+      },
+      "quantity": 2,
+      "confidence": 0.8435618877410889,
+      "status": "review_needed",
+      "bbox": {
+        "x": 0.53921376953125,
+        "y": 0.4602736409505208,
+        "w": 0.33765146484375,
+        "h": 0.12172899034288194
+      },
+      "bboxes": [
+        {
+          "x": 0.53921376953125,
+          "y": 0.4602736409505208,
+          "w": 0.33765146484375,
+          "h": 0.12172899034288194
+        },
+        {
+          "x": 0.5295761067708333,
+          "y": 0.4207025485568576,
+          "w": 0.3445166015625,
+          "h": 0.1754558308919271
+        }
+      ],
+      "possible_matches": [
+        {
+          "item_id": "item-t003",
+          "sku": "T003",
+          "name": "Screwdriver",
+          "confidence": 0.8436
+        }
+      ],
+      "why": [],
+      "ocr": {
+        "detected_text": "incco | incco",
+        "normalized_sku": null,
+        "catalog_match": false,
+        "verification_status": "not_available",
+        "conflict_with_yolo": false,
+        "review_required": false,
+        "candidates": [],
+        "invalid_candidates": [],
+        "attempts": [
+          {
+            "detected_text": "incco",
+            "candidates": [],
+            "processing_time_ms": 812.4,
+            "error": null
+          },
+          {
+            "detected_text": "incco",
+            "candidates": [],
+            "processing_time_ms": 649.689,
+            "error": null
+          }
+        ],
+        "engine": "rapidocr:3.9.2",
+        "processing_time_ms": 1530.336,
+        "error": null
+      }
+    },
+    {
+      "detection_id": "det-f58634178a3a4dfc90d8fba96c3384dc",
+      "item": {
+        "id": "item-e019",
+        "sku": "E019",
+        "name": "LED Blue",
+        "image_url": null
+      },
+      "quantity": 1,
+      "confidence": 0.3298434615135193,
+      "status": "review_needed",
+      "bbox": {
+        "x": 0.6897268229166666,
+        "y": 0.46593665228949654,
+        "w": 0.18481256510416666,
+        "h": 0.11833987765842013
+      },
+      "bboxes": [
+        {
+          "x": 0.6897268229166666,
+          "y": 0.46593665228949654,
+          "w": 0.18481256510416666,
+          "h": 0.11833987765842013
+        }
+      ],
+      "possible_matches": [
+        {
+          "item_id": "item-e019",
+          "sku": "E019",
+          "name": "LED Blue",
+          "confidence": 0.3298
+        }
+      ],
+      "why": [],
+      "ocr": {
+        "detected_text": "incco",
+        "normalized_sku": null,
+        "catalog_match": false,
+        "verification_status": "not_available",
+        "conflict_with_yolo": false,
+        "review_required": false,
+        "candidates": [],
+        "invalid_candidates": [],
+        "attempts": [
+          {
+            "detected_text": "incco",
+            "candidates": [],
+            "processing_time_ms": 589.834,
+            "error": null
+          }
+        ],
+        "engine": "rapidocr:3.9.2",
+        "processing_time_ms": 624.526,
+        "error": null
+      }
+    }
+  ],
+  "summary": {
+    "detected_quantity": 3,
+    "ready_lines": 0,
+    "review_lines": 2,
+    "rejected_lines": 0
+  }
+}

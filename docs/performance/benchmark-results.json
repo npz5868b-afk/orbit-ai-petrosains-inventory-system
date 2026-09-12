@@ -1,0 +1,2157 @@
+{
+  "measured_at": "2026-09-12T14:05:13+0800",
+  "base_commit": "09759cb042e475635d1067d4102a4f7421457a04",
+  "warmups": 3,
+  "runs": 20,
+  "machine": {
+    "os": "Windows-11-10.0.26200-SP0",
+    "cpu": "AMD Ryzen 7 260 w/ Radeon 780M Graphics",
+    "logical_cpu_count": 16,
+    "ram_gib": 23.31,
+    "python": "3.12.14",
+    "torch": "2.13.0+cpu",
+    "torchvision": "0.28.0+cpu",
+    "ultralytics": "8.3.199",
+    "rapidocr": "3.9.2",
+    "onnxruntime": "1.29.0",
+    "node": "v24.15.0",
+    "pnpm": "11.19.0",
+    "nextjs": "16.3.3",
+    "model": "orbit_ai_5class_yolo11n_best.pt",
+    "device": "CPU"
+  },
+  "summary": {
+    "yolo_inference_ms": {
+      "runs": 20,
+      "mean": 209.291,
+      "median": 207.053,
+      "min": 100.969,
+      "max": 327.715,
+      "p95": 274.191
+    },
+    "ocr_processing_ms": {
+      "runs": 20,
+      "mean": 1125.427,
+      "median": 1149.005,
+      "min": 0.0,
+      "max": 2441.548,
+      "p95": 2166.886
+    },
+    "ai_combined_ms": {
+      "runs": 20,
+      "mean": 1334.718,
+      "median": 1364.403,
+      "min": 228.257,
+      "max": 2679.209,
+      "p95": 2267.855
+    },
+    "total_scan_api_ms": {
+      "runs": 20,
+      "mean": 1462.163,
+      "median": 1506.441,
+      "min": 384.292,
+      "max": 2848.89,
+      "p95": 2308.332
+    },
+    "bulk_return_ms": {
+      "runs": 19,
+      "mean": 13.81,
+      "median": 12.831,
+      "min": 11.064,
+      "max": 20.497,
+      "p95": 20.497
+    }
+  },
+  "records": [
+    {
+      "input": "T005_01.jpg",
+      "expected_sku": "T005",
+      "synthetic": false,
+      "yolo_inference_ms": 264.747,
+      "ocr_processing_ms": 999.827,
+      "ai_combined_ms": 1264.574,
+      "total_scan_api_ms": 1408.5254000001441,
+      "bulk_return_ms": 18.24620000024879,
+      "scan": {
+        "scan_session_id": "scan-db71f9bc74d44d35928b15684d5f8da7",
+        "client_scan_id": "benchmark-c52d0f6e8a52426fa1298a9dc25c08d2",
+        "status": "ready",
+        "store_id": "store-1",
+        "detector_version": "ultralytics:orbit_ai_5class_yolo11n_best.pt",
+        "processing_time_ms": 1387,
+        "timings": {
+          "yolo_inference_ms": 264.747,
+          "ocr_processing_ms": 999.827,
+          "ocr_total_scan_ms": 999.827,
+          "ai_combined_ms": 1264.574
+        },
+        "expires_at": "2026-09-12T06:34:42.843473Z",
+        "items": [
+          {
+            "detection_id": "det-7f06ff21665e40888b588f57b838b2a7",
+            "item": {
+              "id": "item-t005",
+              "sku": "T005",
+              "name": "Measure Tape",
+              "image_url": null
+            },
+            "quantity": 1,
+            "confidence": 0.9927793145179749,
+            "status": "ready",
+            "bbox": {
+              "x": 0.49202307265679707,
+              "y": 0.6431728615925537,
+              "w": 0.19206276260504201,
+              "h": 0.32344157280967945
+            },
+            "bboxes": [
+              {
+                "x": 0.49202307265679707,
+                "y": 0.6431728615925537,
+                "w": 0.19206276260504201,
+                "h": 0.32344157280967945
+              }
+            ],
+            "possible_matches": [],
+            "why": [],
+            "ocr": {
+              "detected_text": "VII SA AK-2764 Asaki GERI STEEL MEASURING TAPE \u9ad8\u633a\u5ea6 \u8d85\u8010\u78e8 5M 19m 19mm --- BAGA NAN",
+              "normalized_sku": null,
+              "catalog_match": false,
+              "verification_status": "invalid",
+              "conflict_with_yolo": false,
+              "review_required": false,
+              "candidates": [],
+              "invalid_candidates": [
+                "AK2764"
+              ],
+              "attempts": [
+                {
+                  "detected_text": "VII SA AK-2764 Asaki GERI STEEL MEASURING TAPE \u9ad8\u633a\u5ea6 \u8d85\u8010\u78e8 5M 19m 19mm --- BAGA NAN",
+                  "candidates": [
+                    "AK2764"
+                  ],
+                  "processing_time_ms": 920.23,
+                  "error": null
+                }
+              ],
+              "engine": "rapidocr:3.9.2",
+              "processing_time_ms": 999.827,
+              "error": null
+            }
+          }
+        ],
+        "summary": {
+          "detected_quantity": 1,
+          "ready_lines": 1,
+          "review_lines": 0,
+          "rejected_lines": 0
+        }
+      }
+    },
+    {
+      "input": "T005_02.jpg",
+      "expected_sku": "T005",
+      "synthetic": false,
+      "yolo_inference_ms": 181.053,
+      "ocr_processing_ms": 444.304,
+      "ai_combined_ms": 625.357,
+      "total_scan_api_ms": 714.6732999999585,
+      "bulk_return_ms": 12.850299999627168,
+      "scan": {
+        "scan_session_id": "scan-c5bec6ec657f43648937648a70c68710",
+        "client_scan_id": "benchmark-a53b0612082e4051874ad987b9f92620",
+        "status": "ready",
+        "store_id": "store-1",
+        "detector_version": "ultralytics:orbit_ai_5class_yolo11n_best.pt",
+        "processing_time_ms": 694,
+        "timings": {
+          "yolo_inference_ms": 181.053,
+          "ocr_processing_ms": 444.304,
+          "ocr_total_scan_ms": 444.304,
+          "ai_combined_ms": 625.357
+        },
+        "expires_at": "2026-09-12T06:34:43.576534Z",
+        "items": [
+          {
+            "detection_id": "det-c64ea20db3d94bb883e9aa7e6516a169",
+            "item": {
+              "id": "item-t005",
+              "sku": "T005",
+              "name": "Measure Tape",
+              "image_url": null
+            },
+            "quantity": 1,
+            "confidence": 0.9675622582435608,
+            "status": "ready",
+            "bbox": {
+              "x": 0.6014571686060131,
+              "y": 0.6269932701474145,
+              "w": 0.19677820491622575,
+              "h": 0.11037493508959574
+            },
+            "bboxes": [
+              {
+                "x": 0.6014571686060131,
+                "y": 0.6269932701474145,
+                "w": 0.19677820491622575,
+                "h": 0.11037493508959574
+              }
+            ],
+            "possible_matches": [],
+            "why": [],
+            "ocr": {
+              "detected_text": "AK-2764 Asaki STEEL MEASURING TAPE \u9ad8\u633a\u5ea6\u8d85\u8010\u78e8 5M x16ft width 19mm \u54d1\u5149\u7cbe\u94dc",
+              "normalized_sku": null,
+              "catalog_match": false,
+              "verification_status": "invalid",
+              "conflict_with_yolo": false,
+              "review_required": false,
+              "candidates": [],
+              "invalid_candidates": [
+                "AK2764"
+              ],
+              "attempts": [
+                {
+                  "detected_text": "AK-2764 Asaki STEEL MEASURING TAPE \u9ad8\u633a\u5ea6\u8d85\u8010\u78e8 5M x16ft width 19mm \u54d1\u5149\u7cbe\u94dc",
+                  "candidates": [
+                    "AK2764"
+                  ],
+                  "processing_time_ms": 428.032,
+                  "error": null
+                }
+              ],
+              "engine": "rapidocr:3.9.2",
+              "processing_time_ms": 444.304,
+              "error": null
+            }
+          }
+        ],
+        "summary": {
+          "detected_quantity": 1,
+          "ready_lines": 1,
+          "review_lines": 0,
+          "rejected_lines": 0
+        }
+      }
+    },
+    {
+      "input": "T005_03.jpg",
+      "expected_sku": "T005",
+      "synthetic": false,
+      "yolo_inference_ms": 235.491,
+      "ocr_processing_ms": 1407.051,
+      "ai_combined_ms": 1642.542,
+      "total_scan_api_ms": 1800.8417000000918,
+      "bulk_return_ms": 14.702500000566943,
+      "scan": {
+        "scan_session_id": "scan-ddb3f078d5a74e7299f89b3142d35179",
+        "client_scan_id": "benchmark-18af8028fda74fc8a74401f0c459e6ef",
+        "status": "review_needed",
+        "store_id": "store-1",
+        "detector_version": "ultralytics:orbit_ai_5class_yolo11n_best.pt",
+        "processing_time_ms": 1779,
+        "timings": {
+          "yolo_inference_ms": 235.491,
+          "ocr_processing_ms": 1407.051,
+          "ocr_total_scan_ms": 1407.051,
+          "ai_combined_ms": 1642.542
+        },
+        "expires_at": "2026-09-12T06:34:45.391507Z",
+        "items": [
+          {
+            "detection_id": "det-e9d7f6fa42cd4a7c90e84e27999e653e",
+            "item": {
+              "id": "item-t005",
+              "sku": "T005",
+              "name": "Measure Tape",
+              "image_url": null
+            },
+            "quantity": 1,
+            "confidence": 0.9835169911384583,
+            "status": "ready",
+            "bbox": {
+              "x": 0.32065477558210786,
+              "y": 0.7422249607308201,
+              "w": 0.22328472404586835,
+              "h": 0.17781066419623404
+            },
+            "bboxes": [
+              {
+                "x": 0.32065477558210786,
+                "y": 0.7422249607308201,
+                "w": 0.22328472404586835,
+                "h": 0.17781066419623404
+              }
+            ],
+            "possible_matches": [],
+            "why": [],
+            "ocr": {
+              "detected_text": "Skyworth AK-2764 Asaki STEEL MEASURING TAPE \u9ad8\u633a\u5ea6\u8d85\u8010\u78e8 5M  LMAU",
+              "normalized_sku": null,
+              "catalog_match": false,
+              "verification_status": "invalid",
+              "conflict_with_yolo": false,
+              "review_required": false,
+              "candidates": [],
+              "invalid_candidates": [
+                "AK2764"
+              ],
+              "attempts": [
+                {
+                  "detected_text": "Skyworth AK-2764 Asaki STEEL MEASURING TAPE \u9ad8\u633a\u5ea6\u8d85\u8010\u78e8 5M  LMAU",
+                  "candidates": [
+                    "AK2764"
+                  ],
+                  "processing_time_ms": 650.896,
+                  "error": null
+                }
+              ],
+              "engine": "rapidocr:3.9.2",
+              "processing_time_ms": 710.213,
+              "error": null
+            }
+          },
+          {
+            "detection_id": "det-17100ccfb8294b46ab1303c2d64007bb",
+            "item": {
+              "id": "item-t003",
+              "sku": "T003",
+              "name": "Screwdriver",
+              "image_url": null
+            },
+            "quantity": 1,
+            "confidence": 0.2884162962436676,
+            "status": "review_needed",
+            "bbox": {
+              "x": 0.31219014400193673,
+              "y": 0.7386359491713352,
+              "w": 0.23304690833853073,
+              "h": 0.1807360965219421
+            },
+            "bboxes": [
+              {
+                "x": 0.31219014400193673,
+                "y": 0.7386359491713352,
+                "w": 0.23304690833853073,
+                "h": 0.1807360965219421
+              }
+            ],
+            "possible_matches": [
+              {
+                "item_id": "item-t003",
+                "sku": "T003",
+                "name": "Screwdriver",
+                "confidence": 0.2884
+              }
+            ],
+            "why": [],
+            "ocr": {
+              "detected_text": "Skyworth AK-2764 Asaki STEEL MEASURING TAPE \u9ad8\u633a\u5ea6\u8d85\u8010\u78e8 5 M dh \u91cf\u5149\u7cbe\u8bad",
+              "normalized_sku": null,
+              "catalog_match": false,
+              "verification_status": "invalid",
+              "conflict_with_yolo": false,
+              "review_required": false,
+              "candidates": [],
+              "invalid_candidates": [
+                "AK2764"
+              ],
+              "attempts": [
+                {
+                  "detected_text": "Skyworth AK-2764 Asaki STEEL MEASURING TAPE \u9ad8\u633a\u5ea6\u8d85\u8010\u78e8 5 M dh \u91cf\u5149\u7cbe\u8bad",
+                  "candidates": [
+                    "AK2764"
+                  ],
+                  "processing_time_ms": 628.565,
+                  "error": null
+                }
+              ],
+              "engine": "rapidocr:3.9.2",
+              "processing_time_ms": 696.838,
+              "error": null
+            }
+          }
+        ],
+        "summary": {
+          "detected_quantity": 2,
+          "ready_lines": 1,
+          "review_lines": 1,
+          "rejected_lines": 0
+        }
+      }
+    },
+    {
+      "input": "L003_01.jpg",
+      "expected_sku": "L003",
+      "synthetic": false,
+      "yolo_inference_ms": 185.961,
+      "ocr_processing_ms": 1609.617,
+      "ai_combined_ms": 1795.578,
+      "total_scan_api_ms": 1898.742299999867,
+      "bulk_return_ms": 11.675800000375602,
+      "scan": {
+        "scan_session_id": "scan-725463e5ea6c4718a53746b17b37f155",
+        "client_scan_id": "benchmark-8858d163c548450496161df3ecdc0d91",
+        "status": "review_needed",
+        "store_id": "store-1",
+        "detector_version": "ultralytics:orbit_ai_5class_yolo11n_best.pt",
+        "processing_time_ms": 1878,
+        "timings": {
+          "yolo_inference_ms": 185.961,
+          "ocr_processing_ms": 1609.617,
+          "ocr_total_scan_ms": 1609.617,
+          "ai_combined_ms": 1795.578
+        },
+        "expires_at": "2026-09-12T06:34:47.316388Z",
+        "items": [
+          {
+            "detection_id": "det-0dc73197aa824f88bdda79430f69db2e",
+            "item": {
+              "id": "item-l003",
+              "sku": "L003",
+              "name": "Beaker 250ml",
+              "image_url": null
+            },
+            "quantity": 1,
+            "confidence": 0.9552465081214905,
+            "status": "ready",
+            "bbox": {
+              "x": 0.3488146262194114,
+              "y": 0.3839191557869079,
+              "w": 0.3432449260085979,
+              "h": 0.2666287800622365
+            },
+            "bboxes": [
+              {
+                "x": 0.3488146262194114,
+                "y": 0.3839191557869079,
+                "w": 0.3432449260085979,
+                "h": 0.2666287800622365
+              }
+            ],
+            "possible_matches": [],
+            "why": [],
+            "ocr": {
+              "detected_text": null,
+              "normalized_sku": null,
+              "catalog_match": false,
+              "verification_status": "not_available",
+              "conflict_with_yolo": false,
+              "review_required": false,
+              "candidates": [],
+              "invalid_candidates": [],
+              "attempts": [
+                {
+                  "detected_text": null,
+                  "candidates": [],
+                  "processing_time_ms": 604.815,
+                  "error": null
+                }
+              ],
+              "engine": "rapidocr:3.9.2",
+              "processing_time_ms": 692.426,
+              "error": null
+            }
+          },
+          {
+            "detection_id": "det-a8dc466759f14ad9ae70b18cdf281f48",
+            "item": {
+              "id": "item-t003",
+              "sku": "T003",
+              "name": "Screwdriver",
+              "image_url": null
+            },
+            "quantity": 1,
+            "confidence": 0.252153605222702,
+            "status": "review_needed",
+            "bbox": {
+              "x": 0.3390712435283358,
+              "y": 0.0,
+              "w": 0.6014213360175884,
+              "h": 0.21417651100764198
+            },
+            "bboxes": [
+              {
+                "x": 0.3390712435283358,
+                "y": 0.0,
+                "w": 0.6014213360175884,
+                "h": 0.21417651100764198
+              }
+            ],
+            "possible_matches": [
+              {
+                "item_id": "item-t003",
+                "sku": "T003",
+                "name": "Screwdriver",
+                "confidence": 0.2522
+              }
+            ],
+            "why": [],
+            "ocr": {
+              "detected_text": null,
+              "normalized_sku": null,
+              "catalog_match": false,
+              "verification_status": "not_available",
+              "conflict_with_yolo": false,
+              "review_required": false,
+              "candidates": [],
+              "invalid_candidates": [],
+              "attempts": [
+                {
+                  "detected_text": null,
+                  "candidates": [],
+                  "processing_time_ms": 813.288,
+                  "error": null
+                }
+              ],
+              "engine": "rapidocr:3.9.2",
+              "processing_time_ms": 917.191,
+              "error": null
+            }
+          }
+        ],
+        "summary": {
+          "detected_quantity": 2,
+          "ready_lines": 1,
+          "review_lines": 1,
+          "rejected_lines": 0
+        }
+      }
+    },
+    {
+      "input": "L003_02.jpg",
+      "expected_sku": "L003",
+      "synthetic": false,
+      "yolo_inference_ms": 176.31,
+      "ocr_processing_ms": 1497.054,
+      "ai_combined_ms": 1673.364,
+      "total_scan_api_ms": 1767.9583999997703,
+      "bulk_return_ms": 20.49669999996695,
+      "scan": {
+        "scan_session_id": "scan-28e97664a0654053aff2e4fbb7d888af",
+        "client_scan_id": "benchmark-590d6b7496d04fbcaed6e83e58687102",
+        "status": "ready",
+        "store_id": "store-1",
+        "detector_version": "ultralytics:orbit_ai_5class_yolo11n_best.pt",
+        "processing_time_ms": 1749,
+        "timings": {
+          "yolo_inference_ms": 176.31,
+          "ocr_processing_ms": 1497.054,
+          "ocr_total_scan_ms": 1497.054,
+          "ai_combined_ms": 1673.364
+        },
+        "expires_at": "2026-09-12T06:34:49.108397Z",
+        "items": [
+          {
+            "detection_id": "det-7ce545cf2f6444bf99b345adce7e1508",
+            "item": {
+              "id": "item-l003",
+              "sku": "L003",
+              "name": "Beaker 250ml",
+              "image_url": null
+            },
+            "quantity": 1,
+            "confidence": 0.9608234167098999,
+            "status": "ready",
+            "bbox": {
+              "x": 0.2445922124953497,
+              "y": 0.3252601623535156,
+              "w": 0.4871259820524347,
+              "h": 0.3547017536466084
+            },
+            "bboxes": [
+              {
+                "x": 0.2445922124953497,
+                "y": 0.3252601623535156,
+                "w": 0.4871259820524347,
+                "h": 0.3547017536466084
+              }
+            ],
+            "possible_matches": [],
+            "why": [],
+            "ocr": {
+              "detected_text": "\u5927",
+              "normalized_sku": null,
+              "catalog_match": false,
+              "verification_status": "not_available",
+              "conflict_with_yolo": false,
+              "review_required": false,
+              "candidates": [],
+              "invalid_candidates": [],
+              "attempts": [
+                {
+                  "detected_text": "\u5927",
+                  "candidates": [],
+                  "processing_time_ms": 1341.008,
+                  "error": null
+                }
+              ],
+              "engine": "rapidocr:3.9.2",
+              "processing_time_ms": 1497.054,
+              "error": null
+            }
+          }
+        ],
+        "summary": {
+          "detected_quantity": 1,
+          "ready_lines": 1,
+          "review_lines": 0,
+          "rejected_lines": 0
+        }
+      }
+    },
+    {
+      "input": "L003_03.jpg",
+      "expected_sku": "L003",
+      "synthetic": false,
+      "yolo_inference_ms": 327.715,
+      "ocr_processing_ms": 1678.381,
+      "ai_combined_ms": 2006.096,
+      "total_scan_api_ms": 2208.977000000232,
+      "bulk_return_ms": 12.830900000153633,
+      "scan": {
+        "scan_session_id": "scan-5d32359760dc4251ae3b3e2001ac7243",
+        "client_scan_id": "benchmark-eb5be1795ed040338c1409680214a1f8",
+        "status": "ready",
+        "store_id": "store-1",
+        "detector_version": "ultralytics:orbit_ai_5class_yolo11n_best.pt",
+        "processing_time_ms": 2184,
+        "timings": {
+          "yolo_inference_ms": 327.715,
+          "ocr_processing_ms": 1678.381,
+          "ocr_total_scan_ms": 1678.381,
+          "ai_combined_ms": 2006.096
+        },
+        "expires_at": "2026-09-12T06:34:51.333437Z",
+        "items": [
+          {
+            "detection_id": "det-ab8b99361ebf4a13a37ad8b561295d0e",
+            "item": {
+              "id": "item-l003",
+              "sku": "L003",
+              "name": "Beaker 250ml",
+              "image_url": null
+            },
+            "quantity": 1,
+            "confidence": 0.9634368419647217,
+            "status": "ready",
+            "bbox": {
+              "x": 0.4898588178761088,
+              "y": 0.48206468256247814,
+              "w": 0.3217896533613445,
+              "h": 0.29669091147201065
+            },
+            "bboxes": [
+              {
+                "x": 0.4898588178761088,
+                "y": 0.48206468256247814,
+                "w": 0.3217896533613445,
+                "h": 0.29669091147201065
+              }
+            ],
+            "possible_matches": [],
+            "why": [],
+            "ocr": {
+              "detected_text": "PANOO!",
+              "normalized_sku": null,
+              "catalog_match": false,
+              "verification_status": "not_available",
+              "conflict_with_yolo": false,
+              "review_required": false,
+              "candidates": [],
+              "invalid_candidates": [],
+              "attempts": [
+                {
+                  "detected_text": "PANOO!",
+                  "candidates": [],
+                  "processing_time_ms": 1495.227,
+                  "error": null
+                }
+              ],
+              "engine": "rapidocr:3.9.2",
+              "processing_time_ms": 1678.381,
+              "error": null
+            }
+          }
+        ],
+        "summary": {
+          "detected_quantity": 1,
+          "ready_lines": 1,
+          "review_lines": 0,
+          "rejected_lines": 0
+        }
+      }
+    },
+    {
+      "input": "E018_01.jpg",
+      "expected_sku": "E018",
+      "synthetic": false,
+      "yolo_inference_ms": 274.191,
+      "ocr_processing_ms": 1158.72,
+      "ai_combined_ms": 1432.911,
+      "total_scan_api_ms": 1614.328999999998,
+      "bulk_return_ms": 12.270799999896553,
+      "scan": {
+        "scan_session_id": "scan-7424b49e105347f5a3db536ac3089d54",
+        "client_scan_id": "benchmark-a4a64c8615d3469981fd777e4d6e9881",
+        "status": "review_needed",
+        "store_id": "store-1",
+        "detector_version": "ultralytics:orbit_ai_5class_yolo11n_best.pt",
+        "processing_time_ms": 1592,
+        "timings": {
+          "yolo_inference_ms": 274.191,
+          "ocr_processing_ms": 1158.72,
+          "ocr_total_scan_ms": 1158.72,
+          "ai_combined_ms": 1432.911
+        },
+        "expires_at": "2026-09-12T06:34:52.964580Z",
+        "items": [
+          {
+            "detection_id": "det-5ad0e61808c645ebb5c150430bafd873",
+            "item": {
+              "id": "item-e019",
+              "sku": "E019",
+              "name": "LED Blue",
+              "image_url": null
+            },
+            "quantity": 1,
+            "confidence": 0.9753819704055786,
+            "status": "ready",
+            "bbox": {
+              "x": 0.4635834585570339,
+              "y": 0.46184033305705097,
+              "w": 0.20953010110294118,
+              "h": 0.10898917061941964
+            },
+            "bboxes": [
+              {
+                "x": 0.4635834585570339,
+                "y": 0.46184033305705097,
+                "w": 0.20953010110294118,
+                "h": 0.10898917061941964
+              }
+            ],
+            "possible_matches": [],
+            "why": [],
+            "ocr": {
+              "detected_text": "2 5 20",
+              "normalized_sku": null,
+              "catalog_match": false,
+              "verification_status": "not_available",
+              "conflict_with_yolo": false,
+              "review_required": false,
+              "candidates": [],
+              "invalid_candidates": [],
+              "attempts": [
+                {
+                  "detected_text": "2 5 20",
+                  "candidates": [],
+                  "processing_time_ms": 342.673,
+                  "error": null
+                }
+              ],
+              "engine": "rapidocr:3.9.2",
+              "processing_time_ms": 374.443,
+              "error": null
+            }
+          },
+          {
+            "detection_id": "det-d3a0c668f33e4835a535a198b1c0afbf",
+            "item": {
+              "id": "item-e018",
+              "sku": "E018",
+              "name": "LED Red",
+              "image_url": null
+            },
+            "quantity": 1,
+            "confidence": 0.6825335621833801,
+            "status": "review_needed",
+            "bbox": {
+              "x": 0.34582249783593993,
+              "y": 0.3099026078937434,
+              "w": 0.06739109489281823,
+              "h": 0.1483565258378742
+            },
+            "bboxes": [
+              {
+                "x": 0.34582249783593993,
+                "y": 0.3099026078937434,
+                "w": 0.06739109489281823,
+                "h": 0.1483565258378742
+              }
+            ],
+            "possible_matches": [
+              {
+                "item_id": "item-e018",
+                "sku": "E018",
+                "name": "LED Red",
+                "confidence": 0.6825
+              }
+            ],
+            "why": [],
+            "ocr": {
+              "detected_text": null,
+              "normalized_sku": null,
+              "catalog_match": false,
+              "verification_status": "not_available",
+              "conflict_with_yolo": false,
+              "review_required": false,
+              "candidates": [],
+              "invalid_candidates": [],
+              "attempts": [
+                {
+                  "detected_text": null,
+                  "candidates": [],
+                  "processing_time_ms": 764.769,
+                  "error": null
+                }
+              ],
+              "engine": "rapidocr:3.9.2",
+              "processing_time_ms": 784.277,
+              "error": null
+            }
+          }
+        ],
+        "summary": {
+          "detected_quantity": 2,
+          "ready_lines": 1,
+          "review_lines": 1,
+          "rejected_lines": 0
+        }
+      }
+    },
+    {
+      "input": "E018_02.jpg",
+      "expected_sku": "E018",
+      "synthetic": false,
+      "yolo_inference_ms": 234.037,
+      "ocr_processing_ms": 985.14,
+      "ai_combined_ms": 1219.177,
+      "total_scan_api_ms": 1380.1777999997284,
+      "bulk_return_ms": 12.471800000639632,
+      "scan": {
+        "scan_session_id": "scan-e3e94c1c93214c32a55fb12622dd2e92",
+        "client_scan_id": "benchmark-02222c502872406487c12f6a6d2e81ae",
+        "status": "review_needed",
+        "store_id": "store-1",
+        "detector_version": "ultralytics:orbit_ai_5class_yolo11n_best.pt",
+        "processing_time_ms": 1358,
+        "timings": {
+          "yolo_inference_ms": 234.037,
+          "ocr_processing_ms": 985.14,
+          "ocr_total_scan_ms": 985.14,
+          "ai_combined_ms": 1219.177
+        },
+        "expires_at": "2026-09-12T06:34:54.368542Z",
+        "items": [
+          {
+            "detection_id": "det-7bde90c9e63b4a77b866f923dca08958",
+            "item": {
+              "id": "item-e019",
+              "sku": "E019",
+              "name": "LED Blue",
+              "image_url": null
+            },
+            "quantity": 1,
+            "confidence": 0.9753819704055786,
+            "status": "ready",
+            "bbox": {
+              "x": 0.4635834585570339,
+              "y": 0.46184033305705097,
+              "w": 0.20953010110294118,
+              "h": 0.10898917061941964
+            },
+            "bboxes": [
+              {
+                "x": 0.4635834585570339,
+                "y": 0.46184033305705097,
+                "w": 0.20953010110294118,
+                "h": 0.10898917061941964
+              }
+            ],
+            "possible_matches": [],
+            "why": [],
+            "ocr": {
+              "detected_text": "2 5 20",
+              "normalized_sku": null,
+              "catalog_match": false,
+              "verification_status": "not_available",
+              "conflict_with_yolo": false,
+              "review_required": false,
+              "candidates": [],
+              "invalid_candidates": [],
+              "attempts": [
+                {
+                  "detected_text": "2 5 20",
+                  "candidates": [],
+                  "processing_time_ms": 332.561,
+                  "error": null
+                }
+              ],
+              "engine": "rapidocr:3.9.2",
+              "processing_time_ms": 372.588,
+              "error": null
+            }
+          },
+          {
+            "detection_id": "det-a562d573cc7048fea06a5ba20fc7017d",
+            "item": {
+              "id": "item-e018",
+              "sku": "E018",
+              "name": "LED Red",
+              "image_url": null
+            },
+            "quantity": 1,
+            "confidence": 0.6825335621833801,
+            "status": "review_needed",
+            "bbox": {
+              "x": 0.34582249783593993,
+              "y": 0.3099026078937434,
+              "w": 0.06739109489281823,
+              "h": 0.1483565258378742
+            },
+            "bboxes": [
+              {
+                "x": 0.34582249783593993,
+                "y": 0.3099026078937434,
+                "w": 0.06739109489281823,
+                "h": 0.1483565258378742
+              }
+            ],
+            "possible_matches": [
+              {
+                "item_id": "item-e018",
+                "sku": "E018",
+                "name": "LED Red",
+                "confidence": 0.6825
+              }
+            ],
+            "why": [],
+            "ocr": {
+              "detected_text": null,
+              "normalized_sku": null,
+              "catalog_match": false,
+              "verification_status": "not_available",
+              "conflict_with_yolo": false,
+              "review_required": false,
+              "candidates": [],
+              "invalid_candidates": [],
+              "attempts": [
+                {
+                  "detected_text": null,
+                  "candidates": [],
+                  "processing_time_ms": 592.523,
+                  "error": null
+                }
+              ],
+              "engine": "rapidocr:3.9.2",
+              "processing_time_ms": 612.552,
+              "error": null
+            }
+          }
+        ],
+        "summary": {
+          "detected_quantity": 2,
+          "ready_lines": 1,
+          "review_lines": 1,
+          "rejected_lines": 0
+        }
+      }
+    },
+    {
+      "input": "E019_01.jpg",
+      "expected_sku": "E019",
+      "synthetic": false,
+      "yolo_inference_ms": 237.661,
+      "ocr_processing_ms": 2441.548,
+      "ai_combined_ms": 2679.209,
+      "total_scan_api_ms": 2848.889799999597,
+      "bulk_return_ms": 11.788099999648693,
+      "scan": {
+        "scan_session_id": "scan-bcc7691911ec446eabc35527b28e069f",
+        "client_scan_id": "benchmark-e22791563f3f496a82a6fdc2b00a06cd",
+        "status": "review_needed",
+        "store_id": "store-1",
+        "detector_version": "ultralytics:orbit_ai_5class_yolo11n_best.pt",
+        "processing_time_ms": 2826,
+        "timings": {
+          "yolo_inference_ms": 237.661,
+          "ocr_processing_ms": 2441.548,
+          "ocr_total_scan_ms": 2441.548,
+          "ai_combined_ms": 2679.209
+        },
+        "expires_at": "2026-09-12T06:34:57.241838Z",
+        "items": [
+          {
+            "detection_id": "det-071c5083bbe84c19a8064e55b448c32d",
+            "item": {
+              "id": "item-t003",
+              "sku": "T003",
+              "name": "Screwdriver",
+              "image_url": null
+            },
+            "quantity": 3,
+            "confidence": 0.7001398801803589,
+            "status": "review_needed",
+            "bbox": {
+              "x": 0.4946072124596366,
+              "y": 0.056218748333073464,
+              "w": 0.4991258276313998,
+              "h": 0.09266861880860743
+            },
+            "bboxes": [
+              {
+                "x": 0.4946072124596366,
+                "y": 0.056218748333073464,
+                "w": 0.4991258276313998,
+                "h": 0.09266861880860743
+              },
+              {
+                "x": 0.26733136288369513,
+                "y": 0.5403404342694109,
+                "w": 0.6681593590127023,
+                "h": 0.07365874816723564
+              },
+              {
+                "x": 0.5069831209393479,
+                "y": 0.01651055739373386,
+                "w": 0.49301687906065206,
+                "h": 0.13340764352921344
+              }
+            ],
+            "possible_matches": [
+              {
+                "item_id": "item-t003",
+                "sku": "T003",
+                "name": "Screwdriver",
+                "confidence": 0.7001
+              }
+            ],
+            "why": [],
+            "ocr": {
+              "detected_text": "O micro:bit BATTERY LEATENA RESET | 50 20 R51O-D3 COED O 00 70-1 | micro:bit BBC BATTERY BLET ANA RESET",
+              "normalized_sku": null,
+              "catalog_match": false,
+              "verification_status": "not_available",
+              "conflict_with_yolo": false,
+              "review_required": false,
+              "candidates": [],
+              "invalid_candidates": [],
+              "attempts": [
+                {
+                  "detected_text": "O micro:bit BATTERY LEATENA RESET",
+                  "candidates": [],
+                  "processing_time_ms": 695.891,
+                  "error": null
+                },
+                {
+                  "detected_text": "50 20 R51O-D3 COED O 00 70-1",
+                  "candidates": [],
+                  "processing_time_ms": 693.178,
+                  "error": null
+                },
+                {
+                  "detected_text": "micro:bit BBC BATTERY BLET ANA RESET",
+                  "candidates": [],
+                  "processing_time_ms": 783.053,
+                  "error": null
+                }
+              ],
+              "engine": "rapidocr:3.9.2",
+              "processing_time_ms": 2441.548,
+              "error": null
+            }
+          }
+        ],
+        "summary": {
+          "detected_quantity": 3,
+          "ready_lines": 0,
+          "review_lines": 1,
+          "rejected_lines": 0
+        }
+      }
+    },
+    {
+      "input": "E019_02.jpg",
+      "expected_sku": "E019",
+      "synthetic": false,
+      "yolo_inference_ms": 228.257,
+      "ocr_processing_ms": 0.0,
+      "ai_combined_ms": 228.257,
+      "total_scan_api_ms": 384.29249999990134,
+      "bulk_return_ms": null,
+      "scan": {
+        "scan_session_id": "scan-3a13b8ac2d384907bc644b3f3e8d2edd",
+        "client_scan_id": "benchmark-cd2d57ab0b25460aa8d4362438d27e61",
+        "status": "ready",
+        "store_id": "store-1",
+        "detector_version": "ultralytics:orbit_ai_5class_yolo11n_best.pt",
+        "processing_time_ms": 364,
+        "timings": {
+          "yolo_inference_ms": 228.257,
+          "ocr_processing_ms": 0.0,
+          "ocr_total_scan_ms": 0.0,
+          "ai_combined_ms": 228.257
+        },
+        "expires_at": "2026-09-12T06:34:57.650834Z",
+        "items": [],
+        "summary": {
+          "detected_quantity": 0,
+          "ready_lines": 0,
+          "review_lines": 0,
+          "rejected_lines": 0
+        }
+      }
+    },
+    {
+      "input": "E019_03.jpg",
+      "expected_sku": "E019",
+      "synthetic": false,
+      "yolo_inference_ms": 167.303,
+      "ocr_processing_ms": 457.698,
+      "ai_combined_ms": 625.001,
+      "total_scan_api_ms": 715.3231000002052,
+      "bulk_return_ms": 15.523299999586015,
+      "scan": {
+        "scan_session_id": "scan-8c501761d81e4573b8ee14fdb433a98c",
+        "client_scan_id": "benchmark-12e8f53524f14dc483b3ab844401016b",
+        "status": "ready",
+        "store_id": "store-1",
+        "detector_version": "ultralytics:orbit_ai_5class_yolo11n_best.pt",
+        "processing_time_ms": 690,
+        "timings": {
+          "yolo_inference_ms": 167.303,
+          "ocr_processing_ms": 457.698,
+          "ocr_total_scan_ms": 457.698,
+          "ai_combined_ms": 625.001
+        },
+        "expires_at": "2026-09-12T06:34:58.360614Z",
+        "items": [
+          {
+            "detection_id": "det-d208f0eaf7e3421a83b18fe9b14b57e5",
+            "item": {
+              "id": "item-e019",
+              "sku": "E019",
+              "name": "LED Blue",
+              "image_url": null
+            },
+            "quantity": 1,
+            "confidence": 0.9570996165275574,
+            "status": "ready",
+            "bbox": {
+              "x": 0.39725374628837357,
+              "y": 0.36518426925416975,
+              "w": 0.14041431030058146,
+              "h": 0.17701954311794704
+            },
+            "bboxes": [
+              {
+                "x": 0.39725374628837357,
+                "y": 0.36518426925416975,
+                "w": 0.14041431030058146,
+                "h": 0.17701954311794704
+              }
+            ],
+            "possible_matches": [],
+            "why": [],
+            "ocr": {
+              "detected_text": null,
+              "normalized_sku": null,
+              "catalog_match": false,
+              "verification_status": "not_available",
+              "conflict_with_yolo": false,
+              "review_required": false,
+              "candidates": [],
+              "invalid_candidates": [],
+              "attempts": [
+                {
+                  "detected_text": null,
+                  "candidates": [],
+                  "processing_time_ms": 437.373,
+                  "error": null
+                }
+              ],
+              "engine": "rapidocr:3.9.2",
+              "processing_time_ms": 457.698,
+              "error": null
+            }
+          }
+        ],
+        "summary": {
+          "detected_quantity": 1,
+          "ready_lines": 1,
+          "review_lines": 0,
+          "rejected_lines": 0
+        }
+      }
+    },
+    {
+      "input": "T003_multi_object_synthetic.jpg",
+      "expected_sku": "T003",
+      "synthetic": true,
+      "yolo_inference_ms": 100.969,
+      "ocr_processing_ms": 2166.886,
+      "ai_combined_ms": 2267.855,
+      "total_scan_api_ms": 2308.3321000003707,
+      "bulk_return_ms": 13.07749999978114,
+      "scan": {
+        "scan_session_id": "scan-e9f0802b749e4ea18eb610e3ea239385",
+        "client_scan_id": "benchmark-d9e7ee8917ce4379ba0ca874497d3d01",
+        "status": "review_needed",
+        "store_id": "store-1",
+        "detector_version": "ultralytics:orbit_ai_5class_yolo11n_best.pt",
+        "processing_time_ms": 2286,
+        "timings": {
+          "yolo_inference_ms": 100.969,
+          "ocr_processing_ms": 2166.886,
+          "ocr_total_scan_ms": 2166.886,
+          "ai_combined_ms": 2267.855
+        },
+        "expires_at": "2026-09-12T06:35:00.686660Z",
+        "items": [
+          {
+            "detection_id": "det-26a6c0cc278b492ea1a484fedfdee5dd",
+            "item": {
+              "id": "item-t003",
+              "sku": "T003",
+              "name": "Screwdriver",
+              "image_url": null
+            },
+            "quantity": 2,
+            "confidence": 0.8435618877410889,
+            "status": "review_needed",
+            "bbox": {
+              "x": 0.53921376953125,
+              "y": 0.4602736409505208,
+              "w": 0.33765146484375,
+              "h": 0.12172899034288194
+            },
+            "bboxes": [
+              {
+                "x": 0.53921376953125,
+                "y": 0.4602736409505208,
+                "w": 0.33765146484375,
+                "h": 0.12172899034288194
+              },
+              {
+                "x": 0.5295761067708333,
+                "y": 0.4207025485568576,
+                "w": 0.3445166015625,
+                "h": 0.1754558308919271
+              }
+            ],
+            "possible_matches": [
+              {
+                "item_id": "item-t003",
+                "sku": "T003",
+                "name": "Screwdriver",
+                "confidence": 0.8436
+              }
+            ],
+            "why": [],
+            "ocr": {
+              "detected_text": "incco | incco",
+              "normalized_sku": null,
+              "catalog_match": false,
+              "verification_status": "not_available",
+              "conflict_with_yolo": false,
+              "review_required": false,
+              "candidates": [],
+              "invalid_candidates": [],
+              "attempts": [
+                {
+                  "detected_text": "incco",
+                  "candidates": [],
+                  "processing_time_ms": 803.003,
+                  "error": null
+                },
+                {
+                  "detected_text": "incco",
+                  "candidates": [],
+                  "processing_time_ms": 665.025,
+                  "error": null
+                }
+              ],
+              "engine": "rapidocr:3.9.2",
+              "processing_time_ms": 1532.644,
+              "error": null
+            }
+          },
+          {
+            "detection_id": "det-0969435c59e34279a5e300d0b54b1a43",
+            "item": {
+              "id": "item-e019",
+              "sku": "E019",
+              "name": "LED Blue",
+              "image_url": null
+            },
+            "quantity": 1,
+            "confidence": 0.3298434615135193,
+            "status": "review_needed",
+            "bbox": {
+              "x": 0.6897268229166666,
+              "y": 0.46593665228949654,
+              "w": 0.18481256510416666,
+              "h": 0.11833987765842013
+            },
+            "bboxes": [
+              {
+                "x": 0.6897268229166666,
+                "y": 0.46593665228949654,
+                "w": 0.18481256510416666,
+                "h": 0.11833987765842013
+              }
+            ],
+            "possible_matches": [
+              {
+                "item_id": "item-e019",
+                "sku": "E019",
+                "name": "LED Blue",
+                "confidence": 0.3298
+              }
+            ],
+            "why": [],
+            "ocr": {
+              "detected_text": "incco",
+              "normalized_sku": null,
+              "catalog_match": false,
+              "verification_status": "not_available",
+              "conflict_with_yolo": false,
+              "review_required": false,
+              "candidates": [],
+              "invalid_candidates": [],
+              "attempts": [
+                {
+                  "detected_text": "incco",
+                  "candidates": [],
+                  "processing_time_ms": 612.24,
+                  "error": null
+                }
+              ],
+              "engine": "rapidocr:3.9.2",
+              "processing_time_ms": 634.242,
+              "error": null
+            }
+          }
+        ],
+        "summary": {
+          "detected_quantity": 3,
+          "ready_lines": 0,
+          "review_lines": 2,
+          "rejected_lines": 0
+        }
+      }
+    },
+    {
+      "input": "T003_01.jpg",
+      "expected_sku": "T003",
+      "synthetic": false,
+      "yolo_inference_ms": 181.622,
+      "ocr_processing_ms": 869.873,
+      "ai_combined_ms": 1051.495,
+      "total_scan_api_ms": 1165.869699999348,
+      "bulk_return_ms": 11.064499999520194,
+      "scan": {
+        "scan_session_id": "scan-ec42f8b7c2ea488f825c18ea6ed3c273",
+        "client_scan_id": "benchmark-c23b8073aa5142e68e8f86e1ab60f1a4",
+        "status": "review_needed",
+        "store_id": "store-1",
+        "detector_version": "ultralytics:orbit_ai_5class_yolo11n_best.pt",
+        "processing_time_ms": 1139,
+        "timings": {
+          "yolo_inference_ms": 181.622,
+          "ocr_processing_ms": 869.873,
+          "ocr_total_scan_ms": 869.873,
+          "ai_combined_ms": 1051.495
+        },
+        "expires_at": "2026-09-12T06:35:01.887702Z",
+        "items": [
+          {
+            "detection_id": "det-51514f5c973c46018c26b5cc52433a97",
+            "item": {
+              "id": "item-t003",
+              "sku": "T003",
+              "name": "Screwdriver",
+              "image_url": null
+            },
+            "quantity": 1,
+            "confidence": 0.414218932390213,
+            "status": "review_needed",
+            "bbox": {
+              "x": 0.5439474666819853,
+              "y": 0.36346872367110905,
+              "w": 0.2947682100183823,
+              "h": 0.4437871596392463
+            },
+            "bboxes": [
+              {
+                "x": 0.5439474666819853,
+                "y": 0.36346872367110905,
+                "w": 0.2947682100183823,
+                "h": 0.4437871596392463
+              }
+            ],
+            "possible_matches": [
+              {
+                "item_id": "item-t003",
+                "sku": "T003",
+                "name": "Screwdriver",
+                "confidence": 0.4142
+              }
+            ],
+            "why": [],
+            "ocr": {
+              "detected_text": "8 incco 11",
+              "normalized_sku": null,
+              "catalog_match": false,
+              "verification_status": "not_available",
+              "conflict_with_yolo": false,
+              "review_required": false,
+              "candidates": [],
+              "invalid_candidates": [],
+              "attempts": [
+                {
+                  "detected_text": "8 incco 11",
+                  "candidates": [],
+                  "processing_time_ms": 735.402,
+                  "error": null
+                }
+              ],
+              "engine": "rapidocr:3.9.2",
+              "processing_time_ms": 869.873,
+              "error": null
+            }
+          }
+        ],
+        "summary": {
+          "detected_quantity": 1,
+          "ready_lines": 0,
+          "review_lines": 1,
+          "rejected_lines": 0
+        }
+      }
+    },
+    {
+      "input": "T003_02.jpg",
+      "expected_sku": "T003",
+      "synthetic": false,
+      "yolo_inference_ms": 187.849,
+      "ocr_processing_ms": 1172.411,
+      "ai_combined_ms": 1360.26,
+      "total_scan_api_ms": 1497.4006000002191,
+      "bulk_return_ms": 14.15640000050189,
+      "scan": {
+        "scan_session_id": "scan-6c41636b94ff475799fc374f01ff2ae6",
+        "client_scan_id": "benchmark-907bd5576fac43749d3bd3122ed5adde",
+        "status": "ready",
+        "store_id": "store-1",
+        "detector_version": "ultralytics:orbit_ai_5class_yolo11n_best.pt",
+        "processing_time_ms": 1477,
+        "timings": {
+          "yolo_inference_ms": 187.849,
+          "ocr_processing_ms": 1172.411,
+          "ocr_total_scan_ms": 1172.411,
+          "ai_combined_ms": 1360.26
+        },
+        "expires_at": "2026-09-12T06:35:03.416471Z",
+        "items": [
+          {
+            "detection_id": "det-368334f43632494c994d37d57cc05c88",
+            "item": {
+              "id": "item-t003",
+              "sku": "T003",
+              "name": "Screwdriver",
+              "image_url": null
+            },
+            "quantity": 2,
+            "confidence": 0.8705652356147766,
+            "status": "ready",
+            "bbox": {
+              "x": 0.26945672128714765,
+              "y": 0.46296913296568626,
+              "w": 0.5282659493240656,
+              "h": 0.12741260403901145
+            },
+            "bboxes": [
+              {
+                "x": 0.26945672128714765,
+                "y": 0.46296913296568626,
+                "w": 0.5282659493240656,
+                "h": 0.12741260403901145
+              },
+              {
+                "x": 0.4996915630265778,
+                "y": 0.4625799041947508,
+                "w": 0.3026380651137408,
+                "h": 0.12784132614634394
+              }
+            ],
+            "possible_matches": [],
+            "why": [],
+            "ocr": {
+              "detected_text": "incco",
+              "normalized_sku": null,
+              "catalog_match": false,
+              "verification_status": "not_available",
+              "conflict_with_yolo": false,
+              "review_required": false,
+              "candidates": [],
+              "invalid_candidates": [],
+              "attempts": [
+                {
+                  "detected_text": null,
+                  "candidates": [],
+                  "processing_time_ms": 568.63,
+                  "error": null
+                },
+                {
+                  "detected_text": "incco",
+                  "candidates": [],
+                  "processing_time_ms": 454.653,
+                  "error": null
+                }
+              ],
+              "engine": "rapidocr:3.9.2",
+              "processing_time_ms": 1172.411,
+              "error": null
+            }
+          }
+        ],
+        "summary": {
+          "detected_quantity": 2,
+          "ready_lines": 1,
+          "review_lines": 0,
+          "rejected_lines": 0
+        }
+      }
+    },
+    {
+      "input": "T003_03.jpg",
+      "expected_sku": "T003",
+      "synthetic": false,
+      "yolo_inference_ms": 223.605,
+      "ocr_processing_ms": 751.127,
+      "ai_combined_ms": 974.732,
+      "total_scan_api_ms": 1103.1535000001895,
+      "bulk_return_ms": 19.588399999520334,
+      "scan": {
+        "scan_session_id": "scan-f7248476231a4c1b83f34e761982227e",
+        "client_scan_id": "benchmark-20e8d29fb45f4869a4bcb439700893e0",
+        "status": "review_needed",
+        "store_id": "store-1",
+        "detector_version": "ultralytics:orbit_ai_5class_yolo11n_best.pt",
+        "processing_time_ms": 1085,
+        "timings": {
+          "yolo_inference_ms": 223.605,
+          "ocr_processing_ms": 751.127,
+          "ocr_total_scan_ms": 751.127,
+          "ai_combined_ms": 974.732
+        },
+        "expires_at": "2026-09-12T06:35:04.534357Z",
+        "items": [
+          {
+            "detection_id": "det-70ab377c01514ef9855915466c074531",
+            "item": {
+              "id": "item-t003",
+              "sku": "T003",
+              "name": "Screwdriver",
+              "image_url": null
+            },
+            "quantity": 1,
+            "confidence": 0.7502440810203552,
+            "status": "review_needed",
+            "bbox": {
+              "x": 0.3983618243847018,
+              "y": 0.19366836547851562,
+              "w": 0.16292608921823937,
+              "h": 0.6499936720904183
+            },
+            "bboxes": [
+              {
+                "x": 0.3983618243847018,
+                "y": 0.19366836547851562,
+                "w": 0.16292608921823937,
+                "h": 0.6499936720904183
+              }
+            ],
+            "possible_matches": [
+              {
+                "item_id": "item-t003",
+                "sku": "T003",
+                "name": "Screwdriver",
+                "confidence": 0.7502
+              }
+            ],
+            "why": [],
+            "ocr": {
+              "detected_text": null,
+              "normalized_sku": null,
+              "catalog_match": false,
+              "verification_status": "not_available",
+              "conflict_with_yolo": false,
+              "review_required": false,
+              "candidates": [],
+              "invalid_candidates": [],
+              "attempts": [
+                {
+                  "detected_text": null,
+                  "candidates": [],
+                  "processing_time_ms": 589.687,
+                  "error": null
+                }
+              ],
+              "engine": "rapidocr:3.9.2",
+              "processing_time_ms": 751.127,
+              "error": null
+            }
+          }
+        ],
+        "summary": {
+          "detected_quantity": 1,
+          "ready_lines": 0,
+          "review_lines": 1,
+          "rejected_lines": 0
+        }
+      }
+    },
+    {
+      "input": "T005_01.jpg",
+      "expected_sku": "T005",
+      "synthetic": false,
+      "yolo_inference_ms": 235.887,
+      "ocr_processing_ms": 784.704,
+      "ai_combined_ms": 1020.591,
+      "total_scan_api_ms": 1162.1436000004906,
+      "bulk_return_ms": 12.31290000032459,
+      "scan": {
+        "scan_session_id": "scan-8c5a48f1fe564a95a23e6b4a1e3de85c",
+        "client_scan_id": "benchmark-c3f284593fa1497fb7fc2a3be9ce1eb7",
+        "status": "ready",
+        "store_id": "store-1",
+        "detector_version": "ultralytics:orbit_ai_5class_yolo11n_best.pt",
+        "processing_time_ms": 1141,
+        "timings": {
+          "yolo_inference_ms": 235.887,
+          "ocr_processing_ms": 784.704,
+          "ocr_total_scan_ms": 784.704,
+          "ai_combined_ms": 1020.591
+        },
+        "expires_at": "2026-09-12T06:35:05.724948Z",
+        "items": [
+          {
+            "detection_id": "det-426069f827f24f6fa0e0f85d20c6b379",
+            "item": {
+              "id": "item-t005",
+              "sku": "T005",
+              "name": "Measure Tape",
+              "image_url": null
+            },
+            "quantity": 1,
+            "confidence": 0.9927793145179749,
+            "status": "ready",
+            "bbox": {
+              "x": 0.49202307265679707,
+              "y": 0.6431728615925537,
+              "w": 0.19206276260504201,
+              "h": 0.32344157280967945
+            },
+            "bboxes": [
+              {
+                "x": 0.49202307265679707,
+                "y": 0.6431728615925537,
+                "w": 0.19206276260504201,
+                "h": 0.32344157280967945
+              }
+            ],
+            "possible_matches": [],
+            "why": [],
+            "ocr": {
+              "detected_text": "VII SA AK-2764 Asaki GERI STEEL MEASURING TAPE \u9ad8\u633a\u5ea6 \u8d85\u8010\u78e8 5M 19m 19mm --- BAGA NAN",
+              "normalized_sku": null,
+              "catalog_match": false,
+              "verification_status": "invalid",
+              "conflict_with_yolo": false,
+              "review_required": false,
+              "candidates": [],
+              "invalid_candidates": [
+                "AK2764"
+              ],
+              "attempts": [
+                {
+                  "detected_text": "VII SA AK-2764 Asaki GERI STEEL MEASURING TAPE \u9ad8\u633a\u5ea6 \u8d85\u8010\u78e8 5M 19m 19mm --- BAGA NAN",
+                  "candidates": [
+                    "AK2764"
+                  ],
+                  "processing_time_ms": 702.018,
+                  "error": null
+                }
+              ],
+              "engine": "rapidocr:3.9.2",
+              "processing_time_ms": 784.704,
+              "error": null
+            }
+          }
+        ],
+        "summary": {
+          "detected_quantity": 1,
+          "ready_lines": 1,
+          "review_lines": 0,
+          "rejected_lines": 0
+        }
+      }
+    },
+    {
+      "input": "T005_02.jpg",
+      "expected_sku": "T005",
+      "synthetic": false,
+      "yolo_inference_ms": 140.238,
+      "ocr_processing_ms": 324.71,
+      "ai_combined_ms": 464.948,
+      "total_scan_api_ms": 552.9808999999659,
+      "bulk_return_ms": 11.531799999829673,
+      "scan": {
+        "scan_session_id": "scan-85de1075a9eb4f9d9eb0102524cc9a2e",
+        "client_scan_id": "benchmark-764bfbde956f4d48be2fc52a753e0a21",
+        "status": "ready",
+        "store_id": "store-1",
+        "detector_version": "ultralytics:orbit_ai_5class_yolo11n_best.pt",
+        "processing_time_ms": 533,
+        "timings": {
+          "yolo_inference_ms": 140.238,
+          "ocr_processing_ms": 324.71,
+          "ocr_total_scan_ms": 324.71,
+          "ai_combined_ms": 464.948
+        },
+        "expires_at": "2026-09-12T06:35:06.290813Z",
+        "items": [
+          {
+            "detection_id": "det-1a74c3d1682141f0852c4e90749afb85",
+            "item": {
+              "id": "item-t005",
+              "sku": "T005",
+              "name": "Measure Tape",
+              "image_url": null
+            },
+            "quantity": 1,
+            "confidence": 0.9675622582435608,
+            "status": "ready",
+            "bbox": {
+              "x": 0.6014571686060131,
+              "y": 0.6269932701474145,
+              "w": 0.19677820491622575,
+              "h": 0.11037493508959574
+            },
+            "bboxes": [
+              {
+                "x": 0.6014571686060131,
+                "y": 0.6269932701474145,
+                "w": 0.19677820491622575,
+                "h": 0.11037493508959574
+              }
+            ],
+            "possible_matches": [],
+            "why": [],
+            "ocr": {
+              "detected_text": "AK-2764 Asaki STEEL MEASURING TAPE \u9ad8\u633a\u5ea6\u8d85\u8010\u78e8 5M x16ft width 19mm \u54d1\u5149\u7cbe\u94dc",
+              "normalized_sku": null,
+              "catalog_match": false,
+              "verification_status": "invalid",
+              "conflict_with_yolo": false,
+              "review_required": false,
+              "candidates": [],
+              "invalid_candidates": [
+                "AK2764"
+              ],
+              "attempts": [
+                {
+                  "detected_text": "AK-2764 Asaki STEEL MEASURING TAPE \u9ad8\u633a\u5ea6\u8d85\u8010\u78e8 5M x16ft width 19mm \u54d1\u5149\u7cbe\u94dc",
+                  "candidates": [
+                    "AK2764"
+                  ],
+                  "processing_time_ms": 307.924,
+                  "error": null
+                }
+              ],
+              "engine": "rapidocr:3.9.2",
+              "processing_time_ms": 324.71,
+              "error": null
+            }
+          }
+        ],
+        "summary": {
+          "detected_quantity": 1,
+          "ready_lines": 1,
+          "review_lines": 0,
+          "rejected_lines": 0
+        }
+      }
+    },
+    {
+      "input": "T005_03.jpg",
+      "expected_sku": "T005",
+      "synthetic": false,
+      "yolo_inference_ms": 229.256,
+      "ocr_processing_ms": 1139.289,
+      "ai_combined_ms": 1368.545,
+      "total_scan_api_ms": 1515.4807999997502,
+      "bulk_return_ms": 12.082199999895238,
+      "scan": {
+        "scan_session_id": "scan-ebc49863453c4bdea28394a9335ecb54",
+        "client_scan_id": "benchmark-07d6759d75d845a0b60052bc3f2b4093",
+        "status": "review_needed",
+        "store_id": "store-1",
+        "detector_version": "ultralytics:orbit_ai_5class_yolo11n_best.pt",
+        "processing_time_ms": 1493,
+        "timings": {
+          "yolo_inference_ms": 229.256,
+          "ocr_processing_ms": 1139.289,
+          "ocr_total_scan_ms": 1139.289,
+          "ai_combined_ms": 1368.545
+        },
+        "expires_at": "2026-09-12T06:35:07.816526Z",
+        "items": [
+          {
+            "detection_id": "det-3ad40531fb6c4a30a545e18f3af99cb8",
+            "item": {
+              "id": "item-t005",
+              "sku": "T005",
+              "name": "Measure Tape",
+              "image_url": null
+            },
+            "quantity": 1,
+            "confidence": 0.9835169911384583,
+            "status": "ready",
+            "bbox": {
+              "x": 0.32065477558210786,
+              "y": 0.7422249607308201,
+              "w": 0.22328472404586835,
+              "h": 0.17781066419623404
+            },
+            "bboxes": [
+              {
+                "x": 0.32065477558210786,
+                "y": 0.7422249607308201,
+                "w": 0.22328472404586835,
+                "h": 0.17781066419623404
+              }
+            ],
+            "possible_matches": [],
+            "why": [],
+            "ocr": {
+              "detected_text": "Skyworth AK-2764 Asaki STEEL MEASURING TAPE \u9ad8\u633a\u5ea6\u8d85\u8010\u78e8 5M  LMAU",
+              "normalized_sku": null,
+              "catalog_match": false,
+              "verification_status": "invalid",
+              "conflict_with_yolo": false,
+              "review_required": false,
+              "candidates": [],
+              "invalid_candidates": [
+                "AK2764"
+              ],
+              "attempts": [
+                {
+                  "detected_text": "Skyworth AK-2764 Asaki STEEL MEASURING TAPE \u9ad8\u633a\u5ea6\u8d85\u8010\u78e8 5M  LMAU",
+                  "candidates": [
+                    "AK2764"
+                  ],
+                  "processing_time_ms": 496.59,
+                  "error": null
+                }
+              ],
+              "engine": "rapidocr:3.9.2",
+              "processing_time_ms": 560.731,
+              "error": null
+            }
+          },
+          {
+            "detection_id": "det-ef34a75abddd4c88b740d782a4295ded",
+            "item": {
+              "id": "item-t003",
+              "sku": "T003",
+              "name": "Screwdriver",
+              "image_url": null
+            },
+            "quantity": 1,
+            "confidence": 0.2884162962436676,
+            "status": "review_needed",
+            "bbox": {
+              "x": 0.31219014400193673,
+              "y": 0.7386359491713352,
+              "w": 0.23304690833853073,
+              "h": 0.1807360965219421
+            },
+            "bboxes": [
+              {
+                "x": 0.31219014400193673,
+                "y": 0.7386359491713352,
+                "w": 0.23304690833853073,
+                "h": 0.1807360965219421
+              }
+            ],
+            "possible_matches": [
+              {
+                "item_id": "item-t003",
+                "sku": "T003",
+                "name": "Screwdriver",
+                "confidence": 0.2884
+              }
+            ],
+            "why": [],
+            "ocr": {
+              "detected_text": "Skyworth AK-2764 Asaki STEEL MEASURING TAPE \u9ad8\u633a\u5ea6\u8d85\u8010\u78e8 5 M dh \u91cf\u5149\u7cbe\u8bad",
+              "normalized_sku": null,
+              "catalog_match": false,
+              "verification_status": "invalid",
+              "conflict_with_yolo": false,
+              "review_required": false,
+              "candidates": [],
+              "invalid_candidates": [
+                "AK2764"
+              ],
+              "attempts": [
+                {
+                  "detected_text": "Skyworth AK-2764 Asaki STEEL MEASURING TAPE \u9ad8\u633a\u5ea6\u8d85\u8010\u78e8 5 M dh \u91cf\u5149\u7cbe\u8bad",
+                  "candidates": [
+                    "AK2764"
+                  ],
+                  "processing_time_ms": 509.247,
+                  "error": null
+                }
+              ],
+              "engine": "rapidocr:3.9.2",
+              "processing_time_ms": 578.558,
+              "error": null
+            }
+          }
+        ],
+        "summary": {
+          "detected_quantity": 2,
+          "ready_lines": 1,
+          "review_lines": 1,
+          "rejected_lines": 0
+        }
+      }
+    },
+    {
+      "input": "L003_01.jpg",
+      "expected_sku": "L003",
+      "synthetic": false,
+      "yolo_inference_ms": 183.157,
+      "ocr_processing_ms": 1267.195,
+      "ai_combined_ms": 1450.352,
+      "total_scan_api_ms": 1553.290100000595,
+      "bulk_return_ms": 13.298099999701662,
+      "scan": {
+        "scan_session_id": "scan-fc22fecc86614b7a865fb20a55b6bc7a",
+        "client_scan_id": "benchmark-2913b49babc34b0a958bbc6db7fd6d23",
+        "status": "review_needed",
+        "store_id": "store-1",
+        "detector_version": "ultralytics:orbit_ai_5class_yolo11n_best.pt",
+        "processing_time_ms": 1532,
+        "timings": {
+          "yolo_inference_ms": 183.157,
+          "ocr_processing_ms": 1267.195,
+          "ocr_total_scan_ms": 1267.195,
+          "ai_combined_ms": 1450.352
+        },
+        "expires_at": "2026-09-12T06:35:09.397793Z",
+        "items": [
+          {
+            "detection_id": "det-2223dc2ef1124869a09204b38c0fa1bc",
+            "item": {
+              "id": "item-l003",
+              "sku": "L003",
+              "name": "Beaker 250ml",
+              "image_url": null
+            },
+            "quantity": 1,
+            "confidence": 0.9552465081214905,
+            "status": "ready",
+            "bbox": {
+              "x": 0.3488146262194114,
+              "y": 0.3839191557869079,
+              "w": 0.3432449260085979,
+              "h": 0.2666287800622365
+            },
+            "bboxes": [
+              {
+                "x": 0.3488146262194114,
+                "y": 0.3839191557869079,
+                "w": 0.3432449260085979,
+                "h": 0.2666287800622365
+              }
+            ],
+            "possible_matches": [],
+            "why": [],
+            "ocr": {
+              "detected_text": null,
+              "normalized_sku": null,
+              "catalog_match": false,
+              "verification_status": "not_available",
+              "conflict_with_yolo": false,
+              "review_required": false,
+              "candidates": [],
+              "invalid_candidates": [],
+              "attempts": [
+                {
+                  "detected_text": null,
+                  "candidates": [],
+                  "processing_time_ms": 463.537,
+                  "error": null
+                }
+              ],
+              "engine": "rapidocr:3.9.2",
+              "processing_time_ms": 557.558,
+              "error": null
+            }
+          },
+          {
+            "detection_id": "det-62b9a350592546b5abf62a59474d6508",
+            "item": {
+              "id": "item-t003",
+              "sku": "T003",
+              "name": "Screwdriver",
+              "image_url": null
+            },
+            "quantity": 1,
+            "confidence": 0.252153605222702,
+            "status": "review_needed",
+            "bbox": {
+              "x": 0.3390712435283358,
+              "y": 0.0,
+              "w": 0.6014213360175884,
+              "h": 0.21417651100764198
+            },
+            "bboxes": [
+              {
+                "x": 0.3390712435283358,
+                "y": 0.0,
+                "w": 0.6014213360175884,
+                "h": 0.21417651100764198
+              }
+            ],
+            "possible_matches": [
+              {
+                "item_id": "item-t003",
+                "sku": "T003",
+                "name": "Screwdriver",
+                "confidence": 0.2522
+              }
+            ],
+            "why": [],
+            "ocr": {
+              "detected_text": null,
+              "normalized_sku": null,
+              "catalog_match": false,
+              "verification_status": "not_available",
+              "conflict_with_yolo": false,
+              "review_required": false,
+              "candidates": [],
+              "invalid_candidates": [],
+              "attempts": [
+                {
+                  "detected_text": null,
+                  "candidates": [],
+                  "processing_time_ms": 603.27,
+                  "error": null
+                }
+              ],
+              "engine": "rapidocr:3.9.2",
+              "processing_time_ms": 709.637,
+              "error": null
+            }
+          }
+        ],
+        "summary": {
+          "detected_quantity": 2,
+          "ready_lines": 1,
+          "review_lines": 1,
+          "rejected_lines": 0
+        }
+      }
+    },
+    {
+      "input": "L003_02.jpg",
+      "expected_sku": "L003",
+      "synthetic": false,
+      "yolo_inference_ms": 190.502,
+      "ocr_processing_ms": 1353.006,
+      "ai_combined_ms": 1543.508,
+      "total_scan_api_ms": 1641.8691999997463,
+      "bulk_return_ms": 12.425999999322812,
+      "scan": {
+        "scan_session_id": "scan-7b1128dde8214ff7b7c8fa1745bfe309",
+        "client_scan_id": "benchmark-a65160d54cce4ebb8bea76467b5fd75a",
+        "status": "ready",
+        "store_id": "store-1",
+        "detector_version": "ultralytics:orbit_ai_5class_yolo11n_best.pt",
+        "processing_time_ms": 1621,
+        "timings": {
+          "yolo_inference_ms": 190.502,
+          "ocr_processing_ms": 1353.006,
+          "ocr_total_scan_ms": 1353.006,
+          "ai_combined_ms": 1543.508
+        },
+        "expires_at": "2026-09-12T06:35:11.073421Z",
+        "items": [
+          {
+            "detection_id": "det-27a5295495bd45b8a7b3039bbcb5e587",
+            "item": {
+              "id": "item-l003",
+              "sku": "L003",
+              "name": "Beaker 250ml",
+              "image_url": null
+            },
+            "quantity": 1,
+            "confidence": 0.9608234167098999,
+            "status": "ready",
+            "bbox": {
+              "x": 0.2445922124953497,
+              "y": 0.3252601623535156,
+              "w": 0.4871259820524347,
+              "h": 0.3547017536466084
+            },
+            "bboxes": [
+              {
+                "x": 0.2445922124953497,
+                "y": 0.3252601623535156,
+                "w": 0.4871259820524347,
+                "h": 0.3547017536466084
+              }
+            ],
+            "possible_matches": [],
+            "why": [],
+            "ocr": {
+              "detected_text": "\u5927",
+              "normalized_sku": null,
+              "catalog_match": false,
+              "verification_status": "not_available",
+              "conflict_with_yolo": false,
+              "review_required": false,
+              "candidates": [],
+              "invalid_candidates": [],
+              "attempts": [
+                {
+                  "detected_text": "\u5927",
+                  "candidates": [],
+                  "processing_time_ms": 1191.622,
+                  "error": null
+                }
+              ],
+              "engine": "rapidocr:3.9.2",
+              "processing_time_ms": 1353.006,
+              "error": null
+            }
+          }
+        ],
+        "summary": {
+          "detected_quantity": 1,
+          "ready_lines": 1,
+          "review_lines": 0,
+          "rejected_lines": 0
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,6 @@
+{
+  "synthetic": true,
+  "scenario": "YOLO E018 plus injected OCR E019",
+  "expected": "verification_status=conflict and scan status=review_needed",
+  "automated_test": "backend/tests/test_ocr.py::test_ocr_conflict_forces_review_and_offers_catalog_candidate"
+}

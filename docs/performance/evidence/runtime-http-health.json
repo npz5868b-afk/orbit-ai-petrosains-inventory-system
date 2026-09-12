@@ -1,0 +1,14 @@
+{
+  "status": "ok",
+  "database": "connected",
+  "detector": "ultralytics:orbit_ai_5class_yolo11n_best.pt",
+  "detector_error": null,
+  "ocr": {
+    "enabled": true,
+    "available": true,
+    "engine": "rapidocr:3.9.2",
+    "error": null
+  },
+  "version": "0.1.0",
+  "timestamp": "2026-09-12T06:08:12.481213Z"
+}
