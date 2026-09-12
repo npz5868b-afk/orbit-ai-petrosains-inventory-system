@@ -1,19 +1,22 @@
 import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
-import { Geist, Geist_Mono, Space_Grotesk } from 'next/font/google'
+import localFont from 'next/font/local'
 import './globals.css'
 
-const geist = Geist({
-  subsets: ['latin'],
+const geist = localFont({
+  src: './fonts/Geist-Latin.woff2',
   variable: '--font-geist',
+  weight: '100 900',
 })
-const geistMono = Geist_Mono({
-  subsets: ['latin'],
+const geistMono = localFont({
+  src: './fonts/GeistMono-Latin.woff2',
   variable: '--font-geist-mono',
+  weight: '100 900',
 })
-const spaceGrotesk = Space_Grotesk({
-  subsets: ['latin'],
+const spaceGrotesk = localFont({
+  src: './fonts/SpaceGrotesk-Latin.woff2',
   variable: '--font-space-grotesk',
+  weight: '300 700',
 })
 
 export const metadata: Metadata = {
