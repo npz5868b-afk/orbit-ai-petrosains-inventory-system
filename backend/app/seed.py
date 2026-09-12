@@ -22,6 +22,13 @@ def utc_now() -> str:
     return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
 
 
+def backfill_image_urls(db, catalog: list[dict]) -> None:
+    db.executemany(
+        "UPDATE inventory_items SET image_url = ? WHERE sku = ? AND is_active = 1",
+        [(item["image_url"], item["sku"]) for item in catalog],
+    )
+
+
 def seed_database(path: Path | None = None, force: bool = False) -> None:
     init_database(path)
     if not CATALOG_PATH.exists():
@@ -32,6 +39,7 @@ def seed_database(path: Path | None = None, force: bool = False) -> None:
     with transaction(path) as db:
         count = db.execute("SELECT COUNT(*) FROM inventory_items").fetchone()[0]
         if count and not force:
+            backfill_image_urls(db, catalog)
             return
         if force:
             for table in (

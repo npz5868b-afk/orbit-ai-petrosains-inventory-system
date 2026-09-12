@@ -19,6 +19,7 @@ type CatalogRow = {
   total_quantity: number
   store_id: string
   rack: string | null
+  image_url: string | null
 }
 
 export const storeNames: Record<string, { name: string; area: string }> = {
@@ -47,6 +48,7 @@ export const officialInventory: InventoryItem[] = catalog.map((row) => {
     available: row.available_quantity,
     checkedOut,
     damaged: 0,
+    imageUrl: row.image_url,
     location: `${storeNames[row.store_id].name} — ${storeNames[row.store_id].area}`,
     rack: row.rack ?? 'Location pending',
     lastSeen: row.store_id === 'store-3' || row.store_id === 'store-4' ? 'saved offline' : 'at last sync',

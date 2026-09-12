@@ -46,6 +46,7 @@ type ApiInventoryItem = {
   needs_attention: boolean
   store_id: string
   rack: string | null
+  image_url: string | null
   updated_at: string
 }
 
@@ -65,6 +66,7 @@ export function mapApiInventoryItem(item: ApiInventoryItem): InventoryItem {
     available: item.available_quantity,
     checkedOut: item.checked_out_quantity,
     damaged: 0,
+    imageUrl: item.image_url,
     location: `${store.name} — ${store.area}`,
     rack: item.rack ?? 'Location pending',
     lastSeen: item.updated_at,

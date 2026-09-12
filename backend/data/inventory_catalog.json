@@ -17,7 +17,7 @@
     "source_storage_location": "CHEMICAL ROOM",
     "rack": "CABINET",
     "image_reference": "L020_Potassium Iodide",
-    "image_url": null,
+    "image_url": "/inventory/L020.jpg",
     "ai_class_key": "L020"
   },
   {
@@ -38,7 +38,7 @@
     "source_storage_location": "CHEMICAL ROOM",
     "rack": "CABINET",
     "image_reference": "L021_Methylated Spirit Solution 95%",
-    "image_url": null,
+    "image_url": "/inventory/L021.jpg",
     "ai_class_key": "L021"
   },
   {
@@ -59,7 +59,7 @@
     "source_storage_location": "CHEMICAL ROOM",
     "rack": "CABINET",
     "image_reference": "L022_Copper (II) Chloride 2-Hydrate",
-    "image_url": null,
+    "image_url": "/inventory/L022.jpg",
     "ai_class_key": "L022"
   },
   {
@@ -80,7 +80,7 @@
     "source_storage_location": "CHEMICAL ROOM",
     "rack": "CABINET",
     "image_reference": "L023_Hydrogen Peroxide Solution 6%",
-    "image_url": null,
+    "image_url": "/inventory/L023.jpg",
     "ai_class_key": "L023"
   },
   {
@@ -101,7 +101,7 @@
     "source_storage_location": "CHEMICAL ROOM",
     "rack": "CABINET",
     "image_reference": "L024_Strontium Chloride 6-Hydrate AR",
-    "image_url": null,
+    "image_url": "/inventory/L024.jpg",
     "ai_class_key": "L024"
   },
   {
@@ -122,7 +122,7 @@
     "source_storage_location": "CHEMICAL ROOM",
     "rack": "CABINET",
     "image_reference": "L025_Lithium Chloride",
-    "image_url": null,
+    "image_url": "/inventory/L025.jpg",
     "ai_class_key": "L025"
   },
   {
@@ -143,7 +143,7 @@
     "source_storage_location": "CHEMICAL ROOM",
     "rack": "CABINET",
     "image_reference": "L026_universal indicator",
-    "image_url": null,
+    "image_url": "/inventory/L026.jpg",
     "ai_class_key": "L026"
   },
   {
@@ -164,7 +164,7 @@
     "source_storage_location": "CHILLAX",
     "rack": "MS METAL DRAWER",
     "image_reference": "E001_Arduino Uno",
-    "image_url": null,
+    "image_url": "/inventory/E001.jpg",
     "ai_class_key": "E001"
   },
   {
@@ -185,7 +185,7 @@
     "source_storage_location": "CHILLAX",
     "rack": "DRAWER WOODEN 1",
     "image_reference": "E002_Arduino Nano",
-    "image_url": null,
+    "image_url": "/inventory/E002.jpg",
     "ai_class_key": "E002"
   },
   {
@@ -206,7 +206,7 @@
     "source_storage_location": "CHILLAX",
     "rack": "DRAWER WOODEN 1",
     "image_reference": "E003_Motor Shield",
-    "image_url": null,
+    "image_url": "/inventory/E003.jpg",
     "ai_class_key": "E003"
   },
   {
@@ -227,7 +227,7 @@
     "source_storage_location": "CHILLAX",
     "rack": "DRAWER WOODEN 1",
     "image_reference": "E004_Breadboard",
-    "image_url": null,
+    "image_url": "/inventory/E004.jpg",
     "ai_class_key": "E004"
   },
   {
@@ -248,7 +248,7 @@
     "source_storage_location": "CHILLAX",
     "rack": "DRAWER WOODEN 1",
     "image_reference": "E005_Gas Sensor MQ6",
-    "image_url": null,
+    "image_url": "/inventory/E005.jpg",
     "ai_class_key": "E005"
   },
   {
@@ -269,7 +269,7 @@
     "source_storage_location": "CHILLAX",
     "rack": "DRAWER WOODEN 2",
     "image_reference": "E006_NodeMCU",
-    "image_url": null,
+    "image_url": "/inventory/E006.jpg",
     "ai_class_key": "E006"
   },
   {
@@ -290,7 +290,7 @@
     "source_storage_location": "CHILLAX",
     "rack": "DRAWER WOODEN 2",
     "image_reference": "E007_HC-SR04 Ultrasonic Sensor",
-    "image_url": null,
+    "image_url": "/inventory/E007.jpg",
     "ai_class_key": "E007"
   },
   {
@@ -311,7 +311,7 @@
     "source_storage_location": "CHILLAX",
     "rack": "DRAWER WOODEN 2",
     "image_reference": "E008_N20 Mini Micro Metal Gear",
-    "image_url": null,
+    "image_url": "/inventory/E008.jpg",
     "ai_class_key": "E008"
   },
   {
@@ -332,7 +332,7 @@
     "source_storage_location": "CHILLAX",
     "rack": "DRAWER WOODEN 2",
     "image_reference": "E009_DC Motor 3V",
-    "image_url": null,
+    "image_url": "/inventory/E009.jpg",
     "ai_class_key": "E009"
   },
   {
@@ -353,7 +353,7 @@
     "source_storage_location": "CHILLAX",
     "rack": "DRAWER WOODEN 2",
     "image_reference": "E010_N20 Micro Metal Gear Motor",
-    "image_url": null,
+    "image_url": "/inventory/E010.jpg",
     "ai_class_key": "E010"
   },
   {
@@ -374,7 +374,7 @@
     "source_storage_location": "CHILLAX",
     "rack": "DRAWER WOODEN 2",
     "image_reference": "E011_DHT11 TEMPERATURE AND HUMIDITY",
-    "image_url": null,
+    "image_url": "/inventory/E011.jpg",
     "ai_class_key": "E011"
   },
   {
@@ -395,7 +395,7 @@
     "source_storage_location": "CHILLAX",
     "rack": "DRAWER WOODEN 2",
     "image_reference": "E012_Infrared (IR) Proximity Sensor module",
-    "image_url": null,
+    "image_url": "/inventory/E012.jpg",
     "ai_class_key": "E012"
   },
   {
@@ -416,7 +416,7 @@
     "source_storage_location": "CHILLAX",
     "rack": "DRAWER WOODEN 2",
     "image_reference": "E013_Sound Sensor",
-    "image_url": null,
+    "image_url": "/inventory/E013.jpg",
     "ai_class_key": "E013"
   },
   {
@@ -437,7 +437,7 @@
     "source_storage_location": "CHILLAX",
     "rack": "DRAWER WOODEN 2",
     "image_reference": "E015_Micro:bit",
-    "image_url": null,
+    "image_url": "/inventory/E015.jpg",
     "ai_class_key": "E015"
   },
   {
@@ -458,7 +458,7 @@
     "source_storage_location": "CHILLAX",
     "rack": "DRAWER WOODEN 2",
     "image_reference": "E016_CR2032 battery holder",
-    "image_url": null,
+    "image_url": "/inventory/E016.jpg",
     "ai_class_key": "E016"
   },
   {
@@ -479,7 +479,7 @@
     "source_storage_location": "CHILLAX",
     "rack": "DRAWER WOODEN 3",
     "image_reference": "E017_RC522 RFID Card Reader",
-    "image_url": null,
+    "image_url": "/inventory/E017.jpg",
     "ai_class_key": "E017"
   },
   {
@@ -500,7 +500,7 @@
     "source_storage_location": "CHILLAX",
     "rack": "DRAWER WOODEN 3",
     "image_reference": "E020_MAX30102 Heart Rate and Pulse Oximetry Sensor",
-    "image_url": null,
+    "image_url": "/inventory/E020.jpg",
     "ai_class_key": "E020"
   },
   {
@@ -521,7 +521,7 @@
     "source_storage_location": "CHILLAX",
     "rack": "DRAWER WOODEN 3",
     "image_reference": "E021_Soil Moisture Level Sensor",
-    "image_url": null,
+    "image_url": "/inventory/E021.jpg",
     "ai_class_key": "E021"
   },
   {
@@ -542,7 +542,7 @@
     "source_storage_location": "CHILLAX",
     "rack": "DRAWER WOODEN 3",
     "image_reference": "E024_Light Dependent Resistor (LDR)",
-    "image_url": null,
+    "image_url": "/inventory/E024.jpg",
     "ai_class_key": "E024"
   },
   {
@@ -563,7 +563,7 @@
     "source_storage_location": "CHILLAX",
     "rack": "DRAWER WOODEN 3",
     "image_reference": "E025_Resistor 220Ω",
-    "image_url": null,
+    "image_url": "/inventory/E025.jpg",
     "ai_class_key": "E025"
   },
   {
@@ -584,7 +584,7 @@
     "source_storage_location": "CHILLAX",
     "rack": "DRAWER WOODEN 4",
     "image_reference": "E028_HC-SR501 PIR Motion Sensor",
-    "image_url": null,
+    "image_url": "/inventory/E028.jpg",
     "ai_class_key": "E028"
   },
   {
@@ -605,7 +605,7 @@
     "source_storage_location": "CHILLAX",
     "rack": "DRAWER WOODEN 4",
     "image_reference": "E029_Maker Line Sensor",
-    "image_url": null,
+    "image_url": "/inventory/E029.jpg",
     "ai_class_key": "E029"
   },
   {
@@ -626,7 +626,7 @@
     "source_storage_location": "MAKER STUDIO",
     "rack": "DRAWER WOODEN 1",
     "image_reference": "C001_tracing paper",
-    "image_url": null,
+    "image_url": "/inventory/C001.jpg",
     "ai_class_key": "C001"
   },
   {
@@ -647,7 +647,7 @@
     "source_storage_location": "MAKER STUDIO",
     "rack": "PINK DRAWER",
     "image_reference": "C002_paper cup",
-    "image_url": null,
+    "image_url": "/inventory/C002.jpg",
     "ai_class_key": "C002"
   },
   {
@@ -668,7 +668,7 @@
     "source_storage_location": "MAKER STUDIO",
     "rack": "GREEN DRAWER",
     "image_reference": "C003_thread",
-    "image_url": null,
+    "image_url": "/inventory/C003.jpg",
     "ai_class_key": "C003"
   },
   {
@@ -689,7 +689,7 @@
     "source_storage_location": "MAKER STUDIO",
     "rack": "GREEN DRAWER",
     "image_reference": "C004_needle",
-    "image_url": null,
+    "image_url": "/inventory/C004.jpg",
     "ai_class_key": "C004"
   },
   {
@@ -710,7 +710,7 @@
     "source_storage_location": "MAKER STUDIO",
     "rack": "IKEA WHITE BOX",
     "image_reference": "C005_yarn",
-    "image_url": null,
+    "image_url": "/inventory/C005.jpg",
     "ai_class_key": "C005"
   },
   {
@@ -731,7 +731,7 @@
     "source_storage_location": "MAKER STUDIO",
     "rack": "IKEA WHITE BOX",
     "image_reference": "C006_air clay",
-    "image_url": null,
+    "image_url": "/inventory/C006.jpg",
     "ai_class_key": "C006"
   },
   {
@@ -752,7 +752,7 @@
     "source_storage_location": "MAKER STUDIO",
     "rack": "DRAWER WOODEN 4",
     "image_reference": "C009_popsicle stick",
-    "image_url": null,
+    "image_url": "/inventory/C009.jpg",
     "ai_class_key": "C009"
   },
   {
@@ -773,7 +773,7 @@
     "source_storage_location": "MAKER STUDIO",
     "rack": "CABINET",
     "image_reference": "C010_Fabbxible PLA filament",
-    "image_url": null,
+    "image_url": "/inventory/C010.jpg",
     "ai_class_key": "C010"
   },
   {
@@ -794,7 +794,7 @@
     "source_storage_location": "MAKER STUDIO",
     "rack": "YELLOW DRAWER",
     "image_reference": "C011_glue stick",
-    "image_url": null,
+    "image_url": "/inventory/C011.jpg",
     "ai_class_key": "C011"
   },
   {
@@ -815,7 +815,7 @@
     "source_storage_location": "MAKER STUDIO",
     "rack": "YELLOW DRAWER",
     "image_reference": "C012_pipe cleaner",
-    "image_url": null,
+    "image_url": "/inventory/C012.jpg",
     "ai_class_key": "C012"
   },
   {
@@ -836,7 +836,7 @@
     "source_storage_location": "MAKER STUDIO",
     "rack": "YELLOW DRAWER",
     "image_reference": "C013_pom pom",
-    "image_url": null,
+    "image_url": "/inventory/C013.jpg",
     "ai_class_key": "C013"
   },
   {
@@ -857,7 +857,7 @@
     "source_storage_location": "MAKER STUDIO",
     "rack": "DRAWER WOODEN 1",
     "image_reference": "C014_A4 colored paper",
-    "image_url": null,
+    "image_url": "/inventory/C014.jpg",
     "ai_class_key": "C014"
   },
   {
@@ -878,7 +878,7 @@
     "source_storage_location": "MAKER STUDIO",
     "rack": "IKEA WHITE BOX",
     "image_reference": "C015_ribbon",
-    "image_url": null,
+    "image_url": "/inventory/C015.jpg",
     "ai_class_key": "C015"
   },
   {
@@ -899,7 +899,7 @@
     "source_storage_location": "MAKER STUDIO",
     "rack": "GREEN DRAWER",
     "image_reference": "C016_balloons",
-    "image_url": null,
+    "image_url": "/inventory/C016.jpg",
     "ai_class_key": "C016"
   },
   {
@@ -920,7 +920,7 @@
     "source_storage_location": "MAKER STUDIO",
     "rack": "DRAWER WOODEN 6",
     "image_reference": "C017_key ring",
-    "image_url": null,
+    "image_url": "/inventory/C017.jpg",
     "ai_class_key": "C017"
   },
   {
@@ -941,7 +941,7 @@
     "source_storage_location": "MAKER STUDIO",
     "rack": "GREEN DRAWER",
     "image_reference": "C018_glue gun stick",
-    "image_url": null,
+    "image_url": "/inventory/C019.jpg",
     "ai_class_key": "C019"
   },
   {
@@ -962,7 +962,7 @@
     "source_storage_location": "MAKER STUDIO",
     "rack": "IKEA WHITE BOX",
     "image_reference": "C019_melty beads",
-    "image_url": null,
+    "image_url": "/inventory/C020.jpg",
     "ai_class_key": "C020"
   },
   {
@@ -983,7 +983,7 @@
     "source_storage_location": "MAKER STUDIO",
     "rack": "DRAWER WOODEN 2",
     "image_reference": "C020_tongue depressor",
-    "image_url": null,
+    "image_url": "/inventory/C021.jpg",
     "ai_class_key": "C021"
   },
   {
@@ -1004,7 +1004,7 @@
     "source_storage_location": "MAKER STUDIO",
     "rack": "BOX 13",
     "image_reference": "C021_clothespin",
-    "image_url": null,
+    "image_url": "/inventory/C022.jpg",
     "ai_class_key": "C022"
   },
   {
@@ -1025,7 +1025,7 @@
     "source_storage_location": "MAKER STUDIO",
     "rack": "LOOSE ITEM",
     "image_reference": "C022_googly eyes",
-    "image_url": null,
+    "image_url": "/inventory/C023.jpg",
     "ai_class_key": "C023"
   },
   {
@@ -1046,7 +1046,7 @@
     "source_storage_location": "MAKER STUDIO",
     "rack": "YELLOW DRAWER",
     "image_reference": "C023_liquid glue",
-    "image_url": null,
+    "image_url": "/inventory/C024.jpg",
     "ai_class_key": "C024"
   },
   {
@@ -1067,7 +1067,7 @@
     "source_storage_location": "MAKER STUDIO",
     "rack": "YELLOW DRAWER",
     "image_reference": "S001_Pen",
-    "image_url": null,
+    "image_url": "/inventory/S001.jpg",
     "ai_class_key": "S001"
   },
   {
@@ -1088,7 +1088,7 @@
     "source_storage_location": "MAKER STUDIO",
     "rack": "YELLOW DRAWER",
     "image_reference": "S002_PermanentMarker",
-    "image_url": null,
+    "image_url": "/inventory/S002.jpg",
     "ai_class_key": "S002"
   },
   {
@@ -1109,7 +1109,7 @@
     "source_storage_location": "MAKER STUDIO",
     "rack": "YELLOW DRAWER",
     "image_reference": "S008_TackIt",
-    "image_url": null,
+    "image_url": "/inventory/S008.jpg",
     "ai_class_key": "S008"
   },
   {
@@ -1130,7 +1130,7 @@
     "source_storage_location": "MAKER STUDIO",
     "rack": "YELLOW DRAWER",
     "image_reference": "S009_CorrectionTape",
-    "image_url": null,
+    "image_url": "/inventory/S009.jpg",
     "ai_class_key": "S009"
   },
   {
@@ -1151,7 +1151,7 @@
     "source_storage_location": "MAKER STUDIO",
     "rack": "YELLOW DRAWER",
     "image_reference": "S011_WhiteboardMarker",
-    "image_url": null,
+    "image_url": "/inventory/S011.jpg",
     "ai_class_key": "S011"
   },
   {
@@ -1172,7 +1172,7 @@
     "source_storage_location": "MAKER STUDIO",
     "rack": "YELLOW DRAWER",
     "image_reference": "S015_Eraser",
-    "image_url": null,
+    "image_url": "/inventory/S015.jpg",
     "ai_class_key": "S015"
   },
   {
@@ -1193,7 +1193,7 @@
     "source_storage_location": "MAKER STUDIO",
     "rack": "MS METAL DRAWER",
     "image_reference": "T001_Scissor",
-    "image_url": null,
+    "image_url": "/inventory/T001.jpg",
     "ai_class_key": "T001"
   },
   {
@@ -1214,7 +1214,7 @@
     "source_storage_location": "MAKER STUDIO",
     "rack": "METAL DRAWER 1",
     "image_reference": "T008_SolderPen",
-    "image_url": null,
+    "image_url": "/inventory/T008.jpg",
     "ai_class_key": "T008"
   },
   {
@@ -1235,7 +1235,7 @@
     "source_storage_location": "MAKER STUDIO",
     "rack": "METAL DRAWER 2",
     "image_reference": "T009_SolderWire",
-    "image_url": null,
+    "image_url": "/inventory/T009.jpg",
     "ai_class_key": "T009"
   },
   {
@@ -1256,7 +1256,7 @@
     "source_storage_location": "STORE 1",
     "rack": "DRAWER WOODEN 2",
     "image_reference": "E014_Lilypad Coin Cell Battery Holder",
-    "image_url": null,
+    "image_url": "/inventory/E014.jpg",
     "ai_class_key": "E014"
   },
   {
@@ -1277,7 +1277,7 @@
     "source_storage_location": "STORE 1",
     "rack": "DRAWER WOODEN 3",
     "image_reference": "E018_LED Red",
-    "image_url": null,
+    "image_url": "/inventory/E018.jpg",
     "ai_class_key": "E018"
   },
   {
@@ -1298,7 +1298,7 @@
     "source_storage_location": "STORE 1",
     "rack": "DRAWER WOODEN 3",
     "image_reference": "E019_LED Blue",
-    "image_url": null,
+    "image_url": "/inventory/E019.jpg",
     "ai_class_key": "E019"
   },
   {
@@ -1319,7 +1319,7 @@
     "source_storage_location": "STORE 1",
     "rack": "DRAWER WOODEN 3",
     "image_reference": "E022_Rocker Switch 6pin",
-    "image_url": null,
+    "image_url": "/inventory/E022.jpg",
     "ai_class_key": "E022"
   },
   {
@@ -1340,7 +1340,7 @@
     "source_storage_location": "STORE 1",
     "rack": "DRAWER WOODEN 3",
     "image_reference": "E023_Rocker Switch 2pin (Black)",
-    "image_url": null,
+    "image_url": "/inventory/E023.jpg",
     "ai_class_key": "E023"
   },
   {
@@ -1361,7 +1361,7 @@
     "source_storage_location": "STORE 1",
     "rack": "DRAWER WOODEN 4",
     "image_reference": "E026_Jumper Wire M-M",
-    "image_url": null,
+    "image_url": "/inventory/E026.jpg",
     "ai_class_key": "E026"
   },
   {
@@ -1382,7 +1382,7 @@
     "source_storage_location": "STORE 1",
     "rack": "DRAWER WOODEN 4",
     "image_reference": "E027_Jumper Wire M-F",
-    "image_url": null,
+    "image_url": "/inventory/E027.jpg",
     "ai_class_key": "E027"
   },
   {
@@ -1403,7 +1403,7 @@
     "source_storage_location": "STORE 1",
     "rack": "DRAWER WOODEN 4",
     "image_reference": "E030_16×2 LCD Display",
-    "image_url": null,
+    "image_url": "/inventory/E030.jpg",
     "ai_class_key": "E030"
   },
   {
@@ -1424,7 +1424,7 @@
     "source_storage_location": "STORE 1",
     "rack": "BOX 15",
     "image_reference": "L001_test tubes",
-    "image_url": null,
+    "image_url": "/inventory/L001.jpg",
     "ai_class_key": "L001"
   },
   {
@@ -1445,7 +1445,7 @@
     "source_storage_location": "STORE 1",
     "rack": "BOX 16",
     "image_reference": "L002_test tubes rack",
-    "image_url": null,
+    "image_url": "/inventory/L002.jpg",
     "ai_class_key": "L002"
   },
   {
@@ -1466,7 +1466,7 @@
     "source_storage_location": "STORE 1",
     "rack": "BOX 20",
     "image_reference": "L003_beakers 250ml",
-    "image_url": null,
+    "image_url": "/inventory/L003.jpg",
     "ai_class_key": "L003"
   },
   {
@@ -1487,7 +1487,7 @@
     "source_storage_location": "STORE 1",
     "rack": "BOX 21",
     "image_reference": "L004_beakers 1000ml",
-    "image_url": null,
+    "image_url": "/inventory/L004.jpg",
     "ai_class_key": "L004"
   },
   {
@@ -1508,7 +1508,7 @@
     "source_storage_location": "STORE 1",
     "rack": "BOX 10",
     "image_reference": "L005_conical flask 1000ML",
-    "image_url": null,
+    "image_url": "/inventory/L005.jpg",
     "ai_class_key": "L005"
   },
   {
@@ -1529,7 +1529,7 @@
     "source_storage_location": "STORE 1",
     "rack": "BOX 11",
     "image_reference": "L006_conical flask 5000ml",
-    "image_url": null,
+    "image_url": "/inventory/L006.jpg",
     "ai_class_key": "L006"
   },
   {
@@ -1550,7 +1550,7 @@
     "source_storage_location": "STORE 1",
     "rack": "BOX 3",
     "image_reference": "L007_pipettes 5ml",
-    "image_url": null,
+    "image_url": "/inventory/L007.jpg",
     "ai_class_key": "L007"
   },
   {
@@ -1571,7 +1571,7 @@
     "source_storage_location": "STORE 1",
     "rack": "BOX 5",
     "image_reference": "L008_pipettes 10ml",
-    "image_url": null,
+    "image_url": "/inventory/L008.jpg",
     "ai_class_key": "L008"
   },
   {
@@ -1592,7 +1592,7 @@
     "source_storage_location": "STORE 1",
     "rack": "SHELF 3",
     "image_reference": "L009_ electric thermometer",
-    "image_url": null,
+    "image_url": "/inventory/L009.jpg",
     "ai_class_key": "L009"
   },
   {
@@ -1613,7 +1613,7 @@
     "source_storage_location": "STORE 1",
     "rack": "SHELF 3",
     "image_reference": "L010_thermometer",
-    "image_url": null,
+    "image_url": "/inventory/L010.jpg",
     "ai_class_key": "L010"
   },
   {
@@ -1634,7 +1634,7 @@
     "source_storage_location": "STORE 1",
     "rack": "IKEA WHITE BOX",
     "image_reference": "L011_gloves",
-    "image_url": null,
+    "image_url": "/inventory/L011.jpg",
     "ai_class_key": "L011"
   },
   {
@@ -1655,7 +1655,7 @@
     "source_storage_location": "STORE 1",
     "rack": "IKEA WHITE BOX",
     "image_reference": "L012_gloves LN",
-    "image_url": null,
+    "image_url": "/inventory/L012.jpg",
     "ai_class_key": "L012"
   },
   {
@@ -1676,7 +1676,7 @@
     "source_storage_location": "STORE 1",
     "rack": "BOX 1",
     "image_reference": "L013_petri dishes",
-    "image_url": null,
+    "image_url": "/inventory/L013.jpg",
     "ai_class_key": "L013"
   },
   {
@@ -1697,7 +1697,7 @@
     "source_storage_location": "STORE 1",
     "rack": "BOX 25",
     "image_reference": "L014_syringes 10ml",
-    "image_url": null,
+    "image_url": "/inventory/L014.jpg",
     "ai_class_key": "L014"
   },
   {
@@ -1718,7 +1718,7 @@
     "source_storage_location": "STORE 1",
     "rack": "BOX 26",
     "image_reference": "L015_syringes 60ml",
-    "image_url": null,
+    "image_url": "/inventory/L015.jpg",
     "ai_class_key": "L015"
   },
   {
@@ -1739,7 +1739,7 @@
     "source_storage_location": "STORE 1",
     "rack": "BOX 18",
     "image_reference": "L016_volumetric flask",
-    "image_url": null,
+    "image_url": "/inventory/L016.jpg",
     "ai_class_key": "L016"
   },
   {
@@ -1760,7 +1760,7 @@
     "source_storage_location": "STORE 1",
     "rack": "SHELF 2",
     "image_reference": "L017_bunsen burner",
-    "image_url": null,
+    "image_url": "/inventory/L017.jpg",
     "ai_class_key": "L017"
   },
   {
@@ -1781,7 +1781,7 @@
     "source_storage_location": "STORE 1",
     "rack": "SHELF 3",
     "image_reference": "L018_glass rod",
-    "image_url": null,
+    "image_url": "/inventory/L018.jpg",
     "ai_class_key": "L018"
   },
   {
@@ -1802,7 +1802,7 @@
     "source_storage_location": "STORE 1",
     "rack": "METAL DRAWER 3",
     "image_reference": "L019_Safety Goggle",
-    "image_url": null,
+    "image_url": "/inventory/L019.jpg",
     "ai_class_key": "L019"
   },
   {
@@ -1823,7 +1823,7 @@
     "source_storage_location": "STORE 1",
     "rack": "TOYOGO MAKER STUDIO",
     "image_reference": "C007_acrylic standee A4 landscape/portrait",
-    "image_url": null,
+    "image_url": "/inventory/C007.jpg",
     "ai_class_key": "C007"
   },
   {
@@ -1844,7 +1844,7 @@
     "source_storage_location": "STORE 1",
     "rack": "TOYOGO MAKER STUDIO",
     "image_reference": "C008_acrylic table label",
-    "image_url": null,
+    "image_url": "/inventory/C008.jpg",
     "ai_class_key": "C008"
   },
   {
@@ -1865,7 +1865,7 @@
     "source_storage_location": "STORE 1",
     "rack": "YELLOW DRAWER",
     "image_reference": "S003_Ruler",
-    "image_url": null,
+    "image_url": "/inventory/S003.jpg",
     "ai_class_key": "S003"
   },
   {
@@ -1886,7 +1886,7 @@
     "source_storage_location": "STORE 1",
     "rack": "DRAWER WOODEN 5",
     "image_reference": "S004_Paper",
-    "image_url": null,
+    "image_url": "/inventory/S004.jpg",
     "ai_class_key": "S004"
   },
   {
@@ -1907,7 +1907,7 @@
     "source_storage_location": "STORE 1",
     "rack": "YELLOW DRAWER",
     "image_reference": "S005_StickyNote",
-    "image_url": null,
+    "image_url": "/inventory/S005.jpg",
     "ai_class_key": "S005"
   },
   {
@@ -1928,7 +1928,7 @@
     "source_storage_location": "STORE 1",
     "rack": "MS METAL DRAWER",
     "image_reference": "S006_Stapler",
-    "image_url": null,
+    "image_url": "/inventory/S006.jpg",
     "ai_class_key": "S006"
   },
   {
@@ -1949,7 +1949,7 @@
     "source_storage_location": "STORE 1",
     "rack": "YELLOW DRAWER",
     "image_reference": "S007_BinderClip",
-    "image_url": null,
+    "image_url": "/inventory/S007.jpg",
     "ai_class_key": "S007"
   },
   {
@@ -1970,7 +1970,7 @@
     "source_storage_location": "STORE 1",
     "rack": "YELLOW DRAWER",
     "image_reference": "S010_PaperClip",
-    "image_url": null,
+    "image_url": "/inventory/S010.jpg",
     "ai_class_key": "S010"
   },
   {
@@ -1991,7 +1991,7 @@
     "source_storage_location": "STORE 1",
     "rack": "YELLOW DRAWER",
     "image_reference": "S012_Sellotape",
-    "image_url": null,
+    "image_url": "/inventory/S012.jpg",
     "ai_class_key": "S012"
   },
   {
@@ -2012,7 +2012,7 @@
     "source_storage_location": "STORE 1",
     "rack": "YELLOW DRAWER",
     "image_reference": "S013_ClipBoard",
-    "image_url": null,
+    "image_url": "/inventory/S013.jpg",
     "ai_class_key": "S013"
   },
   {
@@ -2033,7 +2033,7 @@
     "source_storage_location": "STORE 1",
     "rack": "LOOSE ITEM",
     "image_reference": "S014_Pendrive",
-    "image_url": null,
+    "image_url": "/inventory/S014.jpg",
     "ai_class_key": "S014"
   },
   {
@@ -2054,7 +2054,7 @@
     "source_storage_location": "STORE 1",
     "rack": "MS METAL DRAWER",
     "image_reference": "T002_Plier",
-    "image_url": null,
+    "image_url": "/inventory/T002.jpg",
     "ai_class_key": "T002"
   },
   {
@@ -2075,7 +2075,7 @@
     "source_storage_location": "STORE 1",
     "rack": "MS METAL DRAWER",
     "image_reference": "T003_Screwdriver",
-    "image_url": null,
+    "image_url": "/inventory/T003.jpg",
     "ai_class_key": "T003"
   },
   {
@@ -2096,7 +2096,7 @@
     "source_storage_location": "STORE 1",
     "rack": "MS METAL DRAWER",
     "image_reference": "T004_GlueGun",
-    "image_url": null,
+    "image_url": "/inventory/T004.jpg",
     "ai_class_key": "T004"
   },
   {
@@ -2117,7 +2117,7 @@
     "source_storage_location": "STORE 1",
     "rack": "MS METAL DRAWER",
     "image_reference": "T005_MeasuringTape",
-    "image_url": null,
+    "image_url": "/inventory/T005.jpg",
     "ai_class_key": "T005"
   },
   {
@@ -2138,7 +2138,7 @@
     "source_storage_location": "STORE 1",
     "rack": "YELLOW DRAWER",
     "image_reference": "T006_Cutter",
-    "image_url": null,
+    "image_url": "/inventory/T006.jpg",
     "ai_class_key": "T006"
   },
   {
@@ -2159,7 +2159,7 @@
     "source_storage_location": "STORE 1",
     "rack": "MS METAL DRAWER",
     "image_reference": "T007_CuttingMat",
-    "image_url": null,
+    "image_url": "/inventory/T007.jpg",
     "ai_class_key": "T007"
   },
   {
@@ -2180,7 +2180,7 @@
     "source_storage_location": "STORE 1",
     "rack": "TOYOGO MAKER STUDIO",
     "image_reference": "T010_SmokeAbsorber",
-    "image_url": null,
+    "image_url": "/inventory/T010.jpg",
     "ai_class_key": "T010"
   },
   {
@@ -2201,7 +2201,7 @@
     "source_storage_location": "STORE 1",
     "rack": "MS METAL DRAWER",
     "image_reference": "T011_Hammer",
-    "image_url": null,
+    "image_url": "/inventory/T011.jpg",
     "ai_class_key": "T011"
   },
   {
@@ -2222,7 +2222,7 @@
     "source_storage_location": "STORE 1",
     "rack": "MS METAL DRAWER",
     "image_reference": "T012_Mallet",
-    "image_url": null,
+    "image_url": "/inventory/T012.jpg",
     "ai_class_key": "T012"
   },
   {
@@ -2243,7 +2243,7 @@
     "source_storage_location": "STORE 1",
     "rack": "MS METAL DRAWER",
     "image_reference": "T013_ScrewPhillips",
-    "image_url": null,
+    "image_url": "/inventory/T013.jpg",
     "ai_class_key": "T013"
   },
   {
@@ -2264,7 +2264,7 @@
     "source_storage_location": "STORE 1",
     "rack": "MS METAL DRAWER",
     "image_reference": "T014_Spanner",
-    "image_url": null,
+    "image_url": "/inventory/T014.jpg",
     "ai_class_key": "T014"
   },
   {
@@ -2285,7 +2285,7 @@
     "source_storage_location": "STORE 1",
     "rack": "MS METAL DRAWER",
     "image_reference": "T015_Caliper",
-    "image_url": null,
+    "image_url": "/inventory/T015.jpg",
     "ai_class_key": "T015"
   }
 ]

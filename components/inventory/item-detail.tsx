@@ -1,5 +1,6 @@
 'use client'
 
+import { InventoryPhoto } from '@/components/inventory/inventory-photo'
 import { GlassCard, StatusPill } from '@/components/ui-kit'
 import {
   getDemoKindLabel,
@@ -83,42 +84,48 @@ export function ItemDetail({ item: initialItem }: { item: InventoryItem }) {
         </div>
       </div>
 
-      {/* stock breakdown */}
-      <GlassCard strong className="mt-6 animate-rise p-6" style={{ animationDelay: '60ms' }}>
-        <div className="flex items-end justify-between">
-          <div>
-            <p className="text-sm text-muted-foreground">In stock right now</p>
-            <p className="font-display text-5xl font-bold tracking-tight text-cyan">
-              {item.available}
-            </p>
-          </div>
-          <p className="text-sm text-muted-foreground">{total} total units</p>
-        </div>
-
-        {/* stacked bar */}
-        <div className="mt-5 flex h-3 w-full overflow-hidden rounded-full bg-secondary/60">
-          {segments.map((s) =>
-            s.value > 0 ? (
-              <div
-                key={s.label}
-                style={{ width: `${(s.value / total) * 100}%`, background: s.color }}
-                className="h-full"
-              />
-            ) : null,
-          )}
-        </div>
-        <div className="mt-4 grid gap-3 sm:grid-cols-3">
-          {segments.map((s) => (
-            <div key={s.label} className="rounded-xl border border-border bg-secondary/40 p-3">
-              <div className="flex items-center gap-2">
-                <span className="h-2.5 w-2.5 rounded-full" style={{ background: s.color }} />
-                <span className="text-xs text-muted-foreground">{s.label}</span>
-              </div>
-              <p className="mt-1 font-display text-xl font-bold">{s.value}</p>
+      <div className="mt-6 grid gap-5 lg:grid-cols-[minmax(0,1fr)_320px]">
+        {/* stock breakdown */}
+        <GlassCard strong className="animate-rise p-6" style={{ animationDelay: '60ms' }}>
+          <div className="flex items-end justify-between">
+            <div>
+              <p className="text-sm text-muted-foreground">In stock right now</p>
+              <p className="font-display text-5xl font-bold tracking-tight text-cyan">
+                {item.available}
+              </p>
             </div>
-          ))}
-        </div>
-      </GlassCard>
+            <p className="text-sm text-muted-foreground">{total} total units</p>
+          </div>
+
+          {/* stacked bar */}
+          <div className="mt-5 flex h-3 w-full overflow-hidden rounded-full bg-secondary/60">
+            {segments.map((s) =>
+              s.value > 0 ? (
+                <div
+                  key={s.label}
+                  style={{ width: `${(s.value / total) * 100}%`, background: s.color }}
+                  className="h-full"
+                />
+              ) : null,
+            )}
+          </div>
+          <div className="mt-4 grid gap-3 sm:grid-cols-3">
+            {segments.map((s) => (
+              <div key={s.label} className="rounded-xl border border-border bg-secondary/40 p-3">
+                <div className="flex items-center gap-2">
+                  <span className="h-2.5 w-2.5 rounded-full" style={{ background: s.color }} />
+                  <span className="text-xs text-muted-foreground">{s.label}</span>
+                </div>
+                <p className="mt-1 font-display text-xl font-bold">{s.value}</p>
+              </div>
+            ))}
+          </div>
+        </GlassCard>
+
+        <GlassCard className="animate-rise p-3" style={{ animationDelay: '90ms' }}>
+          <InventoryPhoto item={item} variant="detail" />
+        </GlassCard>
+      </div>
 
       <div className="mt-6 grid gap-5 lg:grid-cols-2">
         {/* distribution by store */}

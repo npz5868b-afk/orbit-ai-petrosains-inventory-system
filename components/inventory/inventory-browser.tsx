@@ -1,5 +1,6 @@
 'use client'
 
+import { InventoryPhoto } from '@/components/inventory/inventory-photo'
 import { GlassCard, StatusPill } from '@/components/ui-kit'
 import {
   getInventory,
@@ -131,6 +132,8 @@ export function InventoryBrowser() {
               style={{ animationDelay: `${i * 50}ms` }}
             >
               <GlassCard className="flex items-center gap-4 p-4 transition-all group-hover:border-cyan/30 group-hover:glow-cyan">
+                <InventoryPhoto item={item} />
+
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
                     <p className="font-display text-base font-semibold">{item.name}</p>

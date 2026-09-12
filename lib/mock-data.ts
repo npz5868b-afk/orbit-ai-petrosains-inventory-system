@@ -31,6 +31,7 @@ export const inventory: InventoryItem[] = [
     damaged: 1,
     location: 'Store 1 — Electronics',
     rack: 'Rack B3',
+    imageUrl: null,
     lastSeen: '2 minutes ago',
     status: 'available',
     distribution: [
@@ -54,6 +55,7 @@ export const inventory: InventoryItem[] = [
     damaged: 0,
     location: 'Store 1 — Sensors',
     rack: 'Rack A1',
+    imageUrl: null,
     lastSeen: '11 minutes ago',
     status: 'available',
     distribution: [
@@ -73,6 +75,7 @@ export const inventory: InventoryItem[] = [
     damaged: 2,
     location: 'Store 2 — Sensors',
     rack: 'Rack A2',
+    imageUrl: null,
     lastSeen: '1 hour ago',
     status: 'attention',
     distribution: [
@@ -94,6 +97,7 @@ export const inventory: InventoryItem[] = [
     damaged: 0,
     location: 'Store 1 — Tools',
     rack: 'Rack C5',
+    imageUrl: null,
     lastSeen: '5 minutes ago',
     status: 'available',
     distribution: [
@@ -114,6 +118,7 @@ export const inventory: InventoryItem[] = [
     damaged: 0,
     location: 'Store 1 — Cables',
     rack: 'Rack D2',
+    imageUrl: null,
     lastSeen: '20 minutes ago',
     status: 'available',
     distribution: [
@@ -133,6 +138,7 @@ export const inventory: InventoryItem[] = [
     damaged: 1,
     location: 'Store 3 — Electronics',
     rack: 'Rack B1',
+    imageUrl: null,
     lastSeen: '3 hours ago',
     status: 'attention',
     distribution: [{ store: 'Store 3', qty: 0 }],
@@ -149,6 +155,7 @@ export const inventory: InventoryItem[] = [
     damaged: 0,
     location: 'Store 2 — Tools',
     rack: 'Rack C1',
+    imageUrl: null,
     lastSeen: '40 minutes ago',
     status: 'checked-out',
     distribution: [
@@ -167,6 +174,7 @@ export const inventory: InventoryItem[] = [
     damaged: 0,
     location: 'Store 1 — Tools',
     rack: 'Rack C6',
+    imageUrl: null,
     lastSeen: '9 minutes ago',
     status: 'available',
     distribution: [

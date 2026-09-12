@@ -17,6 +17,7 @@ export type InventoryItem = {
   available: number
   checkedOut: number
   damaged: number
+  imageUrl: string | null
   location: string
   rack: string
   lastSeen: string
