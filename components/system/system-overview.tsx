@@ -4,10 +4,13 @@ import { GlassCard, StatusPill } from '@/components/ui-kit'
 import { getSystemOverview } from '@/lib/services/system-service'
 import { fetchStoresFromApi } from '@/lib/api-client'
 import { flushOfflineQueue, getPendingOperations } from '@/lib/offline-queue'
+import { getStorePhotoSet, type StorePhotoAsset } from '@/lib/store-photos'
 import { cn } from '@/lib/utils'
 import {
-  CheckCircle2,
+  ChevronDown,
+  ChevronUp,
   Cpu,
+  ImageIcon,
   Info,
   MapPin,
   PackageCheck,
@@ -19,6 +22,45 @@ import {
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
+function StorePhotoFrame({
+  photo,
+  fallbackLabel,
+  className,
+  imageClassName,
+}: {
+  photo: StorePhotoAsset | null
+  fallbackLabel: string
+  className: string
+  imageClassName?: string
+}) {
+  const [failed, setFailed] = useState(false)
+  const showImage = photo && !failed
+
+  return (
+    <div
+      className={cn(
+        'relative overflow-hidden rounded-xl border border-border bg-secondary/35',
+        className,
+      )}
+    >
+      {showImage ? (
+        <img
+          src={photo.src}
+          alt={photo.alt}
+          loading="lazy"
+          onError={() => setFailed(true)}
+          className={cn('h-full w-full object-cover object-center', imageClassName)}
+        />
+      ) : (
+        <div className="flex h-full w-full flex-col items-center justify-center gap-2 px-3 text-center text-muted-foreground">
+          <ImageIcon className="h-5 w-5 text-cyan" />
+          <span className="text-xs font-medium">{fallbackLabel}</span>
+        </div>
+      )}
+    </div>
+  )
+}
+
 export function SystemOverview() {
   const overview = getSystemOverview()
   const { facts, offlineStates, recoveryStates } = overview
@@ -26,6 +68,7 @@ export function SystemOverview() {
   const [pendingCount, setPendingCount] = useState(0)
   const [conflictCount, setConflictCount] = useState(0)
   const [syncState, setSyncState] = useState<'idle' | 'syncing' | 'done'>('idle')
+  const [expandedStoreId, setExpandedStoreId] = useState<string | null>(null)
   const online = stores.filter((s) => s.status === 'online').length
 
   useEffect(() => {
@@ -109,54 +152,111 @@ export function SystemOverview() {
       {/* stores */}
       <h2 className="mt-8 animate-rise font-display text-lg font-semibold">Store Status</h2>
       <div className="mt-4 grid gap-3 sm:grid-cols-2">
-        {stores.map((s, i) => (
-          <GlassCard
-            key={s.id}
-            className="animate-rise p-5"
-            style={{ animationDelay: `${120 + i * 60}ms` }}
-          >
-            <div className="flex items-start justify-between">
-              <div className="flex items-center gap-3">
-                <span
-                  className={cn(
-                    'grid h-10 w-10 place-items-center rounded-xl',
-                    s.status === 'online'
-                      ? 'bg-success/15 text-success'
-                      : 'bg-warning/15 text-warning',
-                  )}
-                >
-                  {s.status === 'online' ? (
-                    <Wifi className="h-5 w-5" />
-                  ) : (
-                    <WifiOff className="h-5 w-5" />
-                  )}
-                </span>
-                <div>
-                  <p className="font-display font-semibold">{s.name}</p>
-                  <p className="flex items-center gap-1 text-xs text-muted-foreground">
-                    <MapPin className="h-3 w-3" />
-                    {s.area}
-                  </p>
+        {stores.map((s, i) => {
+          const photos = getStorePhotoSet(s.id)
+          const isExpanded = expandedStoreId === s.id
+          const environmentCount = photos?.environment.length ?? 0
+          return (
+            <GlassCard
+              key={s.id}
+              className="animate-rise p-4 transition duration-300 hover:-translate-y-0.5 hover:border-cyan/30 hover:shadow-[0_18px_46px_-34px_var(--cyan)]"
+              style={{ animationDelay: `${120 + i * 60}ms` }}
+            >
+              <div className="flex gap-3">
+                <div className="shrink-0">
+                  <StorePhotoFrame
+                    photo={photos?.hero ?? null}
+                    fallbackLabel={`${s.name} photo`}
+                    className="store-hero-thumb rounded-xl"
+                  />
+                </div>
+
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="truncate font-display text-lg font-semibold">{s.name}</p>
+                      <p className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
+                        <MapPin className="h-3 w-3 shrink-0" />
+                        <span className="truncate">{s.area}</span>
+                      </p>
+                    </div>
+                    <StatusPill
+                      label={s.status === 'online' ? 'Online' : 'Offline'}
+                      tone={s.status === 'online' ? 'success' : 'warning'}
+                      pulse={s.status === 'offline'}
+                    />
+                  </div>
+
+                  <div className="mt-3 grid gap-1.5 text-sm">
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="text-muted-foreground">Last sync</span>
+                      <span
+                        className={cn(
+                          'truncate text-right',
+                          s.status === 'online' ? 'text-foreground' : 'text-warning',
+                        )}
+                      >
+                        {s.lastSync}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="text-muted-foreground">Items tracked</span>
+                      <span className="font-semibold text-cyan">{s.items}</span>
+                    </div>
+                  </div>
                 </div>
               </div>
-              <StatusPill
-                label={s.status === 'online' ? 'Online' : 'Offline'}
-                tone={s.status === 'online' ? 'success' : 'warning'}
-                pulse={s.status === 'offline'}
-              />
-            </div>
-            <div className="mt-4 flex items-center justify-between border-t border-border pt-3 text-sm">
-              <span className="text-muted-foreground">Last sync</span>
-              <span className={s.status === 'online' ? 'text-foreground' : 'text-warning'}>
-                {s.lastSync}
-              </span>
-            </div>
-            <div className="mt-1.5 flex items-center justify-between text-sm">
-              <span className="text-muted-foreground">Items tracked</span>
-              <span className="font-medium">{s.items}</span>
-            </div>
-          </GlassCard>
-        ))}
+
+              {environmentCount > 0 && (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => setExpandedStoreId(isExpanded ? null : s.id)}
+                    className="mt-3 flex w-full items-center justify-between rounded-xl border border-border bg-secondary/30 px-3 py-2 text-xs font-medium text-muted-foreground transition hover:border-cyan/35 hover:text-cyan focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan/45"
+                    aria-expanded={isExpanded}
+                  >
+                    <span>
+                      {isExpanded ? 'Hide environment' : `View environment (${environmentCount})`}
+                    </span>
+                    {isExpanded ? (
+                      <ChevronUp className="h-4 w-4" />
+                    ) : (
+                      <ChevronDown className="h-4 w-4" />
+                    )}
+                  </button>
+
+                  <div
+                    className={cn(
+                      'grid overflow-hidden transition-[grid-template-rows,opacity] duration-300 ease-out',
+                      isExpanded ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0',
+                    )}
+                  >
+                    <div className="min-h-0">
+                      <p className="mt-3 text-[11px] text-muted-foreground">
+                        Real Petrosains storage environment
+                      </p>
+                      <div
+                        className={cn(
+                          'mt-2 grid gap-2',
+                          environmentCount === 2 ? 'grid-cols-2' : 'grid-cols-3',
+                        )}
+                      >
+                        {photos?.environment.map((photo, index) => (
+                          <StorePhotoFrame
+                            key={photo.src}
+                            photo={photo}
+                            fallbackLabel={`View ${index + 1}`}
+                            className="h-20 sm:h-24 lg:h-[92px]"
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </>
+              )}
+            </GlassCard>
+          )
+        })}
       </div>
 
       {/* sync status */}

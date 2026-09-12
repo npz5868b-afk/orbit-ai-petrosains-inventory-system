@@ -560,3 +560,6 @@
     transform: none;
   }
 }
+
+.store-hero-thumb { width: 144px !important; height: 120px !important; min-width: 144px !important; flex: 0 0 144px !important; }
+@media (max-width: 639px) { .store-hero-thumb { width: 112px !important; height: 104px !important; min-width: 112px !important; flex-basis: 112px !important; } }
