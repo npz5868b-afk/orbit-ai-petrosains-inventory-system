@@ -22,6 +22,8 @@ yarn-error.log*
 
 # python
 /.venv/
+/.venv-py314-broken/
+/.python-runtime/
 /.pytest_cache/
 /.test-cache/
 /.test-tmp/
