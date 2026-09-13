@@ -37,7 +37,7 @@ class ReturnRequest(StrictModel):
 
 
 class ScanRequest(StrictModel):
-    mode: Literal["bulk_return"] = "bulk_return"
+    mode: Literal["bulk_return", "checkout"] = "bulk_return"
     store_id: str = "store-1"
     client_scan_id: str | None = Field(default=None, max_length=128)
     fixture: Literal["mixed", "all_ready", "unknown", "empty", "unavailable"] = "mixed"

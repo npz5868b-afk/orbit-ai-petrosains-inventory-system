@@ -176,10 +176,10 @@ export type ApiScan = {
   summary: { detected_quantity: number; ready_lines: number; review_lines: number; rejected_lines: number }
 }
 
-export function startBulkScan(image: File) {
+export function startAiScan(image: File, mode: 'bulk_return' | 'checkout' = 'bulk_return') {
   const formData = new FormData()
   formData.append('image', image)
-  formData.append('mode', 'bulk_return')
+  formData.append('mode', mode)
   formData.append('store_id', 'store-1')
   formData.append('client_scan_id', crypto.randomUUID())
 
@@ -187,6 +187,14 @@ export function startBulkScan(image: File) {
     method: 'POST',
     body: formData,
   })
+}
+
+export function startBulkScan(image: File) {
+  return startAiScan(image, 'bulk_return')
+}
+
+export function startCheckoutScan(image: File) {
+  return startAiScan(image, 'checkout')
 }
 export function resolveScanReview(
   scanId: string,

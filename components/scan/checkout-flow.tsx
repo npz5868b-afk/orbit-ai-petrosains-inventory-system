@@ -2,9 +2,9 @@
 
 import { GlassCard, StatusPill } from '@/components/ui-kit'
 import {
-  getCheckoutScanCatalog,
   getTeams,
 } from '@/lib/services/scan-service'
+import { startCheckoutScan, type ApiScan } from '@/lib/api-client'
 import { itemIdFromCode } from '@/lib/official-catalog'
 import { submitOrQueue } from '@/lib/offline-queue'
 import { cn } from '@/lib/utils'
@@ -18,38 +18,93 @@ import {
   Users,
 } from 'lucide-react'
 import Link from 'next/link'
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 type Step = 0 | 1 | 2 | 3 | 4
 
 type CartItem = { itemName: string; itemCode: string; qty: number }
+type DetectedCheckoutItem = { itemName: string; itemCode: string; confidence: number }
+type CheckoutScanState = 'idle' | 'scanning' | 'found' | 'error'
 
 const STEP_LABELS = ['Assign', 'Scan', 'Review', 'Confirm', 'Done']
 
 export function CheckoutFlow({ onExit }: { onExit: () => void }) {
   const teams = getTeams()
-  const catalog = getCheckoutScanCatalog()
   const [step, setStep] = useState<Step>(0)
   const [who, setWho] = useState<string | null>(null)
-  const [scanned, setScanned] = useState(0)
   const [cart, setCart] = useState<CartItem[]>([])
+  const [scan, setScan] = useState<ApiScan | null>(null)
+  const [scanState, setScanState] = useState<CheckoutScanState>('idle')
+  const [scanImageUrl, setScanImageUrl] = useState<string | null>(null)
+  const [scanError, setScanError] = useState<string | null>(null)
+  const [detectedItem, setDetectedItem] = useState<DetectedCheckoutItem | null>(null)
   const [submitState, setSubmitState] = useState<'idle' | 'submitting' | 'synced' | 'saved-offline'>('idle')
   const [error, setError] = useState<string | null>(null)
   const transactionId = useRef<string | null>(null)
 
-  const current = catalog[scanned % catalog.length]
+  useEffect(() => {
+    return () => {
+      if (scanImageUrl) URL.revokeObjectURL(scanImageUrl)
+    }
+  }, [scanImageUrl])
+
+  function resetCurrentScan() {
+    setScan(null)
+    setScanState('idle')
+    setScanError(null)
+    setDetectedItem(null)
+    setScanImageUrl(null)
+  }
+
+  async function scanCheckoutItem(image: File) {
+    setScanImageUrl(URL.createObjectURL(image))
+    setScan(null)
+    setScanState('scanning')
+    setScanError(null)
+    setDetectedItem(null)
+
+    try {
+      const nextScan = await startCheckoutScan(image)
+      setScan(nextScan)
+      const hasDetection = nextScan.items.some((item) => item.status !== 'rejected')
+      const detected = nextScan.items.find((item) => item.status !== 'rejected' && item.item)
+
+      if (!detected) {
+        setScanState('error')
+        setScanError(hasDetection ? 'AI could not match this item to the catalog. Please scan again.' : 'No item detected. Try again.')
+        return
+      }
+
+      if (detected.status === 'review_needed') {
+        setScanState('error')
+        setScanError('AI is not confident enough to check out this item. Please scan again.')
+        return
+      }
+
+      setDetectedItem({
+        itemName: detected.item!.name,
+        itemCode: detected.item!.sku,
+        confidence: Math.round(detected.confidence * 100),
+      })
+      setScanState('found')
+    } catch (cause) {
+      setScanState('error')
+      setScanError(cause instanceof Error ? cause.message : 'The scan could not be processed')
+    }
+  }
 
   function addToCart() {
+    if (!detectedItem) return
     setCart((prev) => {
-      const found = prev.find((c) => c.itemCode === current.itemCode)
+      const found = prev.find((c) => c.itemCode === detectedItem.itemCode)
       if (found) {
         return prev.map((c) =>
-          c.itemCode === current.itemCode ? { ...c, qty: c.qty + 1 } : c,
+          c.itemCode === detectedItem.itemCode ? { ...c, qty: c.qty + 1 } : c,
         )
       }
-      return [...prev, { itemName: current.itemName, itemCode: current.itemCode, qty: 1 }]
+      return [...prev, { itemName: detectedItem.itemName, itemCode: detectedItem.itemCode, qty: 1 }]
     })
-    setScanned((s) => s + 1)
+    resetCurrentScan()
   }
 
   function setQty(itemCode: string, delta: number) {
@@ -193,32 +248,99 @@ export function CheckoutFlow({ onExit }: { onExit: () => void }) {
       {step === 1 && (
         <div className="grid gap-5 lg:grid-cols-[1fr_1fr]">
           <GlassCard strong className="animate-rise flex flex-col p-5">
-            <div className="relative grid flex-1 place-items-center overflow-hidden rounded-xl border border-cyan/25 bg-[oklch(0.12_0.02_264)] py-14">
-              <div className="absolute inset-x-8 top-0 h-[3px] animate-scan-sweep rounded-full bg-gradient-to-r from-transparent via-cyan to-transparent" />
+            <div className="relative grid min-h-[280px] flex-1 place-items-center overflow-hidden rounded-xl border border-cyan/25 bg-[oklch(0.12_0.02_264)] py-14">
+              {scanImageUrl ? (
+                <img
+                  src={scanImageUrl}
+                  alt="Selected checkout scan"
+                  className="absolute inset-0 h-full w-full object-contain"
+                />
+              ) : (
+                <div className="absolute inset-0 bg-[radial-gradient(120%_100%_at_24%_18%,oklch(0.28_0.05_240),oklch(0.12_0.024_264)_68%,oklch(0.08_0.018_264)_100%)]" />
+              )}
+              {scanState === 'scanning' && (
+                <div className="absolute inset-x-8 top-0 h-[3px] animate-scan-sweep rounded-full bg-gradient-to-r from-transparent via-cyan to-transparent" />
+              )}
               <div className="text-center">
                 <ScanLine className="mx-auto h-10 w-10 text-cyan" />
-                <p className="mt-3 text-sm text-muted-foreground">Point at an item barcode</p>
+                <p className="mt-3 text-sm text-muted-foreground">
+                  {scanState === 'scanning'
+                    ? 'ORBIT is checking this item.'
+                    : scanState === 'found'
+                      ? 'Item ready to add.'
+                      : scanState === 'error'
+                        ? 'Scan another item image.'
+                        : 'Point at an item barcode'}
+                </p>
               </div>
             </div>
 
-            {/* Item Found */}
-            <div className="mt-4 animate-rise rounded-xl border border-cyan/30 bg-cyan/5 p-4">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-medium uppercase tracking-wide text-cyan">
-                  Item Found
-                </span>
-                <StatusPill label={`${current.confidence}% match`} tone="success" />
+            <label
+              className={cn(
+                'mt-4 inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border border-cyan/30 bg-cyan/10 px-4 py-2.5 text-sm font-semibold text-cyan transition-colors hover:bg-cyan/20',
+                scanState === 'scanning' && 'pointer-events-none opacity-60',
+              )}
+            >
+              <ScanLine className="h-4 w-4" />
+              {scanState === 'scanning' ? 'Scanning' : scanImageUrl ? 'Scan Again' : 'Scan Item'}
+              <input
+                type="file"
+                accept="image/*"
+                capture="environment"
+                className="hidden"
+                onChange={(event) => {
+                  const image = event.target.files?.[0]
+                  if (image) void scanCheckoutItem(image)
+                  event.currentTarget.value = ''
+                }}
+              />
+            </label>
+
+            {scanState === 'scanning' && (
+              <div className="mt-4 animate-rise rounded-xl border border-cyan/30 bg-cyan/5 p-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-medium uppercase tracking-wide text-cyan">
+                    AI Scan Active
+                  </span>
+                  <StatusPill label="Checking" tone="cyan" pulse />
+                </div>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  ORBIT is analysing the selected item image.
+                </p>
               </div>
-              <p className="mt-2 font-display text-lg font-semibold">{current.itemName}</p>
-              <p className="text-sm text-muted-foreground">Code {current.itemCode}</p>
-              <button
-                onClick={addToCart}
-                className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-cyan/15 px-4 py-2.5 text-sm font-semibold text-cyan transition-colors hover:bg-cyan/25"
-              >
-                <Plus className="h-4 w-4" />
-                Add Item
-              </button>
-            </div>
+            )}
+
+            {scanState === 'error' && scanError && (
+              <div className="mt-4 animate-rise rounded-xl border border-warning/30 bg-warning/10 p-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-medium uppercase tracking-wide text-warning">
+                    AI needs review
+                  </span>
+                  <StatusPill label="Try Again" tone="warning" />
+                </div>
+                <p className="mt-2 text-sm text-muted-foreground">{scanError}</p>
+              </div>
+            )}
+
+            {scanState === 'found' && detectedItem && (
+              <div className="mt-4 animate-rise rounded-xl border border-cyan/30 bg-cyan/5 p-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-medium uppercase tracking-wide text-cyan">
+                    Item Found
+                  </span>
+                  <StatusPill label={`${detectedItem.confidence}% match`} tone="success" />
+                </div>
+                <p className="mt-2 font-display text-lg font-semibold">{detectedItem.itemName}</p>
+                <p className="text-sm text-muted-foreground">Code {detectedItem.itemCode}</p>
+                <button
+                  onClick={addToCart}
+                  className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-cyan/15 px-4 py-2.5 text-sm font-semibold text-cyan transition-colors hover:bg-cyan/25"
+                >
+                  <Plus className="h-4 w-4" />
+                  Add Item
+                </button>
+              </div>
+            )}
           </GlassCard>
 
           {/* Cart */}

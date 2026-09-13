@@ -47,7 +47,7 @@ CREATE TABLE IF NOT EXISTS inventory_items (
 CREATE TABLE IF NOT EXISTS scan_sessions (
     id TEXT PRIMARY KEY,
     client_scan_id TEXT UNIQUE,
-    mode TEXT NOT NULL CHECK (mode = 'bulk_return'),
+    mode TEXT NOT NULL CHECK (mode IN ('bulk_return', 'checkout')),
     status TEXT NOT NULL CHECK (status IN ('created','scanning','review','ready','confirmed','expired')),
     store_id TEXT NOT NULL REFERENCES stores(id),
     image_reference TEXT,
@@ -169,8 +169,54 @@ def init_database(path: Path | None = None) -> None:
     connection = connect(path)
     try:
         connection.executescript(SCHEMA)
+        _migrate_scan_session_modes(connection)
     finally:
         connection.close()
+
+
+def _migrate_scan_session_modes(connection: sqlite3.Connection) -> None:
+    row = connection.execute(
+        "SELECT sql FROM sqlite_master WHERE type = 'table' AND name = 'scan_sessions'",
+    ).fetchone()
+    sql = row["sql"] if row else ""
+    if "CHECK (mode = 'bulk_return')" not in sql:
+        return
+
+    connection.execute("PRAGMA foreign_keys = OFF")
+    try:
+        connection.executescript(
+            """
+            CREATE TABLE scan_sessions_new (
+                id TEXT PRIMARY KEY,
+                client_scan_id TEXT UNIQUE,
+                mode TEXT NOT NULL CHECK (mode IN ('bulk_return', 'checkout')),
+                status TEXT NOT NULL CHECK (status IN ('created','scanning','review','ready','confirmed','expired')),
+                store_id TEXT NOT NULL REFERENCES stores(id),
+                image_reference TEXT,
+                detector_version TEXT NOT NULL,
+                processing_time_ms INTEGER,
+                created_at TEXT NOT NULL,
+                expires_at TEXT NOT NULL,
+                confirmed_transaction_id TEXT
+            );
+
+            INSERT INTO scan_sessions_new (
+                id, client_scan_id, mode, status, store_id, image_reference,
+                detector_version, processing_time_ms, created_at, expires_at,
+                confirmed_transaction_id
+            )
+            SELECT
+                id, client_scan_id, mode, status, store_id, image_reference,
+                detector_version, processing_time_ms, created_at, expires_at,
+                confirmed_transaction_id
+            FROM scan_sessions;
+
+            DROP TABLE scan_sessions;
+            ALTER TABLE scan_sessions_new RENAME TO scan_sessions;
+            """
+        )
+    finally:
+        connection.execute("PRAGMA foreign_keys = ON")
 
 
 def json_value(value: str | None, default=None):
