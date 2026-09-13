@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: orbit-ai-backend
+    runtime: python
+    plan: starter
+    buildCommand: python -m pip install --upgrade pip && python -m pip install -r backend/requirements-deploy.txt
+    startCommand: python -m uvicorn app.main:app --app-dir backend --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/health
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.13.15"
+      - key: ORBIT_DETECTOR_MODE
+        value: real
+      - key: ORBIT_MODEL_WEIGHTS
+        value: backend/models/orbit_ai_5class_yolo11n_best.pt
+      - key: ORBIT_OCR_ENABLED
+        value: "true"
+      - key: ORBIT_DB_PATH
+        value: /var/data/orbit.db
+      - key: ORBIT_CORS_ORIGINS
+        sync: false
+    disk:
+      name: orbit-ai-sqlite
+      mountPath: /var/data
+      sizeGB: 1

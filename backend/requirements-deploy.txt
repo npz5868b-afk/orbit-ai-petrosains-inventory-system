@@ -1,0 +1,5 @@
+# Render backend deployment stack.
+# Keep these includes aligned with the locally validated backend, ML, and OCR pins.
+-r requirements.txt
+-r requirements-ml.txt
+-r requirements-ocr.txt
