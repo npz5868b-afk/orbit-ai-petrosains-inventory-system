@@ -223,7 +223,7 @@
   top: -18%;
   height: 68vmax;
   width: 68vmax;
-  background: radial-gradient(circle, oklch(0.72 0.14 205 / 0.42), transparent 62%);
+  background: radial-gradient(circle, oklch(0.72 0.14 205 / 0.66), transparent 64%);
   animation: lux-aurora-a 15s ease-in-out infinite;
 }
 .ambient-aurora-b {
@@ -231,7 +231,7 @@
   top: 4%;
   height: 64vmax;
   width: 64vmax;
-  background: radial-gradient(circle, oklch(0.62 0.17 292 / 0.38), transparent 64%);
+  background: radial-gradient(circle, oklch(0.62 0.17 292 / 0.62), transparent 66%);
   animation: lux-aurora-b 18s ease-in-out infinite;
 }
 .ambient-aurora-c {
@@ -239,16 +239,16 @@
   left: 20%;
   height: 58vmax;
   width: 58vmax;
-  background: radial-gradient(circle, oklch(0.72 0.11 185 / 0.28), transparent 64%);
+  background: radial-gradient(circle, oklch(0.72 0.11 185 / 0.45), transparent 68%);
   animation: lux-aurora-c 21s ease-in-out infinite;
 }
 .ambient-depth-grid {
   position: absolute;
   inset: -8%;
-  opacity: 0.13;
+  opacity: 0.145;
   background-image:
-    linear-gradient(oklch(0.8 0.14 205 / 0.42) 1px, transparent 1px),
-    linear-gradient(90deg, oklch(0.8 0.14 205 / 0.42) 1px, transparent 1px);
+    linear-gradient(oklch(0.8 0.14 205 / 0.46) 1px, transparent 1px),
+    linear-gradient(90deg, oklch(0.8 0.14 205 / 0.46) 1px, transparent 1px);
   background-size: 64px 64px;
   mask-image: radial-gradient(120% 82% at 52% 32%, black 19%, transparent 74%);
   transform: perspective(900px) rotateX(58deg) translateY(-18%);
@@ -258,12 +258,12 @@
 .ambient-depth-lines {
   position: absolute;
   inset: 0;
-  opacity: 0.12;
+  opacity: 0.13;
   background:
     repeating-linear-gradient(
       100deg,
       transparent 0 92px,
-      oklch(0.78 0.14 205 / 0.25) 93px,
+      oklch(0.78 0.14 205 / 0.28) 93px,
       transparent 95px
     );
   mask-image: linear-gradient(90deg, transparent, black 20%, black 72%, transparent);
@@ -274,9 +274,38 @@
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(58% 42% at 46% 18%, oklch(0.78 0.14 205 / 0.18), transparent 70%),
-    radial-gradient(44% 36% at 30% 28%, oklch(0.66 0.19 292 / 0.14), transparent 72%);
+    radial-gradient(64% 46% at 38% 13%, oklch(0.78 0.14 205 / 0.32), transparent 72%),
+    radial-gradient(48% 40% at 30% 32%, oklch(0.66 0.19 292 / 0.25), transparent 74%),
+    radial-gradient(36% 30% at 78% 18%, oklch(0.66 0.19 292 / 0.14), transparent 78%);
   animation: hero-halo-breathe 5.5s ease-in-out infinite;
+}
+.ambient-command-bloom {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(58% 34% at 40% 8%, oklch(0.8 0.14 205 / 0.19), transparent 76%),
+    radial-gradient(44% 28% at 50% 42%, oklch(0.72 0.11 185 / 0.08), transparent 78%);
+  animation: hero-halo-breathe 7.2s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+.ambient-starfield {
+  position: absolute;
+  inset: 0;
+  opacity: 0.22;
+  background-image:
+    radial-gradient(circle at 8% 20%, oklch(0.88 0.08 210 / 0.78) 0 1px, transparent 1.8px),
+    radial-gradient(circle at 16% 44%, oklch(0.78 0.14 205 / 0.32) 0 0.7px, transparent 1.6px),
+    radial-gradient(circle at 23% 72%, oklch(0.78 0.14 205 / 0.6) 0 1px, transparent 2px),
+    radial-gradient(circle at 36% 23%, oklch(0.88 0.08 210 / 0.52) 0 0.8px, transparent 1.8px),
+    radial-gradient(circle at 42% 66%, oklch(0.66 0.19 292 / 0.3) 0 0.7px, transparent 1.7px),
+    radial-gradient(circle at 54% 78%, oklch(0.66 0.19 292 / 0.5) 0 1px, transparent 2px),
+    radial-gradient(circle at 63% 28%, oklch(0.78 0.14 205 / 0.42) 0 0.7px, transparent 1.8px),
+    radial-gradient(circle at 69% 37%, oklch(0.78 0.14 205 / 0.58) 0 1px, transparent 2px),
+    radial-gradient(circle at 78% 13%, oklch(0.88 0.08 210 / 0.48) 0 0.8px, transparent 1.8px),
+    radial-gradient(circle at 84% 18%, oklch(0.88 0.08 210 / 0.62) 0 1px, transparent 2px),
+    radial-gradient(circle at 90% 64%, oklch(0.66 0.19 292 / 0.46) 0 1px, transparent 2px),
+    radial-gradient(circle at 94% 82%, oklch(0.78 0.14 205 / 0.24) 0 0.7px, transparent 1.6px);
+  mask-image: radial-gradient(104% 84% at 50% 42%, black 10%, transparent 84%);
 }
 .ambient-particle {
   position: absolute;
@@ -287,66 +316,89 @@
   animation-iteration-count: infinite;
   will-change: transform, opacity;
 }
+.ambient-particle-distant {
+  opacity: 0;
+}
+.ambient-particle-highlight {
+  z-index: 1;
+}
+.ambient-particle-twinkle::after {
+  content: '';
+  position: absolute;
+  inset: -30%;
+  border-radius: inherit;
+  background: inherit;
+  box-shadow: inherit;
+  opacity: 0;
+  animation: star-twinkle var(--twinkle-duration) ease-in-out infinite;
+  animation-delay: var(--twinkle-delay);
+  will-change: transform, opacity;
+}
 .ambient-streak {
   position: absolute;
-  height: 1px;
+  height: 1.75px;
   border-radius: 9999px;
   opacity: 0;
   background: linear-gradient(
     90deg,
-    transparent,
-    oklch(0.88 0.08 205 / 0.08),
-    oklch(0.9 0.08 205 / 0.72),
-    transparent
+    transparent 0%,
+    oklch(0.78 0.14 205 / 0.05) 10%,
+    oklch(0.8 0.14 205 / 0.36) 42%,
+    oklch(0.9 0.08 210 / 0.72) 68%,
+    oklch(0.98 0.03 210 / 1) 82%,
+    oklch(0.66 0.19 292 / 0.58) 90%,
+    transparent 100%
   );
-  box-shadow: 0 0 16px oklch(0.8 0.14 205 / 0.26);
+  box-shadow:
+    0 0 22px oklch(0.8 0.14 205 / 0.48),
+    0 0 38px oklch(0.66 0.19 292 / 0.24);
   animation-name: light-streak;
   animation-timing-function: ease-in-out;
   animation-iteration-count: infinite;
-  transform: rotate(-18deg);
+  transform: rotate(var(--streak-angle, -18deg));
   will-change: transform, opacity;
 }
 
 @keyframes lux-aurora-a {
   0% {
     transform: translate3d(-5%, -4%, 0) scale(1.05) rotate(0deg);
-    opacity: 0.56;
+    opacity: 0.62;
   }
   50% {
     transform: translate3d(7%, 5%, 0) scale(1.18) rotate(6deg);
-    opacity: 0.72;
+    opacity: 0.82;
   }
   100% {
     transform: translate3d(-5%, -4%, 0) scale(1.05) rotate(0deg);
-    opacity: 0.56;
+    opacity: 0.62;
   }
 }
 @keyframes lux-aurora-b {
   0% {
     transform: translate3d(5%, 6%, 0) scale(1.16) rotate(0deg);
-    opacity: 0.5;
+    opacity: 0.56;
   }
   50% {
     transform: translate3d(-7%, -5%, 0) scale(1.04) rotate(-8deg);
-    opacity: 0.68;
+    opacity: 0.78;
   }
   100% {
     transform: translate3d(5%, 6%, 0) scale(1.16) rotate(0deg);
-    opacity: 0.5;
+    opacity: 0.56;
   }
 }
 @keyframes lux-aurora-c {
   0% {
     transform: translate3d(-3%, 4%, 0) scale(1.08);
-    opacity: 0.38;
+    opacity: 0.44;
   }
   50% {
     transform: translate3d(5%, -5%, 0) scale(1.2);
-    opacity: 0.55;
+    opacity: 0.64;
   }
   100% {
     transform: translate3d(-3%, 4%, 0) scale(1.08);
-    opacity: 0.38;
+    opacity: 0.44;
   }
 }
 @keyframes depth-grid-pan {
@@ -367,7 +419,7 @@
 }
 @keyframes hero-halo-breathe {
   0% {
-    opacity: 0.68;
+    opacity: 0.74;
     transform: scale(1);
   }
   50% {
@@ -375,7 +427,7 @@
     transform: scale(1.04);
   }
   100% {
-    opacity: 0.68;
+    opacity: 0.74;
     transform: scale(1);
   }
 }
@@ -385,32 +437,59 @@
     opacity: 0;
   }
   18% {
-    opacity: 0.62;
+    opacity: var(--particle-peak);
+  }
+  40% {
+    opacity: var(--particle-mid);
+    transform: translate3d(var(--drift-mid-x), var(--drift-mid-y), 0) scale(0.86);
+  }
+  58% {
+    opacity: var(--particle-peak);
   }
   70% {
-    opacity: 0.5;
+    opacity: var(--particle-mid);
   }
   100% {
     transform: translate3d(var(--drift-x), var(--drift-y), 0) scale(1);
     opacity: 0;
   }
 }
+@keyframes star-twinkle {
+  0%,
+  100% {
+    opacity: 0;
+    transform: scale(0.82);
+  }
+  42% {
+    opacity: var(--particle-twinkle);
+    transform: scale(1.68);
+  }
+  58% {
+    opacity: 0.14;
+    transform: scale(1.05);
+  }
+}
 @keyframes light-streak {
   0%,
+  55% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0) rotate(var(--streak-angle, -18deg));
+  }
+  62% {
+    opacity: 0.34;
+  }
+  68% {
+    opacity: var(--streak-peak, 0.92);
+  }
   76% {
     opacity: 0;
-    transform: translate3d(0, 0, 0) rotate(-18deg);
-  }
-  81% {
-    opacity: 0.72;
-  }
-  88% {
-    opacity: 0;
-    transform: translate3d(-54vw, 28vh, 0) rotate(-18deg);
+    transform: translate3d(var(--streak-x), var(--streak-y), 0)
+      rotate(var(--streak-angle, -18deg));
   }
   100% {
     opacity: 0;
-    transform: translate3d(-54vw, 28vh, 0) rotate(-18deg);
+    transform: translate3d(var(--streak-x), var(--streak-y), 0)
+      rotate(var(--streak-angle, -18deg));
   }
 }
 @keyframes scan-sweep {
@@ -517,6 +596,49 @@
   animation: scan-sweep 2.6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
 
+@media (max-width: 768px) {
+  .ambient-aurora-a {
+    background: radial-gradient(circle, oklch(0.72 0.14 205 / 0.46), transparent 62%);
+  }
+
+  .ambient-aurora-b {
+    background: radial-gradient(circle, oklch(0.62 0.17 292 / 0.42), transparent 64%);
+  }
+
+  .ambient-aurora-c {
+    background: radial-gradient(circle, oklch(0.72 0.11 185 / 0.31), transparent 64%);
+  }
+
+  .ambient-depth-grid {
+    opacity: 0.11;
+  }
+
+  .ambient-depth-lines {
+    opacity: 0.1;
+  }
+
+  .ambient-hero-glow {
+    background:
+      radial-gradient(62% 44% at 44% 16%, oklch(0.78 0.14 205 / 0.2), transparent 70%),
+      radial-gradient(46% 38% at 32% 30%, oklch(0.66 0.19 292 / 0.16), transparent 72%);
+  }
+
+  .ambient-command-bloom {
+    background:
+      radial-gradient(60% 34% at 40% 8%, oklch(0.8 0.14 205 / 0.12), transparent 76%),
+      radial-gradient(44% 28% at 50% 42%, oklch(0.72 0.11 185 / 0.05), transparent 78%);
+  }
+
+  .ambient-starfield {
+    opacity: 0.1;
+  }
+
+  .ambient-particle-highlight,
+  .ambient-streak-soft {
+    display: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -531,8 +653,10 @@
   .ambient-depth-grid,
   .ambient-depth-lines,
   .ambient-hero-glow,
+  .ambient-command-bloom,
   .ambient-particle,
   .ambient-streak,
+  .ambient-particle-twinkle::after,
   .cta-sheen,
   .cta-sheen-cyan,
   .flagship-breathe,

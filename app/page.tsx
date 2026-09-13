@@ -50,7 +50,6 @@ export default function HomePage() {
             style={{ animationDelay: '60ms' }}
           >
             <div className="absolute inset-0 bg-gradient-to-br from-violet/28 via-card/72 to-cyan/18" />
-            <div className="absolute inset-0 opacity-25 [background-image:linear-gradient(90deg,oklch(0.8_0.14_205/0.28)_1px,transparent_1px),linear-gradient(oklch(0.8_0.14_205/0.18)_1px,transparent_1px)] [background-size:46px_46px]" />
             <div className="absolute inset-x-8 top-6 h-px bg-gradient-to-r from-transparent via-cyan/60 to-transparent opacity-70 transition-transform duration-500 group-hover:translate-x-3" />
             <div
               className="absolute -right-8 -top-12 h-56 w-56 rounded-full opacity-70 blur-3xl"
