@@ -1,27 +1,132 @@
-# ORBIT AI — Petrosains Inventory System
+# ORBIT AI
 
-ORBIT AI is a local-first inventory prototype for the AI Innovators Challenge. It tracks the official 109 inventory types across five categories and four storerooms, supports checkout and camera-led bulk return, routes uncertain detections to human review, and prevents duplicate stock changes during reconnect or retry.
+Operational Recognition & Bulk Inventory Tracking
+
+See it. Verify it. Track it. Anywhere.
+
+**Competition:** Petrosains AI Innovators Challenge 2026 - Stage 1
+**Team:** YKPZ 1 - Universiti Teknologi Malaysia
+
+**Demo Video:** [https://youtu.be/XqnYcnUVp6I](https://youtu.be/XqnYcnUVp6I)
+**Live App:** Coming soon / not publicly deployed
+
+## Executive Summary
+
+Petrosains operates a 109-item inventory catalogue across real storeroom environments. ORBIT AI is an operations-first inventory system for check-out, live availability, and mixed-item bulk return, designed so storeroom users can move quickly without losing traceability.
+
+The system is offline-first because Stores 3-4 may not always have reliable internet. Users can keep working, save transactions locally, and synchronize safely after reconnect. The backend uses idempotent transaction processing so retries do not accidentally change inventory twice.
+
+ORBIT AI combines object detection, OCR evidence, confidence-aware logic, and human review. AI predictions create reviewable proposals; inventory is changed only by confirmed transactions. Uncertain AI output never directly mutates stock.
+
+The operational catalogue contains **109 item types**. The current real computer-vision prototype is validated on **five trained classes only**:
+
+- T003 Screwdriver
+- T005 Measure Tape
+- L003 Beaker 250ml
+- E018 LED Red
+- E019 LED Blue
+
+## Key Features
+
+- Real AI-assisted check-out
+- Live inventory availability
+- Mixed-item bulk return
+- Human-in-the-loop review
+- Quantity correction
+- Confidence-aware decision logic
+- OCR evidence
+- Offline queue + reconnect synchronization
+- Activity / audit trail
+- Inventory integrity protection
+- 109-item operational catalogue
+
+## Measured Results
+
+Independent 5-class held-out test set:
+
+| Metric | Result |
+|---|---:|
+| Precision | 79.6% |
+| Recall | 74.7% |
+| mAP@0.50 | 73.8% |
+| mAP@0.50:0.95 | 61.9% |
+
+Real local scan performance: approximately **2.0 seconds** including YOLO + OCR in the measured run. The local CPU benchmark reports a 20-run mean of 1.46 seconds for `/api/scans` and a P95 of 2.31 seconds.
+
+These results apply only to the five validated computer-vision classes. They do not imply recognition across all 109 catalogue items.
+
+## Demo Evidence
+
+The verified competition demo flow shows:
+
+1. **AI Check-out** - Measure Tape `T005` detected at approximately 99% confidence.
+2. **Live Availability** - `T005` available quantity updates after confirmed checkout.
+3. **Mixed-item Bulk Return** - one scene contains Beaker 250ml, Screwdriver, and Measure Tape.
+4. **Failure & Recovery** - the detector initially produced Qty 3 for one physical Screwdriver due to overlapping detections. Human Review corrected Qty 3 to Qty 1.
+5. **Final Verified Return** - Beaker 250ml x1, Screwdriver x1, Measure Tape x1.
+6. **Offline-first** - a transaction can be saved locally while offline and synchronized after reconnect.
+
+Existing evidence:
+
+![Real detection evidence](docs/performance/evidence/real-detection.jpg)
+
+![Mixed-item bulk return evidence](docs/performance/evidence/multi-object-demo.jpg)
+
+![Review needed evidence](docs/performance/evidence/review-needed.jpg)
+
+Additional reproducible records are in [`docs/performance/evidence/`](docs/performance/evidence/) and [`docs/performance/performance-report.md`](docs/performance/performance-report.md).
 
 ## Architecture
 
-```mermaid
-flowchart LR
-  UI[Next.js UI] --> API[FastAPI REST API]
-  UI --> Q[Browser offline queue]
-  Q -->|ordered reconnect sync| API
-  API --> DB[(SQLite with WAL)]
-  API --> D{Detector interface}
-  D --> M[Deterministic Mock]
-  D --> R[Optional local Ultralytics model]
-  R --> O[RapidOCR on padded YOLO crops]
-  O --> C[109-item catalog verification]
+```text
+Browser UI
+  -> FastAPI
+  -> YOLO11n detection
+  -> RapidOCR evidence
+  -> confidence / SKU mapping
+  -> human review when needed
+  -> transaction layer
+  -> SQLite inventory
+  -> activity audit trail
 ```
 
-Inventory never changes from raw AI output. A scan creates reviewable proposals; checkout or return changes stock only after a confirmed, atomic transaction. The browser creates `client_transaction_id` before sending, preserves offline payloads in `localStorage`, and removes them only after the server reports `applied` or `duplicate`.
+Offline path:
 
-## Run on Windows
+```text
+Browser local queue
+  -> reconnect
+  -> /api/sync
+  -> idempotent transaction processing
+```
 
-From the repository root:
+AI proposes. Human users confirm uncertain cases. Transactions mutate inventory. Raw AI predictions alone do not mutate inventory.
+
+## Responsible AI
+
+AI recommends. Humans remain in control. Every inventory decision is traceable.
+
+- Low-confidence results require review.
+- Duplicate or overlapping detections can be corrected before return.
+- Invalid returns are blocked by inventory rules.
+- OCR does not blindly override confident visual detections.
+- Prototype limitations are disclosed: the current real model is validated on five classes, not all 109 catalogue items.
+
+## Tech Stack
+
+| Area | Stack |
+|---|---|
+| Frontend | Next.js / React / TypeScript |
+| Backend | FastAPI / Python |
+| Computer Vision | Ultralytics YOLO11n / PyTorch |
+| OCR | RapidOCR / ONNX Runtime |
+| Database | SQLite |
+| Offline | Browser local queue + idempotent sync |
+
+## Quick Start
+
+These commands are for local Windows development from the repository root.
+
+### 1. Install base dependencies
 
 ```powershell
 python -m venv .venv
@@ -30,78 +135,108 @@ pnpm install --frozen-lockfile
 .\.venv\Scripts\python.exe backend\scripts\reset_demo.py
 ```
 
-Start the backend in one terminal:
+### 2. Run in Mock mode
+
+Mock mode starts quickly and does not require YOLO/OCR packages.
 
 ```powershell
 .\.venv\Scripts\python.exe -m uvicorn app.main:app --app-dir backend --reload --port 8000
 ```
 
-Start the frontend in a second terminal:
+In a second terminal:
 
 ```powershell
 pnpm dev
 ```
 
-Open `http://localhost:3000`. API documentation is at `http://127.0.0.1:8000/docs`. Defaults are in `.env.example`; no secret is required for Mock mode.
+Open `http://localhost:3000`. API documentation is available at `http://127.0.0.1:8000/docs`.
 
-For the real five-class YOLO + OCR pipeline, install the pinned CPU stacks and set process-local environment variables:
+### 3. Run Real YOLO + OCR mode
+
+Install the validated CPU ML/OCR stacks:
 
 ```powershell
 .\.venv\Scripts\python.exe -m pip install -r backend\requirements-ml.txt
 .\.venv\Scripts\python.exe -m pip install -r backend\requirements-ocr.txt
+```
+
+Start the backend with real detection:
+
+```powershell
 $env:ORBIT_DETECTOR_MODE="real"
 $env:ORBIT_MODEL_WEIGHTS="backend/models/orbit_ai_5class_yolo11n_best.pt"
+$env:ORBIT_OCR_ENABLED="true"
 .\.venv\Scripts\python.exe -m uvicorn app.main:app --app-dir backend --port 8000
 ```
 
-OCR keeps the original YOLO confidence. A matching catalog SKU is marked `verified`; a conflicting or ambiguous valid SKU forces Review Needed. No readable text, an invalid SKU, an OCR exception, or an OCR timeout falls back to the existing YOLO confidence policy without changing inventory.
-
-## Test and reset
+Useful local checks:
 
 ```powershell
+curl http://127.0.0.1:8000/api/health
 .\.venv\Scripts\python.exe -m pytest backend\tests -q
-.\node_modules\.bin\tsc.cmd --noEmit
-.\node_modules\.bin\next.cmd build
-.\.venv\Scripts\python.exe backend\scripts\reset_demo.py
+pnpm.cmd exec next build --webpack
 ```
 
-The reset is deterministic. It imports the official catalog and simulates seven outstanding Store 1 units so the Bulk Return fixture can return them without allowing available stock to exceed total stock.
-
-## API
+## API Surface
 
 | Method | Path | Purpose |
 |---|---|---|
-| GET | `/api/health` | Database and detector status |
-| GET | `/api/inventory` | Search/filter/paginate inventory |
-| GET | `/api/inventory/{item_id}` | Item, unit rules, store, recent transactions |
+| GET | `/api/health` | Database, detector, and OCR status |
+| GET | `/api/inventory` | Search, filter, and paginate inventory |
+| GET | `/api/inventory/{item_id}` | Item detail, unit rules, store, and recent transactions |
 | GET | `/api/stores` | Stable store IDs and connectivity |
-| POST | `/api/scans` | JSON fixture, multipart image, or raw JPEG/PNG scan |
+| POST | `/api/scans` | Multipart image or raw JPEG/PNG scan |
 | GET | `/api/scans/{scan_id}` | Restore a scan after refresh |
 | POST | `/api/scans/{scan_id}/reviews/{detection_id}` | Confirm, choose another, rescan, or reject |
 | POST | `/api/transactions/checkout` | Atomic idempotent checkout |
 | POST | `/api/transactions/returns` | Atomic idempotent reviewed return |
 | GET | `/api/activity` | Transaction audit history |
-| POST | `/api/sync` | Per-operation offline replay/conflict result |
+| POST | `/api/sync` | Offline replay and conflict-safe synchronization |
 
-The initial confidence policy is configurable: ready at `>= 0.85`, human review at `0.60–0.8499`, and unknown below `0.60`. These are demo thresholds, pending calibration against an annotated validation set.
+## Testing
 
-## Official data and computer vision
+Current validation evidence includes:
 
-The normalized inventory seed is `backend/data/inventory_catalog.json`. It keeps official SKU, name, category, location, quantity, unit, rack, and AI class key. `backend/scripts/import_official_inventory.py` reproduces it from the official workbook.
+- Backend tests: **20 passed**
+- Independent 5-class computer-vision evaluation
+- Real checkout end-to-end test
+- Mixed-item bulk return
+- Human review flow
+- Quantity correction
+- Offline/reconnect behavior
+- Inventory integrity guard
+- Production build evidence in [`docs/performance/evidence/production-build.txt`](docs/performance/evidence/production-build.txt)
+- TypeScript validation evidence in [`docs/performance/evidence/typecheck.txt`](docs/performance/evidence/typecheck.txt)
 
-The resource audit under `docs/data-audit/` covers every supplied inventory and storeroom photo without copying the 6.46 GB source set into Git. It records formats, image metrics, duplicate components, fixed class mapping, lookalikes, and a leakage-controlled split.
+## Important Project Data
 
-The repository includes `backend/models/orbit_ai_5class_yolo11n_best.pt`, which recognizes the validated T003, T005, L003, E018, and E019 prototype classes. The operational catalog still contains 109 items; the model must not be described as recognizing all 109. OCR validates extracted SKU candidates against all 109 catalog entries but never replaces YOLO or updates stock directly.
+- Normalized operational catalogue: [`backend/data/inventory_catalog.json`](backend/data/inventory_catalog.json)
+- Five-class model weights: [`backend/models/orbit_ai_5class_yolo11n_best.pt`](backend/models/orbit_ai_5class_yolo11n_best.pt)
+- Detector/OCR model card: [`docs/model-card.md`](docs/model-card.md)
+- Local CPU performance report: [`docs/performance/performance-report.md`](docs/performance/performance-report.md)
+- Data audit: [`docs/data-audit/audit-report.md`](docs/data-audit/audit-report.md)
+- Backend integration report: [`docs/backend-integration-report.md`](docs/backend-integration-report.md)
+- Phase completion report: [`docs/phase-completion-report.md`](docs/phase-completion-report.md)
 
-Measured local CPU performance and reproducible benchmark details are in `docs/performance/performance-report.md`. The benchmark uses three excluded warm-ups followed by 20 measured scans.
+## Limitations & Next Steps
 
-## Five-minute demo path
+Current limitations:
 
-1. Reset the database and open Inventory to show 109 official item types.
-2. Check out one Store 1 item and refresh Inventory/Activity to show persistence.
-3. Start Bulk Return. The deterministic fixture finds three ready lines and one red/blue LED review.
-4. Explain the confidence and visual ambiguity, confirm the human choice, then confirm the return.
-5. Double-click/retry the same client transaction to show a replay without another stock change.
-6. Disconnect external internet and continue against the local backend; optionally stop the backend to demonstrate `Saved Offline`, restart it, and use System → Sync all now.
+- Real CV is validated on five classes, not all 109 catalogue items.
+- LED classes are more challenging.
+- Real-world clutter, overlap, lighting, and small items can reduce confidence.
+- Public cloud deployment is not currently provided.
 
-See [OCR/build/performance handoff](docs/ocr-performance-handoff.md), [local CPU performance](docs/performance/performance-report.md), [backend integration report](docs/backend-integration-report.md), [completion report](docs/phase-completion-report.md), and [data audit](docs/data-audit/audit-report.md).
+Next steps:
+
+- Expand the dataset toward all 109 operational classes.
+- Collect more real Petrosains imagery.
+- Improve duplicate suppression and quantity estimation.
+- Strengthen small-item recognition.
+- Package local inference for offline stores.
+
+## Credits / AI Usage
+
+ORBIT AI uses Ultralytics YOLO11n, PyTorch, RapidOCR, ONNX Runtime, FastAPI, SQLite, Next.js, and React.
+
+OpenAI ChatGPT / Codex assisted with coding, debugging, testing, documentation, and presentation preparation. Generated suggestions were reviewed and validated by the team.
