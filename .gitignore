@@ -46,3 +46,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+/.venv-train/
+/runs/
+/weights/
+/yolo11n.pt

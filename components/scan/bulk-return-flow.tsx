@@ -30,7 +30,7 @@ import {
   TriangleAlert,
 } from 'lucide-react'
 import Link from 'next/link'
-import { useEffect, useRef, useState } from 'react'
+import { type ChangeEvent, useEffect, useRef, useState } from 'react'
 import { CameraView } from './camera-view'
 
 type Stage = 'camera' | 'scanning' | 'found' | 'review' | 'summary' | 'updated'
@@ -105,15 +105,33 @@ export function BulkReturnFlow({
   const [submitState, setSubmitState] = useState<'idle' | 'submitting' | 'synced' | 'saved-offline'>('idle')
   const [error, setError] = useState<string | null>(null)
   const [scanImageUrl, setScanImageUrl] = useState<string | null>(null)
+  const [cameraLive, setCameraLive] = useState(false)
+  const [cameraError, setCameraError] = useState<string | null>(null)
   const [hydrated, setHydrated] = useState(false)
   const transactionId = useRef<string | null>(null)
+  const videoRef = useRef<HTMLVideoElement | null>(null)
+  const streamRef = useRef<MediaStream | null>(null)
+  const fileInputRef = useRef<HTMLInputElement | null>(null)
   const [stage, setStage] = useState<Stage>(initialStage)
   const [revealed, setRevealed] = useState(initialStage === 'review' ? detectedItems.length : 0)
   const timers = useRef<ReturnType<typeof setTimeout>[]>([])
 
   useEffect(() => {
-    return () => timers.current.forEach(clearTimeout)
+    return () => {
+      timers.current.forEach(clearTimeout)
+      stopCameraStream(false)
+    }
   }, [])
+
+  useEffect(() => {
+    if (!cameraLive || !videoRef.current || !streamRef.current) return
+
+    const video = videoRef.current
+    video.srcObject = streamRef.current
+    void video.play().catch(() => {
+      setCameraError('Camera preview could not start. Upload a photo instead.')
+    })
+  }, [cameraLive])
 
   useEffect(() => {
     try {
@@ -146,6 +164,7 @@ export function BulkReturnFlow({
   }, [hydrated, stage, scan, detectedItems, reviewCandidates, transactionResult, submitState])
 
   function exitFlow() {
+    stopCameraStream()
     localStorage.removeItem(BULK_RETURN_STATE_KEY)
     onExit()
   }
@@ -155,7 +174,78 @@ export function BulkReturnFlow({
     timers.current = []
   }
 
+  function stopCameraStream(updateState = true) {
+    streamRef.current?.getTracks().forEach((track) => track.stop())
+    streamRef.current = null
+    if (videoRef.current) videoRef.current.srcObject = null
+    if (updateState) setCameraLive(false)
+  }
+
+  async function startCameraPreview() {
+    setError(null)
+    setCameraError(null)
+    if (typeof navigator === 'undefined' || !navigator.mediaDevices?.getUserMedia) {
+      setCameraError('Camera is not available in this browser. Upload a photo instead.')
+      return
+    }
+    try {
+      stopCameraStream()
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { ideal: 'environment' } },
+        audio: false,
+      })
+      streamRef.current = stream
+      setCameraLive(true)
+    } catch {
+      stopCameraStream()
+      setCameraError('Camera access was not available. Upload a photo instead.')
+    }
+  }
+
+  async function capturePhoto() {
+    const video = videoRef.current
+    if (!video || !streamRef.current || !video.videoWidth || !video.videoHeight) {
+      setCameraError('Camera preview is not ready. Upload a photo instead.')
+      return
+    }
+    const canvas = document.createElement('canvas')
+    canvas.width = video.videoWidth
+    canvas.height = video.videoHeight
+    const context = canvas.getContext('2d')
+    if (!context) {
+      setCameraError('Could not capture from the camera. Upload a photo instead.')
+      return
+    }
+    context.drawImage(video, 0, 0, canvas.width, canvas.height)
+    const blob = await new Promise<Blob | null>((resolve) => {
+      canvas.toBlob(resolve, 'image/jpeg', 0.92)
+    })
+    if (!blob) {
+      setCameraError('Could not capture from the camera. Upload a photo instead.')
+      return
+    }
+    const image = new File([blob], `bulk-return-capture-${Date.now()}.jpg`, {
+      type: 'image/jpeg',
+    })
+    stopCameraStream()
+    await startScan(image)
+  }
+
+  function chooseUploadPhoto() {
+    fileInputRef.current?.click()
+  }
+
+  function handleUploadPhoto(event: ChangeEvent<HTMLInputElement>) {
+    const image = event.target.files?.[0]
+    if (image) {
+      stopCameraStream()
+      void startScan(image)
+    }
+    event.currentTarget.value = ''
+  }
+
   async function startScan(image: File) {
+    stopCameraStream()
     setScanImageUrl(URL.createObjectURL(image))
     clearScanTimers()
     setStage('scanning')
@@ -264,14 +354,58 @@ export function BulkReturnFlow({
         <div className="grid gap-5 lg:grid-cols-[1.45fr_0.95fr]">
           <div className="relative">
             <CameraView
-  active={stage === 'scanning' || stage === 'found'}
-  revealed={revealedCount}
-  count={scan?.summary.detected_quantity ?? revealedCount}
-  frozen={stage === 'found'}
-  imageUrl={scanImageUrl}
-  detections={scan?.items ?? []}
-/>
+              active={stage === 'scanning' || stage === 'found'}
+              revealed={revealedCount}
+              count={scan?.summary.detected_quantity ?? revealedCount}
+              frozen={stage === 'found'}
+              imageUrl={scanImageUrl}
+              detections={scan?.items ?? []}
+              showVideo={cameraLive}
+              videoRef={videoRef}
+            />
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              capture="environment"
+              className="hidden"
+              onChange={handleUploadPhoto}
+            />
             {stage === 'camera' && (
+              cameraLive ? (
+                <div className="absolute inset-x-4 bottom-4 z-40 rounded-2xl border border-cyan/25 bg-[oklch(0.075_0.018_264/0.78)] p-4 shadow-[0_18px_48px_-28px_var(--cyan)] backdrop-blur-md">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                      <p className="text-sm font-semibold text-foreground">Camera ready</p>
+                      <p className="text-xs text-muted-foreground">
+                        Capture one photo to start AI scanning.
+                      </p>
+                    </div>
+                    <div className="flex flex-col gap-2 sm:flex-row">
+                      <button
+                        type="button"
+                        onClick={() => void capturePhoto()}
+                        className="cta-sheen-cyan inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold text-primary-foreground transition-all hover:shadow-[0_0_30px_-4px_var(--cyan)]"
+                      >
+                        <Camera className="h-4 w-4" />
+                        Capture Photo
+                      </button>
+                      <button
+                        type="button"
+                        onClick={chooseUploadPhoto}
+                        className="rounded-xl border border-border bg-secondary/70 px-5 py-3 text-sm font-medium transition-colors hover:text-cyan"
+                      >
+                        Upload Photo
+                      </button>
+                    </div>
+                  </div>
+                  {cameraError && (
+                    <p className="mt-3 rounded-lg border border-warning/30 bg-warning/10 px-3 py-2 text-xs text-warning">
+                      {cameraError}
+                    </p>
+                  )}
+                </div>
+              ) : (
               <div className="absolute inset-0 grid place-items-center rounded-2xl bg-[oklch(0.075_0.018_264/0.62)] p-6 backdrop-blur-sm">
                 <div className="animate-rise flex max-w-xs flex-col items-center text-center">
                   <span className="grid h-14 w-14 place-items-center rounded-2xl border border-violet/35 bg-violet/15 text-violet shadow-[0_0_32px_-16px_var(--violet)]">
@@ -280,25 +414,32 @@ export function BulkReturnFlow({
                   <p className="mt-4 text-sm text-muted-foreground">
                     Point the camera at returned items.
                   </p>
-                  <label className="group cta-sheen mt-5 inline-flex cursor-pointer items-center gap-2.5 rounded-xl px-6 py-3.5 text-sm font-semibold text-primary-foreground transition-all hover:shadow-[0_0_34px_-4px_var(--violet)]">
-  <Camera className="h-5 w-5" />
-  Start Camera
-  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-
-  <input
-    type="file"
-    accept="image/*"
-    capture="environment"
-    className="hidden"
-    onChange={(event) => {
-      const image = event.target.files?.[0]
-      if (image) void startScan(image)
-      event.currentTarget.value = ''
-    }}
-  />
-</label>
+                  {cameraError && (
+                    <p className="mt-3 rounded-lg border border-warning/30 bg-warning/10 px-3 py-2 text-xs text-warning">
+                      {cameraError}
+                    </p>
+                  )}
+                  <div className="mt-5 flex flex-col gap-2 sm:flex-row">
+                    <button
+                      type="button"
+                      onClick={() => void startCameraPreview()}
+                      className="group cta-sheen inline-flex items-center justify-center gap-2.5 rounded-xl px-6 py-3.5 text-sm font-semibold text-primary-foreground transition-all hover:shadow-[0_0_34px_-4px_var(--violet)]"
+                    >
+                      <Camera className="h-5 w-5" />
+                      Start Camera
+                      <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={chooseUploadPhoto}
+                      className="rounded-xl border border-border bg-secondary/70 px-6 py-3.5 text-sm font-medium transition-colors hover:text-cyan"
+                    >
+                      Upload Photo
+                    </button>
+                  </div>
                 </div>
               </div>
+              )
             )}
           </div>
 
@@ -410,6 +551,7 @@ export function BulkReturnFlow({
           reviewTotal={reviewTotal}
           onConfirm={(candidate, quantity) => confirmReview(currentReviewItem.id, candidate, quantity)}
           onScanAgain={() => {
+            stopCameraStream()
             clearScanTimers()
             localStorage.removeItem(BULK_RETURN_STATE_KEY)
             setScan(null)

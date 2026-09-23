@@ -2,6 +2,7 @@
 
 import { cn } from '@/lib/utils'
 import { Camera, Radio } from 'lucide-react'
+import type { RefObject } from 'react'
 
 type BoundingBox = {
   x: number
@@ -32,6 +33,8 @@ export function CameraView({
   frozen = false,
   imageUrl = null,
   detections = [],
+  showVideo = false,
+  videoRef,
 }: {
   active: boolean
   revealed: number
@@ -39,6 +42,8 @@ export function CameraView({
   frozen?: boolean
   imageUrl?: string | null
   detections?: CameraDetection[]
+  showVideo?: boolean
+  videoRef?: RefObject<HTMLVideoElement | null>
 }) {
   const visibleDetections = detections
     .filter((detection) => detection.status !== 'rejected')
@@ -47,8 +52,17 @@ export function CameraView({
   return (
     <div className="relative aspect-[16/10] min-h-[280px] w-full overflow-hidden rounded-2xl border border-cyan/25 bg-[oklch(0.1_0.024_264)] shadow-[0_22px_80px_-44px_var(--cyan)]">
 
-      {/* Real scanned image */}
-      {imageUrl ? (
+      {/* Live camera preview / real scanned image */}
+      {showVideo ? (
+        <video
+          ref={videoRef}
+          autoPlay
+          muted
+          playsInline
+          aria-label="Live camera preview"
+          className="absolute inset-0 z-0 h-full w-full object-cover"
+        />
+      ) : imageUrl ? (
         <img
           src={imageUrl}
           alt="Scanned inventory"
