@@ -11,6 +11,7 @@ import { cn } from '@/lib/utils'
 import {
   ArrowRight,
   Check,
+  Camera,
   Minus,
   Plus,
   ScanLine,
@@ -41,12 +42,88 @@ export function CheckoutFlow({ onExit }: { onExit: () => void }) {
   const [submitState, setSubmitState] = useState<'idle' | 'submitting' | 'synced' | 'saved-offline'>('idle')
   const [error, setError] = useState<string | null>(null)
   const transactionId = useRef<string | null>(null)
+  const videoRef = useRef<HTMLVideoElement | null>(null)
+  const streamRef = useRef<MediaStream | null>(null)
+  const fileInputRef = useRef<HTMLInputElement | null>(null)
+  const [cameraLive, setCameraLive] = useState(false)
+  const [cameraError, setCameraError] = useState<string | null>(null)
 
   useEffect(() => {
     return () => {
       if (scanImageUrl) URL.revokeObjectURL(scanImageUrl)
     }
   }, [scanImageUrl])
+
+  useEffect(() => {
+    if (!cameraLive || !videoRef.current || !streamRef.current) return
+    const video = videoRef.current
+    video.srcObject = streamRef.current
+    void video.play().catch(() => {
+      setCameraError('Camera preview could not start. Upload a photo instead.')
+    })
+  }, [cameraLive])
+
+  useEffect(() => {
+    return () => {
+      streamRef.current?.getTracks().forEach((track) => track.stop())
+    }
+  }, [])
+
+  function stopCameraStream() {
+    streamRef.current?.getTracks().forEach((track) => track.stop())
+    streamRef.current = null
+    if (videoRef.current) videoRef.current.srcObject = null
+    setCameraLive(false)
+  }
+
+  async function startCameraPreview() {
+    setCameraError(null)
+    if (typeof navigator === 'undefined' || !navigator.mediaDevices?.getUserMedia) {
+      setCameraError('Camera is not available in this browser. Upload a photo instead.')
+      return
+    }
+    try {
+      stopCameraStream()
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { ideal: 'environment' } },
+        audio: false,
+      })
+      streamRef.current = stream
+      setCameraLive(true)
+    } catch {
+      stopCameraStream()
+      setCameraError('Camera access was not available. Upload a photo instead.')
+    }
+  }
+
+  async function capturePhoto() {
+    const video = videoRef.current
+    if (!video || !streamRef.current || !video.videoWidth || !video.videoHeight) {
+      setCameraError('Camera preview is not ready. Upload a photo instead.')
+      return
+    }
+    const canvas = document.createElement('canvas')
+    canvas.width = video.videoWidth
+    canvas.height = video.videoHeight
+    const context = canvas.getContext('2d')
+    if (!context) {
+      setCameraError('Could not capture from the camera. Upload a photo instead.')
+      return
+    }
+    context.drawImage(video, 0, 0, canvas.width, canvas.height)
+    const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/jpeg', 0.92))
+    if (!blob) {
+      setCameraError('Could not capture from the camera. Upload a photo instead.')
+      return
+    }
+    const image = new File([blob], `checkout-capture-${Date.now()}.jpg`, { type: 'image/jpeg' })
+    stopCameraStream()
+    await scanCheckoutItem(image)
+  }
+
+  function chooseUploadPhoto() {
+    fileInputRef.current?.click()
+  }
 
   function resetCurrentScan() {
     setScan(null)
@@ -249,7 +326,15 @@ export function CheckoutFlow({ onExit }: { onExit: () => void }) {
         <div className="grid gap-5 lg:grid-cols-[1fr_1fr]">
           <GlassCard strong className="animate-rise flex flex-col p-5">
             <div className="relative grid min-h-[280px] flex-1 place-items-center overflow-hidden rounded-xl border border-cyan/25 bg-[oklch(0.12_0.02_264)] py-14">
-              {scanImageUrl ? (
+              {cameraLive ? (
+                <video
+                  ref={videoRef}
+                  autoPlay
+                  playsInline
+                  muted
+                  className="absolute inset-0 h-full w-full object-cover"
+                />
+              ) : scanImageUrl ? (
                 <img
                   src={scanImageUrl}
                   alt="Selected checkout scan"
@@ -275,26 +360,55 @@ export function CheckoutFlow({ onExit }: { onExit: () => void }) {
               </div>
             </div>
 
-            <label
-              className={cn(
-                'mt-4 inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border border-cyan/30 bg-cyan/10 px-4 py-2.5 text-sm font-semibold text-cyan transition-colors hover:bg-cyan/20',
-                scanState === 'scanning' && 'pointer-events-none opacity-60',
-              )}
-            >
-              <ScanLine className="h-4 w-4" />
-              {scanState === 'scanning' ? 'Scanning' : scanImageUrl ? 'Scan Again' : 'Scan Item'}
-              <input
-                type="file"
-                accept="image/*"
-                capture="environment"
-                className="hidden"
-                onChange={(event) => {
-                  const image = event.target.files?.[0]
-                  if (image) void scanCheckoutItem(image)
-                  event.currentTarget.value = ''
-                }}
-              />
-            </label>
+
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              capture="environment"
+              className="hidden"
+              onChange={(event) => {
+                const image = event.target.files?.[0]
+                if (image) {
+                  stopCameraStream()
+                  void scanCheckoutItem(image)
+                }
+                event.currentTarget.value = ''
+              }}
+            />
+
+            <div className="mt-4 flex flex-col gap-2 sm:flex-row">
+              <button
+                type="button"
+                disabled={scanState === 'scanning'}
+                onClick={() => cameraLive ? void capturePhoto() : void startCameraPreview()}
+                className={cn(
+                  'group inline-flex flex-1 items-center justify-center gap-2.5 rounded-xl px-6 py-3.5 text-sm font-semibold text-primary-foreground transition-all disabled:opacity-60',
+                  cameraLive
+                    ? 'cta-sheen-cyan hover:shadow-[0_0_30px_-4px_var(--cyan)]'
+                    : 'cta-sheen hover:shadow-[0_0_34px_-4px_var(--violet)]',
+                )}
+              >
+                <Camera className="h-5 w-5" />
+                {scanState === 'scanning' ? 'Scanning' : cameraLive ? 'Capture Photo' : scanImageUrl ? 'Scan Again' : 'Start Camera'}
+                {!cameraLive && scanState !== 'scanning' && (
+                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+                )}
+              </button>
+              <button
+                type="button"
+                disabled={scanState === 'scanning'}
+                onClick={chooseUploadPhoto}
+                className="inline-flex flex-1 items-center justify-center rounded-xl border border-border bg-secondary/70 px-6 py-3.5 text-sm font-medium transition-colors hover:text-cyan disabled:opacity-60"
+              >
+                Upload Photo
+              </button>
+            </div>
+            {cameraError && (
+              <p className="mt-3 rounded-lg border border-warning/30 bg-warning/10 px-3 py-2 text-xs text-warning">
+                {cameraError}
+              </p>
+            )}
 
             {scanState === 'scanning' && (
               <div className="mt-4 animate-rise rounded-xl border border-cyan/30 bg-cyan/5 p-4">
