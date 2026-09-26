@@ -32,6 +32,23 @@ function priorityLabel(priority: 'critical' | 'preference') {
   return priority === 'critical' ? 'Critical' : 'Preference'
 }
 
+function GoalSummary({title, goals}: {title: string; goals: Request['themes']}) {
+  if (!goals.length) return null
+  return (
+    <div className="rounded-2xl border border-cyan/20 bg-cyan/[0.04] p-4">
+      <p className="text-xs font-semibold uppercase tracking-wide text-cyan">{title}</p>
+      <div className="mt-2 space-y-1.5">
+        {goals.map((goal, index) => (
+          <p key={`${title}:${goal.text}:${index}`} className="text-sm">
+            {goal.text}
+            <span className="text-muted-foreground"> · {priorityLabel(goal.priority)}</span>
+          </p>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 export function Understanding({request: r, compactUnknowns = []}: {request: Request; compactUnknowns?: string[]}) {
   const cards = [
     ['Participants', r.participants],
@@ -39,8 +56,6 @@ export function Understanding({request: r, compactUnknowns = []}: {request: Requ
     ['Duration', r.durationMin === null ? null : `${r.durationMin} min`],
   ]
   const tags = [
-    ...r.themes.map((g) => `Theme: ${g.text} (${priorityLabel(g.priority)})`),
-    ...r.objectives.map((g) => `Objective: ${g.text} (${priorityLabel(g.priority)})`),
     r.venue !== 'unknown' ? shown(r.venue) : '',
     r.internet !== 'unknown' ? `Internet: ${shown(r.internet)}` : '',
   ].filter(Boolean)
@@ -60,6 +75,12 @@ export function Understanding({request: r, compactUnknowns = []}: {request: Requ
           </div>
         ))}
       </div>
+      {(r.themes.length > 0 || r.objectives.length > 0) && (
+        <div className="grid gap-3 md:grid-cols-2">
+          <GoalSummary title="Themes" goals={r.themes} />
+          <GoalSummary title="Objectives" goals={r.objectives} />
+        </div>
+      )}
       {tags.length > 0 && (
         <div className="flex flex-wrap gap-2">
           {tags.map((tag) => <span key={tag} className="rounded-full border border-cyan/25 bg-cyan/10 px-3 py-1 text-xs text-cyan">{tag}</span>)}

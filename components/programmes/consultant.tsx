@@ -1,7 +1,7 @@
 'use client'
 
 import {useEffect, useMemo, useRef, useState} from 'react'
-import {ArrowLeft, ArrowRight, Check, ChevronDown, Compass, RefreshCw, Sparkles, WifiOff} from 'lucide-react'
+import {ArrowLeft, ArrowRight, Check, ChevronDown, Compass, RefreshCw, Sparkles, WifiOff, X} from 'lucide-react'
 import {GlassCard, StatusPill} from '@/components/ui-kit'
 import {Button} from '@/components/ui/button'
 import {adaptCatalogue} from '@/lib/programmes/catalogue'
@@ -28,8 +28,14 @@ function formatAge(ages: ReturnType<typeof normalizeRequest>['request']['ages'])
   return ages ? `${ages.min}${ages.max === null ? '+' : `–${ages.max}`}` : 'Unknown'
 }
 
-function priorityLabel(priority: Goal['priority']) {
-  return priority === 'critical' ? 'Critical' : 'Preference'
+function blankGoal(): Goal {
+  return {text: '', priority: 'preference'}
+}
+
+function compactGoals(values: Goal[]) {
+  return values
+    .map((goal) => ({text: goal.text.trim(), priority: goal.priority}))
+    .filter((goal) => goal.text)
 }
 
 function StepProgress({stage}: {stage: Stage}) {
@@ -85,12 +91,8 @@ function SectionTitle({eyebrow, title, subtitle}: {eyebrow: string; title: strin
 export function ProgrammeConsultant() {
   const [stage, setStage] = useState<Stage>('request')
   const [draft, setDraft] = useState<Draft>(initial)
-  const [themes, setThemes] = useState<Goal[]>([])
-  const [objectives, setObjectives] = useState<Goal[]>([])
-  const [themeInput, setThemeInput] = useState('')
-  const [objectiveInput, setObjectiveInput] = useState('')
-  const [themePriority, setThemePriority] = useState<Goal['priority']>('preference')
-  const [objectivePriority, setObjectivePriority] = useState<Goal['priority']>('preference')
+  const [themes, setThemes] = useState<Goal[]>([blankGoal()])
+  const [objectives, setObjectives] = useState<Goal[]>([blankGoal()])
   const [hardBudget, setHardBudget] = useState(false)
   const [participantLed, setParticipantLed] = useState(false)
   const [bundle, setBundle] = useState<B1Bundle | null>(null)
@@ -116,6 +118,8 @@ export function ProgrammeConsultant() {
 
   const catalogue = useMemo(() => bundle ? adaptCatalogue(bundle) : null, [bundle])
   const themeOptions = useMemo(() => [...new Set(catalogue?.offerings.flatMap((o) => String(o.fields.Suitable_Themes?.value ?? '').split(/[;,]/).map((t) => t.trim()).filter(Boolean)) ?? [])], [catalogue])
+  const filledThemes = useMemo(() => compactGoals(themes), [themes])
+  const filledObjectives = useMemo(() => compactGoals(objectives), [objectives])
   const raw = useMemo(() => ({
     ...draft,
     participants: draft.participants === '' ? null : Number(draft.participants),
@@ -123,11 +127,11 @@ export function ProgrammeConsultant() {
     ages: draft.ages || null,
     eventStart: draft.eventStart ? `${draft.eventStart}:00+08:00` : null,
     accessibility: draft.accessMode === 'unknown' ? null : draft.accessMode === 'none' ? [] : draft.accessibility.split('\n').map((t) => t.trim()).filter(Boolean),
-    themes,
-    objectives,
+    themes: filledThemes,
+    objectives: filledObjectives,
     budgetIsHardLimit: hardBudget,
     participantLed,
-  }), [draft, themes, objectives, hardBudget, participantLed])
+  }), [draft, filledThemes, filledObjectives, hardBudget, participantLed])
   const request = useMemo(() => { const {accessMode:_, ...value} = raw; return value }, [raw])
   const understanding = useMemo(() => normalizeRequest(request), [request])
   const draftKey = JSON.stringify({request, selected, maxActivities, keepPlan, localMode, online})
@@ -147,60 +151,82 @@ export function ProgrammeConsultant() {
   function select(key: keyof Draft, label: string, options: string[]) {
     return <Field label={label}><select className={inputClass} value={draft[key]} onChange={(e) => field(key, e.target.value)}>{['unknown', ...options].map((v) => <option key={v} value={v}>{v === 'unknown' ? 'Unknown' : v.replaceAll('_', ' ')}</option>)}</select></Field>
   }
-  function addGoal(kind: 'theme' | 'objective') {
-    const text = (kind === 'theme' ? themeInput : objectiveInput).trim()
-    if (!text) return
+  function setGoalRows(kind: 'theme' | 'objective', updater: (values: Goal[]) => Goal[]) {
     invalidate()
-    if (kind === 'theme' && themes.length < 8) { setThemes([...themes, {text, priority:themePriority}]); setThemeInput('') }
-    if (kind === 'objective' && objectives.length < 8) { setObjectives([...objectives, {text, priority:objectivePriority}]); setObjectiveInput('') }
+    const apply = (values: Goal[]) => {
+      const next = updater(values).slice(0, 8)
+      return next.length ? next : [blankGoal()]
+    }
+    if (kind === 'theme') setThemes(apply)
+    else setObjectives(apply)
   }
-  function chipList(kind: 'theme' | 'objective', values: Goal[], setValues: (values: Goal[]) => void, inputValue: string, setInputValue: (value: string) => void) {
+
+  function updateGoal(kind: 'theme' | 'objective', index: number, patch: Partial<Goal>) {
+    setGoalRows(kind, (values) => values.map((goal, i) => i === index ? {...goal, ...patch} : goal))
+  }
+
+  function removeGoal(kind: 'theme' | 'objective', index: number) {
+    setGoalRows(kind, (values) => values.length === 1 ? [blankGoal()] : values.filter((_, i) => i !== index))
+  }
+
+  function addGoalRow(kind: 'theme' | 'objective') {
+    setGoalRows(kind, (values) => values.length >= 8 ? values : [...values, blankGoal()])
+  }
+
+  function goalRows(kind: 'theme' | 'objective', values: Goal[]) {
     const id = kind === 'theme' ? 'programme-themes' : undefined
+    const title = kind === 'theme' ? 'Themes' : 'Objectives'
+    const addLabel = kind === 'theme' ? '+ Add another theme' : '+ Add another objective'
+    const filledCount = compactGoals(values).length
     return (
       <div className="min-w-0 rounded-2xl border border-white/10 bg-white/[0.025] p-4">
         <div className="flex items-center justify-between gap-3">
-          <p className="text-sm font-semibold">{kind === 'theme' ? 'Themes' : 'Objectives'}</p>
-          <span className="text-xs text-muted-foreground">{values.length}/8</span>
+          <p className="text-sm font-semibold">{title}</p>
+          <span className="text-xs text-muted-foreground">{filledCount}/8</span>
         </div>
-        <div className="mt-3 flex flex-wrap gap-2">
+        <div className="mt-3 space-y-2">
           {values.map((goal, index) => (
-            <button
-              key={`${goal.text}:${index}`}
-              type="button"
-              onClick={() => { invalidate(); setValues(values.filter((_, i) => i !== index)) }}
-              className={cn('rounded-full border px-3 py-1.5 text-xs transition-colors hover:border-danger/40 hover:text-danger', goal.priority === 'critical' ? 'border-violet/35 bg-violet/15 text-violet' : 'border-cyan/25 bg-cyan/10 text-cyan')}
-              title="Remove"
-            >
-              {goal.text}
-              <span className="ml-1 text-[10px] font-semibold uppercase tracking-wide opacity-75">· {priorityLabel(goal.priority)}</span>
-            </button>
+            <div key={`${kind}:${index}`} className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_minmax(13rem,auto)_auto]">
+              <input
+                list={id}
+                className={inputClass + ' !mt-0'}
+                value={goal.text}
+                maxLength={200}
+                placeholder={kind === 'theme' ? 'Sustainability' : 'Hands-on science learning'}
+                onChange={(e) => updateGoal(kind, index, {text: e.target.value})}
+                onKeyDown={(e) => { if (e.key === 'Enter') e.preventDefault() }}
+              />
+              <select
+                aria-label={`${title.slice(0, -1)} ${index + 1} priority`}
+                className={inputClass + ' !mt-0 !px-2'}
+                value={goal.priority}
+                onChange={(event) => updateGoal(kind, index, {priority: event.target.value as Goal['priority']})}
+                onKeyDown={(e) => { if (e.key === 'Enter') e.preventDefault() }}
+              >
+                <option value="critical">Critical — must be satisfied</option>
+                <option value="preference">Preference — trade-offs allowed</option>
+              </select>
+              <button
+                type="button"
+                onClick={() => removeGoal(kind, index)}
+                className="grid size-10 place-items-center rounded-xl border border-white/10 bg-white/[0.03] text-muted-foreground transition hover:border-danger/35 hover:text-danger focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danger/70"
+                aria-label={`Remove ${kind} row ${index + 1}`}
+                title="Remove"
+              >
+                <X className="size-4" />
+              </button>
+            </div>
           ))}
-          {values.length === 0 && <span className="text-xs text-muted-foreground">Unknown until added</span>}
         </div>
-        <div className="mt-3 grid gap-2 sm:grid-cols-[minmax(0,1fr)_minmax(10rem,auto)_auto]">
-          <input
-            list={id}
-            className={inputClass + ' !mt-0'}
-            value={inputValue}
-            maxLength={200}
-            placeholder={kind === 'theme' ? 'Add theme' : 'Add objective'}
-            onChange={(e) => setInputValue(e.target.value)}
-            onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addGoal(kind) } }}
-          />
-          <label className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-            Priority
-            <select
-              aria-label={`${kind} priority`}
-              className={inputClass + ' !mt-1 !px-2'}
-              value={kind === 'theme' ? themePriority : objectivePriority}
-              onChange={(event) => kind === 'theme' ? setThemePriority(event.target.value as Goal['priority']) : setObjectivePriority(event.target.value as Goal['priority'])}
-            >
-              <option value="critical">Critical — must be satisfied</option>
-              <option value="preference">Preference — trade-offs allowed</option>
-            </select>
-          </label>
-          <Button type="button" variant="outline" disabled={values.length >= 8} onClick={() => addGoal(kind)}>+ Add</Button>
-        </div>
+        {values.length < 8 && (
+          <button
+            type="button"
+            className="mt-3 text-sm font-medium text-cyan transition hover:text-cyan/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan"
+            onClick={() => addGoalRow(kind)}
+          >
+            {addLabel}
+          </button>
+        )}
       </div>
     )
   }
@@ -321,8 +347,8 @@ export function ProgrammeConsultant() {
           <GlassCard strong className="animate-rise overflow-hidden p-5 sm:p-7">
             <SectionTitle eyebrow="1 · Tell us what you need" title="Start with the essentials" subtitle="Start with the essentials. You can leave anything unknown." />
             <div className="grid gap-4 xl:grid-cols-2">
-              {chipList('theme', themes, setThemes, themeInput, setThemeInput)}
-              {chipList('objective', objectives, setObjectives, objectiveInput, setObjectiveInput)}
+              {goalRows('theme', themes)}
+              {goalRows('objective', objectives)}
             </div>
             <datalist id="programme-themes">{themeOptions.map((t) => <option key={t} value={t}/>)}</datalist>
             <div className="mt-5 grid gap-4 md:grid-cols-3">
