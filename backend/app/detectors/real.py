@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import re
 import time
 from io import BytesIO
 from pathlib import Path
@@ -8,6 +9,23 @@ from pathlib import Path
 from ..config import BACKEND_DIR
 from ..ocr import OcrService
 from .base import DetectionBatch, RawDetection
+
+
+MODEL_CLASS_SKUS = {
+    0: "T003",
+    1: "T005",
+    2: "L003",
+    3: "E018",
+    4: "E019",
+}
+SKU_PATTERN = re.compile(r"([A-Z]{1,3}[\s_-]*\d{2,4})", re.IGNORECASE)
+
+
+def class_key_from_model_name(class_index: int, model_class_name: str) -> str:
+    match = SKU_PATTERN.search(model_class_name)
+    if match:
+        return re.sub(r"[^A-Z0-9]", "", match.group(1).upper())
+    return MODEL_CLASS_SKUS.get(class_index, model_class_name.split("_", 1)[0].upper())
 
 
 class RealDetector:
@@ -54,7 +72,7 @@ class RealDetector:
         for box in result.boxes:
             class_index = int(box.cls.item())
             model_class_name = str(result.names[class_index])
-            class_key = model_class_name.split("_", 1)[0].upper()
+            class_key = class_key_from_model_name(class_index, model_class_name)
             grouped.setdefault(class_key, []).append(box)
 
         prepared: list[dict] = []

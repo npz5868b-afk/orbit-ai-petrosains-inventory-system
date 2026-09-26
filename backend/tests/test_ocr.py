@@ -9,6 +9,7 @@ from PIL import Image
 
 from app.config import Settings
 from app.detectors.base import RawDetection
+from app.detectors.real import class_key_from_model_name
 from app.main import create_app
 from app.ocr.engine import OcrText
 from app.ocr.service import OcrService, extract_sku_candidates, normalize_sku
@@ -46,6 +47,14 @@ def verify(yolo_sku: str, outputs: list[OcrText] | Exception, boxes=BOX) -> dict
 def test_sku_normalization_uses_catalog_after_regex_extraction():
     assert normalize_sku(" e-018 ") == "E018"
     assert extract_sku_candidates("SKU: E 018 / batch Z-999") == ["E018", "Z999"]
+
+
+def test_real_detector_class_name_normalization_supports_v1_and_v2_names():
+    assert class_key_from_model_name(2, "L003_Beaker_250ml") == "L003"
+    assert class_key_from_model_name(2, "L003 Beaker 250ml") == "L003"
+    assert class_key_from_model_name(1, "T005 Measure Tape") == "T005"
+    assert class_key_from_model_name(3, "E018_LED_Red") == "E018"
+    assert class_key_from_model_name(4, "Blue LED") == "E019"
 
 
 def test_ocr_match_conflict_missing_invalid_ambiguous_and_failure():
