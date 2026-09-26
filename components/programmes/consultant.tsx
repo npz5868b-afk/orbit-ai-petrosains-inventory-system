@@ -17,6 +17,9 @@ const inputClass = 'mt-2 w-full min-w-0 rounded-xl border border-white/15 bg-bac
 const initial = {brief:'',audienceType:'',ages:'',participants:'',durationMin:'',eventStart:'',venue:'unknown',internet:'unknown',electricity:'unknown',water:'unknown',budgetBand:'unknown',accessibility:'',accessMode:'unknown',format:''}
 type Draft = typeof initial
 type Stage = 'request' | 'review' | 'programme'
+type Priority = Goal['priority']
+type RequirementKind = 'theme' | 'objective'
+type RequirementRow = {id: string; value: string; priority: Priority}
 
 const stepMeta: Array<{id: Stage; eyebrow: string; label: string}> = [
   {id:'request', eyebrow:'01', label:'Request'},
@@ -24,18 +27,14 @@ const stepMeta: Array<{id: Stage; eyebrow: string; label: string}> = [
   {id:'programme', eyebrow:'03', label:'Programme'},
 ]
 
-function formatAge(ages: ReturnType<typeof normalizeRequest>['request']['ages']) {
-  return ages ? `${ages.min}${ages.max === null ? '+' : `–${ages.max}`}` : 'Unknown'
+function blankRow(id: string): RequirementRow {
+  return {id, value: '', priority: 'preference'}
 }
 
-function blankGoal(): Goal {
-  return {text: '', priority: 'preference'}
-}
-
-function compactGoals(values: Goal[]) {
-  return values
-    .map((goal) => ({text: goal.text.trim(), priority: goal.priority}))
-    .filter((goal) => goal.text)
+function rowsToGoals(rows: RequirementRow[]): Goal[] {
+  return rows
+    .map((row) => ({text: row.value.trim(), priority: row.priority}))
+    .filter((goal) => goal.text.length > 0)
 }
 
 function StepProgress({stage}: {stage: Stage}) {
@@ -68,10 +67,6 @@ function StepProgress({stage}: {stage: Stage}) {
   )
 }
 
-function storeOneLine(values: string[]) {
-  return values.filter(Boolean).join(' · ') || 'Still open'
-}
-
 function Field({label, children}: {label: string; children: React.ReactNode}) {
   return <label className="block min-w-0 text-sm font-medium">{label}{children}</label>
 }
@@ -91,8 +86,8 @@ function SectionTitle({eyebrow, title, subtitle}: {eyebrow: string; title: strin
 export function ProgrammeConsultant() {
   const [stage, setStage] = useState<Stage>('request')
   const [draft, setDraft] = useState<Draft>(initial)
-  const [themes, setThemes] = useState<Goal[]>([blankGoal()])
-  const [objectives, setObjectives] = useState<Goal[]>([blankGoal()])
+  const [themeRows, setThemeRows] = useState<RequirementRow[]>(() => [blankRow('theme-1')])
+  const [objectiveRows, setObjectiveRows] = useState<RequirementRow[]>(() => [blankRow('objective-1')])
   const [hardBudget, setHardBudget] = useState(false)
   const [participantLed, setParticipantLed] = useState(false)
   const [bundle, setBundle] = useState<B1Bundle | null>(null)
@@ -115,11 +110,17 @@ export function ProgrammeConsultant() {
   const lastRead = useRef<string | null>(null)
   const resultsRef = useRef<HTMLDivElement>(null)
   const reviewRef = useRef<HTMLDivElement>(null)
+  const rowIdCounter = useRef(1)
 
   const catalogue = useMemo(() => bundle ? adaptCatalogue(bundle) : null, [bundle])
   const themeOptions = useMemo(() => [...new Set(catalogue?.offerings.flatMap((o) => String(o.fields.Suitable_Themes?.value ?? '').split(/[;,]/).map((t) => t.trim()).filter(Boolean)) ?? [])], [catalogue])
-  const filledThemes = useMemo(() => compactGoals(themes), [themes])
-  const filledObjectives = useMemo(() => compactGoals(objectives), [objectives])
+  const themes = useMemo(() => rowsToGoals(themeRows), [themeRows])
+  const objectives = useMemo(() => rowsToGoals(objectiveRows), [objectiveRows])
+  const catalogueStatus = catalogueLoading
+    ? 'Loading official catalogue...'
+    : catalogue
+      ? `${catalogue.offerings.length} official activities loaded`
+      : catalogueError || 'Official catalogue is unavailable.'
   const raw = useMemo(() => ({
     ...draft,
     participants: draft.participants === '' ? null : Number(draft.participants),
@@ -127,11 +128,11 @@ export function ProgrammeConsultant() {
     ages: draft.ages || null,
     eventStart: draft.eventStart ? `${draft.eventStart}:00+08:00` : null,
     accessibility: draft.accessMode === 'unknown' ? null : draft.accessMode === 'none' ? [] : draft.accessibility.split('\n').map((t) => t.trim()).filter(Boolean),
-    themes: filledThemes,
-    objectives: filledObjectives,
+    themes,
+    objectives,
     budgetIsHardLimit: hardBudget,
     participantLed,
-  }), [draft, filledThemes, filledObjectives, hardBudget, participantLed])
+  }), [draft, themes, objectives, hardBudget, participantLed])
   const request = useMemo(() => { const {accessMode:_, ...value} = raw; return value }, [raw])
   const understanding = useMemo(() => normalizeRequest(request), [request])
   const draftKey = JSON.stringify({request, selected, maxActivities, keepPlan, localMode, online})
@@ -151,33 +152,45 @@ export function ProgrammeConsultant() {
   function select(key: keyof Draft, label: string, options: string[]) {
     return <Field label={label}><select className={inputClass} value={draft[key]} onChange={(e) => field(key, e.target.value)}>{['unknown', ...options].map((v) => <option key={v} value={v}>{v === 'unknown' ? 'Unknown' : v.replaceAll('_', ' ')}</option>)}</select></Field>
   }
-  function setGoalRows(kind: 'theme' | 'objective', updater: (values: Goal[]) => Goal[]) {
+  function createRow(kind: RequirementKind): RequirementRow {
+    rowIdCounter.current += 1
+    return blankRow(`${kind}-${rowIdCounter.current}`)
+  }
+
+  function setRequirementRows(kind: RequirementKind, updater: (rows: RequirementRow[]) => RequirementRow[]) {
     invalidate()
-    const apply = (values: Goal[]) => {
-      const next = updater(values).slice(0, 8)
-      return next.length ? next : [blankGoal()]
+    const apply = (rows: RequirementRow[]) => {
+      const next = updater(rows).slice(0, 8)
+      return next.length ? next : [createRow(kind)]
     }
-    if (kind === 'theme') setThemes(apply)
-    else setObjectives(apply)
+    if (kind === 'theme') setThemeRows(apply)
+    else setObjectiveRows(apply)
   }
 
-  function updateGoal(kind: 'theme' | 'objective', index: number, patch: Partial<Goal>) {
-    setGoalRows(kind, (values) => values.map((goal, i) => i === index ? {...goal, ...patch} : goal))
+  function updateRequirementValue(kind: RequirementKind, id: string, value: string) {
+    setRequirementRows(kind, (rows) => rows.map((row) => row.id === id ? {...row, value} : row))
   }
 
-  function removeGoal(kind: 'theme' | 'objective', index: number) {
-    setGoalRows(kind, (values) => values.length === 1 ? [blankGoal()] : values.filter((_, i) => i !== index))
+  function updateRequirementPriority(kind: RequirementKind, id: string, priority: Priority) {
+    setRequirementRows(kind, (rows) => rows.map((row) => row.id === id ? {...row, priority} : row))
   }
 
-  function addGoalRow(kind: 'theme' | 'objective') {
-    setGoalRows(kind, (values) => values.length >= 8 ? values : [...values, blankGoal()])
+  function removeRequirementRow(kind: RequirementKind, id: string) {
+    setRequirementRows(kind, (rows) => {
+      const next = rows.filter((row) => row.id !== id)
+      return next.length ? next : [createRow(kind)]
+    })
   }
 
-  function goalRows(kind: 'theme' | 'objective', values: Goal[]) {
+  function addRequirementRow(kind: RequirementKind) {
+    setRequirementRows(kind, (rows) => rows.length >= 8 ? rows : [...rows, createRow(kind)])
+  }
+
+  function requirementRows(kind: RequirementKind, rows: RequirementRow[]) {
     const id = kind === 'theme' ? 'programme-themes' : undefined
     const title = kind === 'theme' ? 'Themes' : 'Objectives'
     const addLabel = kind === 'theme' ? '+ Add another theme' : '+ Add another objective'
-    const filledCount = compactGoals(values).length
+    const filledCount = rows.filter((row) => row.value.trim().length > 0).length
     return (
       <div className="min-w-0 rounded-2xl border border-white/10 bg-white/[0.025] p-4">
         <div className="flex items-center justify-between gap-3">
@@ -185,22 +198,22 @@ export function ProgrammeConsultant() {
           <span className="text-xs text-muted-foreground">{filledCount}/8</span>
         </div>
         <div className="mt-3 space-y-2">
-          {values.map((goal, index) => (
-            <div key={`${kind}:${index}`} className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_minmax(13rem,auto)_auto]">
+          {rows.map((row, index) => (
+            <div key={row.id} className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_minmax(13rem,auto)_auto]">
               <input
                 list={id}
                 className={inputClass + ' !mt-0'}
-                value={goal.text}
+                value={row.value}
                 maxLength={200}
                 placeholder={kind === 'theme' ? 'Sustainability' : 'Hands-on science learning'}
-                onChange={(e) => updateGoal(kind, index, {text: e.target.value})}
+                onChange={(e) => updateRequirementValue(kind, row.id, e.target.value)}
                 onKeyDown={(e) => { if (e.key === 'Enter') e.preventDefault() }}
               />
               <select
                 aria-label={`${title.slice(0, -1)} ${index + 1} priority`}
                 className={inputClass + ' !mt-0 !px-2'}
-                value={goal.priority}
-                onChange={(event) => updateGoal(kind, index, {priority: event.target.value as Goal['priority']})}
+                value={row.priority}
+                onChange={(event) => updateRequirementPriority(kind, row.id, event.target.value as Priority)}
                 onKeyDown={(e) => { if (e.key === 'Enter') e.preventDefault() }}
               >
                 <option value="critical">Critical — must be satisfied</option>
@@ -208,7 +221,7 @@ export function ProgrammeConsultant() {
               </select>
               <button
                 type="button"
-                onClick={() => removeGoal(kind, index)}
+                onClick={() => removeRequirementRow(kind, row.id)}
                 className="grid size-10 place-items-center rounded-xl border border-white/10 bg-white/[0.03] text-muted-foreground transition hover:border-danger/35 hover:text-danger focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danger/70"
                 aria-label={`Remove ${kind} row ${index + 1}`}
                 title="Remove"
@@ -218,11 +231,11 @@ export function ProgrammeConsultant() {
             </div>
           ))}
         </div>
-        {values.length < 8 && (
+        {rows.length < 8 && (
           <button
             type="button"
             className="mt-3 text-sm font-medium text-cyan transition hover:text-cyan/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan"
-            onClick={() => addGoalRow(kind)}
+            onClick={() => addRequirementRow(kind)}
           >
             {addLabel}
           </button>
@@ -249,7 +262,10 @@ export function ProgrammeConsultant() {
       if (loader.current === abort) setCatalogueError('Catalogue could not be loaded. Connect and retry; local calculation needs this catalogue first.')
     } finally {
       clearTimeout(timer)
-      if (loader.current === abort) setCatalogueLoading(false)
+      if (loader.current === abort) {
+        setCatalogueLoading(false)
+        loader.current = null
+      }
     }
   }
 
@@ -338,7 +354,7 @@ export function ProgrammeConsultant() {
       <StepProgress stage={stage} />
 
       <div aria-live="polite" className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
-        <span>{catalogueLoading ? 'Loading official catalogue...' : catalogue ? `${catalogue.offerings.length} official offerings loaded` : catalogueError}</span>
+        <span>{catalogueStatus}</span>
         {catalogueError && <Button variant="outline" className="!h-8" onClick={() => void loadCatalogue()}>Retry catalogue</Button>}
       </div>
 
@@ -347,8 +363,8 @@ export function ProgrammeConsultant() {
           <GlassCard strong className="animate-rise overflow-hidden p-5 sm:p-7">
             <SectionTitle eyebrow="1 · Tell us what you need" title="Start with the essentials" subtitle="Start with the essentials. You can leave anything unknown." />
             <div className="grid gap-4 xl:grid-cols-2">
-              {goalRows('theme', themes)}
-              {goalRows('objective', objectives)}
+              {requirementRows('theme', themeRows)}
+              {requirementRows('objective', objectiveRows)}
             </div>
             <datalist id="programme-themes">{themeOptions.map((t) => <option key={t} value={t}/>)}</datalist>
             <div className="mt-5 grid gap-4 md:grid-cols-3">
@@ -403,7 +419,6 @@ export function ProgrammeConsultant() {
               <button type="submit" className="cta-sheen inline-flex items-center justify-center gap-2 rounded-xl px-6 py-3.5 text-sm font-semibold text-primary-foreground transition-all hover:shadow-[0_0_34px_-4px_var(--violet)]">
                 Review Request <ArrowRight className="size-4" />
               </button>
-              <span className="text-sm text-muted-foreground">{storeOneLine([requestSummary.participants ? `${requestSummary.participants} participants` : '', requestSummary.ages ? `${formatAge(requestSummary.ages)} years` : '', requestSummary.durationMin ? `${requestSummary.durationMin} min` : ''])}</span>
             </div>
           </GlassCard>
         </form>
