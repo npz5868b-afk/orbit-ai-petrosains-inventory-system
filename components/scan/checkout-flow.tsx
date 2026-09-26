@@ -1,12 +1,13 @@
 'use client'
 
 import { GlassCard, StatusPill } from '@/components/ui-kit'
+import { fetchInventoryForStoreFromApi, startCheckoutScan, type ApiScan } from '@/lib/api-client'
+import { getInventory } from '@/lib/services/inventory-service'
 import {
-  getTeams,
+  getTeams as getScanTeams,
 } from '@/lib/services/scan-service'
-import { startCheckoutScan, type ApiScan } from '@/lib/api-client'
-import { itemIdFromCode } from '@/lib/official-catalog'
 import { submitOrQueue } from '@/lib/offline-queue'
+import type { InventoryItem } from '@/lib/types'
 import { cn } from '@/lib/utils'
 import {
   ArrowRight,
@@ -15,6 +16,7 @@ import {
   Minus,
   Plus,
   ScanLine,
+  Search,
   Sparkles,
   Users,
 } from 'lucide-react'
@@ -23,14 +25,18 @@ import { useEffect, useRef, useState } from 'react'
 
 type Step = 0 | 1 | 2 | 3 | 4
 
-type CartItem = { itemName: string; itemCode: string; qty: number }
-type DetectedCheckoutItem = { itemName: string; itemCode: string; confidence: number }
+type CartItem = { itemId: string; itemName: string; itemCode: string; qty: number; source: 'ai' | 'manual' }
+type DetectedCheckoutItem = { itemId: string; itemName: string; itemCode: string; confidence: number }
 type CheckoutScanState = 'idle' | 'scanning' | 'found' | 'error'
 
 const STEP_LABELS = ['Assign', 'Scan', 'Review', 'Confirm', 'Done']
 
+function storeOneInventoryFallback() {
+  return getInventory().filter((item) => item.location.toLowerCase().startsWith('store 1'))
+}
+
 export function CheckoutFlow({ onExit }: { onExit: () => void }) {
-  const teams = getTeams()
+  const teams = getScanTeams()
   const [step, setStep] = useState<Step>(0)
   const [who, setWho] = useState<string | null>(null)
   const [cart, setCart] = useState<CartItem[]>([])
@@ -47,6 +53,10 @@ export function CheckoutFlow({ onExit }: { onExit: () => void }) {
   const fileInputRef = useRef<HTMLInputElement | null>(null)
   const [cameraLive, setCameraLive] = useState(false)
   const [cameraError, setCameraError] = useState<string | null>(null)
+  const [manualPickerOpen, setManualPickerOpen] = useState(false)
+  const [manualInventory, setManualInventory] = useState<InventoryItem[]>([])
+  const [manualLoading, setManualLoading] = useState(false)
+  const [manualError, setManualError] = useState<string | null>(null)
 
   useEffect(() => {
     return () => {
@@ -139,6 +149,7 @@ export function CheckoutFlow({ onExit }: { onExit: () => void }) {
     setScanState('scanning')
     setScanError(null)
     setDetectedItem(null)
+    setManualPickerOpen(false)
 
     try {
       const nextScan = await startCheckoutScan(image)
@@ -159,6 +170,7 @@ export function CheckoutFlow({ onExit }: { onExit: () => void }) {
       }
 
       setDetectedItem({
+        itemId: detected.item!.id,
         itemName: detected.item!.name,
         itemCode: detected.item!.sku,
         confidence: Math.round(detected.confidence * 100),
@@ -170,24 +182,56 @@ export function CheckoutFlow({ onExit }: { onExit: () => void }) {
     }
   }
 
-  function addToCart() {
-    if (!detectedItem) return
+  function addCartItem(itemId: string, itemName: string, itemCode: string, quantity: number, source: CartItem['source']) {
     setCart((prev) => {
-      const found = prev.find((c) => c.itemCode === detectedItem.itemCode)
+      const found = prev.find((c) => c.itemId === itemId)
       if (found) {
         return prev.map((c) =>
-          c.itemCode === detectedItem.itemCode ? { ...c, qty: c.qty + 1 } : c,
+          c.itemId === itemId
+            ? {
+                ...c,
+                qty: c.qty + quantity,
+                source: c.source === 'manual' || source === 'manual' ? 'manual' : 'ai',
+              }
+            : c,
         )
       }
-      return [...prev, { itemName: detectedItem.itemName, itemCode: detectedItem.itemCode, qty: 1 }]
+      return [...prev, { itemId, itemName, itemCode, qty: quantity, source }]
     })
+  }
+
+  function addToCart() {
+    if (!detectedItem) return
+    addCartItem(detectedItem.itemId, detectedItem.itemName, detectedItem.itemCode, 1, 'ai')
     resetCurrentScan()
   }
 
-  function setQty(itemCode: string, delta: number) {
+  async function openManualPicker() {
+    setManualPickerOpen(true)
+    setManualError(null)
+    if (manualInventory.length) return
+    setManualLoading(true)
+    try {
+      setManualInventory(await fetchInventoryForStoreFromApi('store-1'))
+    } catch {
+      setManualInventory(storeOneInventoryFallback())
+      setManualError('Showing the saved Store 1 catalogue while the live catalogue is unavailable.')
+    } finally {
+      setManualLoading(false)
+    }
+  }
+
+  function addManualItem(item: InventoryItem, quantity: number) {
+    addCartItem(item.id, item.name, item.code, quantity, 'manual')
+    setManualPickerOpen(false)
+    setManualError(null)
+    resetCurrentScan()
+  }
+
+  function setQty(itemId: string, delta: number) {
     setCart((prev) =>
       prev
-        .map((c) => (c.itemCode === itemCode ? { ...c, qty: Math.max(0, c.qty + delta) } : c))
+        .map((c) => (c.itemId === itemId ? { ...c, qty: Math.max(0, c.qty + delta) } : c))
         .filter((c) => c.qty > 0),
     )
   }
@@ -203,9 +247,7 @@ export function CheckoutFlow({ onExit }: { onExit: () => void }) {
     transactionId.current ??= crypto.randomUUID()
     try {
       const items = cart.map((item) => {
-        const itemId = itemIdFromCode(item.itemCode)
-        if (!itemId) throw new Error(`Official item ${item.itemCode} is not mapped`)
-        return { item_id: itemId, quantity: item.qty, unit: 'unit' }
+        return { item_id: item.itemId, quantity: item.qty, unit: 'unit' }
       })
       const result = await submitOrQueue('checkout', {
         client_transaction_id: transactionId.current,
@@ -433,6 +475,23 @@ export function CheckoutFlow({ onExit }: { onExit: () => void }) {
                   <StatusPill label="Try Again" tone="warning" />
                 </div>
                 <p className="mt-2 text-sm text-muted-foreground">{scanError}</p>
+                <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+                  <button
+                    type="button"
+                    onClick={() => void openManualPicker()}
+                    className="cta-sheen-cyan inline-flex flex-1 items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold text-primary-foreground transition-all hover:shadow-[0_0_26px_-8px_var(--cyan)]"
+                  >
+                    <Plus className="h-4 w-4" />
+                    Add Item Manually
+                  </button>
+                  <button
+                    type="button"
+                    onClick={resetCurrentScan}
+                    className="inline-flex flex-1 items-center justify-center rounded-lg border border-border bg-secondary/60 px-4 py-2.5 text-sm font-medium transition-colors hover:text-cyan"
+                  >
+                    Try Again
+                  </button>
+                </div>
               </div>
             )}
 
@@ -453,7 +512,24 @@ export function CheckoutFlow({ onExit }: { onExit: () => void }) {
                   <Plus className="h-4 w-4" />
                   Add Item
                 </button>
+                <button
+                  type="button"
+                  onClick={() => void openManualPicker()}
+                  className="mt-2 inline-flex w-full items-center justify-center rounded-lg border border-border bg-secondary/55 px-4 py-2.5 text-sm font-medium transition-colors hover:text-cyan"
+                >
+                  Add Item Manually
+                </button>
               </div>
+            )}
+
+            {manualPickerOpen && (
+              <CheckoutManualItemPicker
+                items={manualInventory}
+                loading={manualLoading}
+                error={manualError}
+                onAdd={addManualItem}
+                onClose={() => setManualPickerOpen(false)}
+              />
             )}
           </GlassCard>
 
@@ -475,17 +551,20 @@ export function CheckoutFlow({ onExit }: { onExit: () => void }) {
               ) : (
                 cart.map((c) => (
                   <div
-                    key={c.itemCode}
+                    key={c.itemId}
                     className="animate-rise flex items-center gap-3 rounded-xl border border-border bg-secondary/40 p-3"
                   >
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-sm font-medium">{c.itemName}</p>
-                      <p className="text-xs text-muted-foreground">{c.itemCode}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {c.itemCode}
+                        {c.source === 'manual' && <span className="text-cyan"> · Manual</span>}
+                      </p>
                     </div>
                     <div className="flex items-center gap-2">
                       <button
                         aria-label={`Remove one ${c.itemName}`}
-                        onClick={() => setQty(c.itemCode, -1)}
+                        onClick={() => setQty(c.itemId, -1)}
                         className="grid h-9 w-9 place-items-center rounded-lg border border-border text-muted-foreground hover:text-foreground"
                       >
                         <Minus className="h-3.5 w-3.5" />
@@ -493,7 +572,7 @@ export function CheckoutFlow({ onExit }: { onExit: () => void }) {
                       <span className="w-5 text-center text-sm font-semibold">{c.qty}</span>
                       <button
                         aria-label={`Add one ${c.itemName}`}
-                        onClick={() => setQty(c.itemCode, 1)}
+                        onClick={() => setQty(c.itemId, 1)}
                         className="grid h-9 w-9 place-items-center rounded-lg border border-border text-muted-foreground hover:text-foreground"
                       >
                         <Plus className="h-3.5 w-3.5" />
@@ -526,12 +605,15 @@ export function CheckoutFlow({ onExit }: { onExit: () => void }) {
           <div className="mt-4 flex flex-col gap-2">
             {cart.map((c) => (
               <div
-                key={c.itemCode}
+                key={c.itemId}
                 className="flex items-center justify-between rounded-xl border border-border bg-secondary/40 p-3.5"
               >
                 <div>
                   <p className="text-sm font-medium">{c.itemName}</p>
-                  <p className="text-xs text-muted-foreground">{c.itemCode}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {c.itemCode}
+                    {c.source === 'manual' && <span className="text-cyan"> · Manual</span>}
+                  </p>
                 </div>
                 <span className="text-sm text-muted-foreground">Qty {c.qty}</span>
               </div>
@@ -610,6 +692,158 @@ export function CheckoutFlow({ onExit }: { onExit: () => void }) {
           </div>
         </GlassCard>
       )}
+    </div>
+  )
+}
+
+function CheckoutManualItemPicker({
+  items,
+  loading,
+  error,
+  onAdd,
+  onClose,
+}: {
+  items: InventoryItem[]
+  loading: boolean
+  error: string | null
+  onAdd: (item: InventoryItem, quantity: number) => void
+  onClose: () => void
+}) {
+  const [query, setQuery] = useState('')
+  const [quantity, setQuantity] = useState(1)
+  const [selectedId, setSelectedId] = useState('')
+  const filtered = items
+    .filter((item) => {
+      const term = query.trim().toLowerCase()
+      return !term || item.name.toLowerCase().includes(term) || item.code.toLowerCase().includes(term)
+    })
+    .slice(0, 6)
+  const selected = items.find((item) => item.id === selectedId) ?? filtered[0] ?? null
+  const safeQuantity = Math.max(1, quantity)
+
+  return (
+    <div className="mt-4 animate-rise rounded-xl border border-cyan/25 bg-cyan/[0.045] p-4">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h3 className="font-display text-base font-semibold">Add Item Manually</h3>
+          <p className="text-sm text-muted-foreground">
+            Select an existing catalogue item for this check-out.
+          </p>
+        </div>
+        <StatusPill label="Verified catalogue only" tone="cyan" />
+      </div>
+
+      <div className="mt-4 grid gap-3 sm:grid-cols-[1fr_auto]">
+        <label className="relative block">
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <input
+            value={query}
+            onChange={(event) => {
+              setQuery(event.target.value)
+              setSelectedId('')
+            }}
+            placeholder="Search item or SKU..."
+            className="h-11 w-full rounded-xl border border-border bg-secondary/45 pl-10 pr-3 text-sm outline-none transition focus:border-cyan/50"
+          />
+        </label>
+        <div className="flex items-center rounded-xl border border-border bg-secondary/45 p-1">
+          <button
+            type="button"
+            onClick={() => setQuantity((value) => Math.max(1, value - 1))}
+            aria-label="Decrease manual quantity"
+            className="grid h-9 w-9 place-items-center rounded-lg text-lg font-semibold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+          >
+            -
+          </button>
+          <input
+            type="number"
+            min={1}
+            value={safeQuantity}
+            onChange={(event) => {
+              const parsed = Number.parseInt(event.target.value, 10)
+              setQuantity(Number.isFinite(parsed) ? Math.max(1, parsed) : 1)
+            }}
+            aria-label="Manual quantity"
+            className="h-9 w-14 bg-transparent text-center font-display text-base font-semibold text-foreground outline-none"
+          />
+          <button
+            type="button"
+            onClick={() => setQuantity((value) => value + 1)}
+            aria-label="Increase manual quantity"
+            className="grid h-9 w-9 place-items-center rounded-lg text-lg font-semibold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+          >
+            +
+          </button>
+        </div>
+      </div>
+
+      {error && (
+        <p className="mt-3 rounded-xl border border-warning/30 bg-warning/10 px-3 py-2 text-xs text-warning">
+          {error}
+        </p>
+      )}
+
+      <div className="mt-4 grid gap-2">
+        {loading ? (
+          <div className="rounded-xl border border-border bg-secondary/30 p-4 text-sm text-muted-foreground">
+            Loading verified inventory catalogue...
+          </div>
+        ) : filtered.length ? (
+          filtered.map((item) => (
+            <button
+              key={item.id}
+              type="button"
+              onClick={() => setSelectedId(item.id)}
+              className={cn(
+                'rounded-xl border p-3 text-left transition-all',
+                selected?.id === item.id
+                  ? 'border-cyan/50 bg-cyan/10'
+                  : 'border-border bg-secondary/35 hover:border-cyan/30',
+              )}
+            >
+              <div className="flex items-center justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-semibold">{item.name}</p>
+                  <p className="mt-0.5 font-mono text-[11px] text-muted-foreground">
+                    {item.code} · {item.rack}
+                  </p>
+                </div>
+                <span
+                  className={cn(
+                    'grid h-5 w-5 shrink-0 place-items-center rounded-full border',
+                    selected?.id === item.id ? 'border-cyan bg-cyan text-primary-foreground' : 'border-border',
+                  )}
+                >
+                  {selected?.id === item.id && <Check className="h-3 w-3" />}
+                </span>
+              </div>
+            </button>
+          ))
+        ) : (
+          <div className="rounded-xl border border-border bg-secondary/30 p-4 text-sm text-muted-foreground">
+            No inventory item found. Try another SKU or item name.
+          </div>
+        )}
+      </div>
+
+      <div className="mt-4 flex flex-col gap-2 sm:flex-row">
+        <button
+          type="button"
+          disabled={!selected || loading}
+          onClick={() => selected && onAdd(selected, safeQuantity)}
+          className="cta-sheen-cyan inline-flex flex-1 items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold text-primary-foreground transition-all enabled:hover:shadow-[0_0_30px_-4px_var(--cyan)] disabled:opacity-40"
+        >
+          <Plus className="h-4 w-4" />
+          Add Selected Item
+        </button>
+        <button
+          type="button"
+          onClick={onClose}
+          className="inline-flex flex-1 items-center justify-center rounded-xl border border-border bg-secondary/60 px-5 py-3 text-sm font-medium transition-colors hover:text-cyan"
+        >
+          Cancel
+        </button>
+      </div>
     </div>
   )
 }
