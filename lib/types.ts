@@ -71,7 +71,14 @@ export type ActivityRecord = {
   status: ActivityStatus
   syncStatus: SyncStatus
   transactionId: string
-  items: { name: string; qty: number }[]
+  items: {
+    name: string
+    qty: number
+    delta?: number
+    quantityBefore?: number
+    quantityAfter?: number
+    source?: 'ai' | 'manual'
+  }[]
   aiSummary: string
   online: boolean
 }

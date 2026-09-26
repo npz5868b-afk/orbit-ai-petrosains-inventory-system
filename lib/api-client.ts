@@ -113,7 +113,14 @@ type ApiActivity = {
   store_id: string
   user_name: string | null
   summary: string
-  details: Array<{ name: string; quantity_checked_out?: number; quantity_returned?: number }>
+  details: Array<{
+    name: string
+    quantity_checked_out?: number
+    quantity_returned?: number
+    quantity_before?: number
+    quantity_after?: number
+    source?: 'ai' | 'manual'
+  }>
   created_at: string
 }
 
@@ -135,10 +142,21 @@ export async function fetchActivitiesFromApi(): Promise<ActivityRecord[]> {
       status: 'synced',
       syncStatus: 'up-to-date',
       transactionId: event.entity_id,
-      items: event.details.map((item) => ({
-        name: item.name,
-        qty: item.quantity_checked_out ?? item.quantity_returned ?? 0,
-      })),
+      items: event.details.map((item) => {
+        const delta = item.quantity_returned != null
+          ? item.quantity_returned
+          : item.quantity_checked_out != null
+            ? -item.quantity_checked_out
+            : undefined
+        return {
+          name: item.name,
+          qty: item.quantity_checked_out ?? item.quantity_returned ?? 0,
+          delta,
+          quantityBefore: item.quantity_before,
+          quantityAfter: item.quantity_after,
+          source: item.source,
+        }
+      }),
       aiSummary: event.summary,
       online: true,
     }

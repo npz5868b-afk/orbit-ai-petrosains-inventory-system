@@ -27,6 +27,13 @@ const typeMeta = {
   issue: { icon: TriangleAlert, tone: 'warning' as const, bg: 'bg-warning/15 text-warning' },
 }
 
+function activityDelta(activity: ActivityRecord, qty: number, delta?: number) {
+  if (typeof delta === 'number') return delta
+  if (activity.type === 'return') return qty
+  if (activity.type === 'check-out') return -qty
+  return 0
+}
+
 export function ActivityTimeline() {
   const [filter, setFilter] = useState<ActivityFilter>('all')
   const [activities, setActivities] = useState<ActivityRecord[]>([])
@@ -141,15 +148,40 @@ function ActivityCard({ activity, delay }: { activity: ActivityRecord; delay: nu
                 Items
               </p>
               <div className="mt-2 flex flex-col gap-1.5">
-                {activity.items.map((it) => (
+                {activity.items.map((it) => {
+                  const delta = activityDelta(activity, it.qty, it.delta)
+                  const showDelta = activity.type === 'return' || activity.type === 'check-out' || delta !== 0
+                  const hasStockRange =
+                    typeof it.quantityBefore === 'number' && typeof it.quantityAfter === 'number'
+                  return (
                   <div
                     key={it.name}
-                    className="flex items-center justify-between rounded-lg border border-border bg-secondary/40 px-3 py-2 text-sm"
+                    className="flex items-center justify-between gap-3 rounded-lg border border-border bg-secondary/40 px-3 py-2 text-sm"
                   >
-                    <span>{it.name}</span>
-                    <span className="text-muted-foreground">×{it.qty}</span>
+                    <div className="min-w-0">
+                      <span className="block truncate">{it.name}</span>
+                      <span className="mt-0.5 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                        {hasStockRange && (
+                          <span>{it.quantityBefore} → {it.quantityAfter}</span>
+                        )}
+                        {it.source && (
+                          <span className={it.source === 'manual' ? 'text-cyan' : 'text-violet'}>
+                            {it.source === 'manual' ? 'Manual' : 'AI'}
+                          </span>
+                        )}
+                      </span>
+                    </div>
+                    <span
+                      className={cn(
+                        'shrink-0 font-display text-base font-semibold',
+                        delta > 0 ? 'text-success' : delta < 0 ? 'text-warning' : 'text-muted-foreground',
+                      )}
+                    >
+                      {showDelta ? `${delta > 0 ? '+' : ''}${delta}` : `×${it.qty}`}
+                    </span>
                   </div>
-                ))}
+                  )
+                })}
               </div>
             </div>
             <div>

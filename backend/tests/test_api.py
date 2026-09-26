@@ -50,6 +50,11 @@ def test_checkout_is_atomic_and_idempotent(client):
     assert replay.status_code == 200
     assert replay.json()["idempotent_replay"] is True
     assert client.get("/api/inventory/item-e014").json()["available_quantity"] == before - 2
+    activity = client.get("/api/activity?event_type=checkout").json()
+    line = activity["events"][0]["details"][0]
+    assert line["quantity_checked_out"] == 2
+    assert line["quantity_before"] == before
+    assert line["quantity_after"] == before - 2
 
     changed = {**payload, "items": [{"item_id": "item-e014", "quantity": 3, "unit": "unit"}]}
     conflict = client.post("/api/transactions/checkout", json=changed)
@@ -150,6 +155,12 @@ def test_empty_scan_can_add_verified_manual_item_before_return(client):
     assert response.status_code == 200, response.text
     assert response.json()["total_items_returned"] == 1
     assert client.get("/api/inventory/item-t003").json()["available_quantity"] == before + 1
+    activity = client.get("/api/activity?event_type=return").json()
+    line = activity["events"][0]["details"][0]
+    assert line["quantity_returned"] == 1
+    assert line["quantity_before"] == before
+    assert line["quantity_after"] == before + 1
+    assert line["source"] == "manual"
 
 
 def test_detector_and_upload_failures_do_not_change_inventory(client):

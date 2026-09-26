@@ -686,6 +686,9 @@ def apply_return(db_path: Path, request: ReturnRequest) -> dict:
         )
         changes = []
         for line, item, quantity_base in validated:
+            detection = detections[line.detection_id]
+            raw_metadata = json_value(detection["raw_metadata"], {})
+            source = "manual" if raw_metadata.get("source") == "manual_catalog_selection" else "ai"
             before = int(item["available_quantity"])
             added = quantity_base if line.condition == "good" else 0
             after = before + added
@@ -701,7 +704,7 @@ def apply_return(db_path: Path, request: ReturnRequest) -> dict:
             changes.append(
                 {"item_id": item["id"], "name": item["name"], "quantity_returned": quantity_base,
                  "quantity_added_to_available": added, "condition": line.condition,
-                 "quantity_before": before, "quantity_after": after}
+                 "quantity_before": before, "quantity_after": after, "source": source}
             )
         manual_reviews = db.execute(
             """
