@@ -72,7 +72,10 @@ export type ActivityRecord = {
   syncStatus: SyncStatus
   transactionId: string
   items: {
+    itemId?: string
     name: string
+    code?: string
+    imageUrl?: string | null
     qty: number
     delta?: number
     quantityBefore?: number

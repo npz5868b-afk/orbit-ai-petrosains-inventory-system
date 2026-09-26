@@ -1,6 +1,7 @@
 'use client'
 
 import { GlassCard, StatusPill } from '@/components/ui-kit'
+import { InventoryPhoto } from '@/components/inventory/inventory-photo'
 import {
   filterActivities,
   getActivityStatusMeta,
@@ -155,15 +156,22 @@ function ActivityCard({ activity, delay }: { activity: ActivityRecord; delay: nu
                     typeof it.quantityBefore === 'number' && typeof it.quantityAfter === 'number'
                   return (
                   <div
-                    key={it.name}
+                    key={it.itemId ?? it.name}
                     className="flex items-center justify-between gap-3 rounded-lg border border-border bg-secondary/40 px-3 py-2 text-sm"
                   >
-                    <div className="min-w-0">
-                      <span className="block truncate">{it.name}</span>
+                    <InventoryPhoto
+                      item={{
+                        code: it.code ?? 'ITEM',
+                        imageUrl: it.imageUrl ?? null,
+                        name: it.name,
+                      }}
+                      className="h-12 w-12 rounded-lg sm:h-14 sm:w-14"
+                    />
+                    <div className="min-w-0 flex-1">
+                      <span className="block truncate font-medium">{it.name}</span>
                       <span className="mt-0.5 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                        {hasStockRange && (
-                          <span>{it.quantityBefore} → {it.quantityAfter}</span>
-                        )}
+                        {it.code && <span className="font-mono">{it.code}</span>}
+                        {hasStockRange && <span>{it.quantityBefore} → {it.quantityAfter}</span>}
                         {it.source && (
                           <span className={it.source === 'manual' ? 'text-cyan' : 'text-violet'}>
                             {it.source === 'manual' ? 'Manual' : 'AI'}
@@ -229,12 +237,12 @@ function ActivityCard({ activity, delay }: { activity: ActivityRecord; delay: nu
             </div>
           </div>
 
-          {/* AI summary */}
+          {/* Transaction summary */}
           <div className="mt-4 flex items-start gap-3 rounded-xl border border-cyan/25 bg-cyan/5 p-3.5">
             <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-cyan" />
             <div>
               <p className="text-xs font-semibold uppercase tracking-wide text-cyan">
-                AI summary
+                Transaction summary
               </p>
               <p className="mt-0.5 text-sm text-muted-foreground">{activity.aiSummary}</p>
             </div>

@@ -1,4 +1,4 @@
-import { storeNames } from './official-catalog'
+import { officialInventory, storeNames } from './official-catalog'
 import type { ActivityRecord, InventoryItem, InventoryStatus, StoreLocation } from './types'
 
 const API_BASE = (process.env.NEXT_PUBLIC_ORBIT_API_URL ?? 'http://127.0.0.1:8000/api').replace(/\/$/, '')
@@ -114,6 +114,7 @@ type ApiActivity = {
   user_name: string | null
   summary: string
   details: Array<{
+    item_id?: string
     name: string
     quantity_checked_out?: number
     quantity_returned?: number
@@ -126,6 +127,8 @@ type ApiActivity = {
 
 export async function fetchActivitiesFromApi(): Promise<ActivityRecord[]> {
   const response = await request<{ events: ApiActivity[] }>('/activity?limit=100')
+  const inventoryById = new Map(officialInventory.map((item) => [item.id, item]))
+  const inventoryByName = new Map(officialInventory.map((item) => [item.name.toLowerCase(), item]))
   return response.events.map((event) => {
     const quantity = event.details.reduce(
       (sum, item) => sum + (item.quantity_checked_out ?? item.quantity_returned ?? 0),
@@ -143,13 +146,18 @@ export async function fetchActivitiesFromApi(): Promise<ActivityRecord[]> {
       syncStatus: 'up-to-date',
       transactionId: event.entity_id,
       items: event.details.map((item) => {
+        const inventoryItem = (item.item_id ? inventoryById.get(item.item_id) : undefined)
+          ?? inventoryByName.get(item.name.toLowerCase())
         const delta = item.quantity_returned != null
           ? item.quantity_returned
           : item.quantity_checked_out != null
             ? -item.quantity_checked_out
             : undefined
         return {
+          itemId: item.item_id,
           name: item.name,
+          code: inventoryItem?.code,
+          imageUrl: inventoryItem?.imageUrl,
           qty: item.quantity_checked_out ?? item.quantity_returned ?? 0,
           delta,
           quantityBefore: item.quantity_before,
