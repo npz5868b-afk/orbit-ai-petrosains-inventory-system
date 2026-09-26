@@ -1,132 +1,231 @@
 # ORBIT AI
 
-Operational Recognition & Bulk Inventory Tracking
+**Operational intelligence for Petrosains inventory and programme planning**
 
-See it. Verify it. Track it. Anywhere.
+> See it. Verify it. Plan it. Track it.
 
-**Competition:** Petrosains AI Innovators Challenge 2026 - Stage 1
-**Team:** YKPZ 1 - Universiti Teknologi Malaysia
+**Competition:** Petrosains AI Innovators Challenge 2026 — Finals
+**Team:** YKPZ 1 — Universiti Teknologi Malaysia
+**Demo Video:** https://youtu.be/XqnYcnUVp6I
+**Live App:** Local finals build / not publicly deployed
 
-**Demo Video:** [https://youtu.be/XqnYcnUVp6I](https://youtu.be/XqnYcnUVp6I)
-**Live App:** Coming soon / not publicly deployed
+---
 
-## Executive Summary
+## What ORBIT AI Does
 
-Petrosains operates a 109-item inventory catalogue across real storeroom environments. ORBIT AI is an operations-first inventory system for check-out, live availability, and mixed-item bulk return, designed so storeroom users can move quickly without losing traceability.
+ORBIT AI combines two connected layers:
 
-The system is offline-first because Stores 3-4 may not always have reliable internet. Users can keep working, save transactions locally, and synchronize safely after reconnect. The backend uses idempotent transaction processing so retries do not accidentally change inventory twice.
+1. **Inventory Operations** — AI-assisted checkout, mixed-item bulk return, live stock, offline sync, and auditability.
+2. **Programme Twin** — a grounded AI-powered programme consultant that converts stakeholder requests into practical programme plans using the official Petrosains catalogue only.
 
-ORBIT AI combines object detection, OCR evidence, confidence-aware logic, and human review. AI predictions create reviewable proposals; inventory is changed only by confirmed transactions. Uncertain AI output never directly mutates stock.
+The finals idea is simple: **planning should understand operational reality**. A programme recommendation is more useful when it can be checked against constraints, resources, uncertainty, and the inventory workflow that will eventually support execution.
 
-The operational catalogue contains **109 item types**. The current real computer-vision prototype is validated on **five trained classes only**:
+```text
+Stakeholder Request
+      ↓
+Programme Twin
+      ↓
+Official Catalogue Reasoning
+      ↓
+Multi-theme Coverage + Constraints
+      ↓
+Resource Feasibility + Unknowns
+      ↓
+Participant Journey + Plan B
+      ↓
+Approved Programme
+      ↓
+ORBIT Inventory Operations
+Checkout → Return → Audit
+```
 
-- T003 Screwdriver
-- T005 Measure Tape
-- L003 Beaker 250ml
-- E018 LED Red
-- E019 LED Blue
+---
 
-## Key Features
+## Finals Extension — Programme Twin
 
-- Real AI-assisted check-out
-- Live inventory availability
+The Programme Twin extends the Stage 1 inventory system into an **AI-Powered Programme Consultant**.
+
+It can:
+
+- interpret themes, objectives, audience, participant count, age, duration, venue, internet conditions, and extra context;
+- recommend from the **21 official catalogue offerings only**;
+- support **multiple themes and objectives** instead of forcing a single-theme answer;
+- explain why each activity fits the request;
+- check practical constraints such as capacity, duration, venue, utilities, staffing-related unknowns, and materials;
+- distinguish between **verified facts, assumptions, and items needing verification**;
+- produce a cohesive participant journey rather than a disconnected activity list;
+- surface **Plan B / trade-offs** when constraints create risk;
+- propose clearly labelled enhancements without pretending they are official catalogue offerings;
+- save favourite programmes and activities locally in the browser;
+- export a print-friendly programme report.
+
+### Grounding Rules
+
+Programme Twin is intentionally conservative:
+
+- It **does not invent Petrosains offerings**.
+- It says when information is missing.
+- It does not treat current inventory quantity as guaranteed future booking availability.
+- It does not assume future staffing, room availability, utilities, safety approval, or kit availability.
+- Adapted timings are labelled as **PROPOSED ENHANCEMENT — Adapted Format**.
+- If no suitable programme can be supported, it should say so instead of fabricating an answer.
+
+---
+
+## Inventory Operations
+
+The Stage 1 operational layer remains the execution backbone.
+
+### Core Capabilities
+
+- AI-assisted checkout
+- Camera capture and image upload
 - Mixed-item bulk return
 - Human-in-the-loop review
-- Quantity correction
-- Confidence-aware decision logic
+- Quantity correction before inventory mutation
+- Manual fallback for out-of-scope catalogue items
+- Live inventory availability
+- Activity trail with signed quantity deltas
 - OCR evidence
 - Offline queue + reconnect synchronization
-- Activity / audit trail
+- Idempotent transaction processing
 - Inventory integrity protection
-- 109-item operational catalogue
 
-## Measured Results
+The operational catalogue contains **109 item types**.
 
-Independent 5-class held-out test set:
+The current real computer-vision prototype is trained for **five classes**:
 
-| Metric | Result |
-|---|---:|
-| Precision | 79.6% |
-| Recall | 74.7% |
-| mAP@0.50 | 73.8% |
-| mAP@0.50:0.95 | 61.9% |
+| Class | Item |
+|---|---|
+| T003 | Screwdriver |
+| T005 | Measure Tape |
+| L003 | Beaker 250ml |
+| E018 | LED Red |
+| E019 | LED Blue |
 
-Real local scan performance: approximately **2.0 seconds** including YOLO + OCR in the measured run. The local CPU benchmark reports a 20-run mean of 1.46 seconds for `/api/scans` and a P95 of 2.31 seconds.
+Items outside these trained classes can still use the existing catalogue through the manual fallback flow.
 
-These results apply only to the five validated computer-vision classes. They do not imply recognition across all 109 catalogue items.
+### AI Safety Principle
 
-## Demo Evidence
+**AI proposes. Humans confirm uncertain cases. Transactions mutate inventory. Raw AI predictions do not directly change stock.**
 
-The verified competition demo flow shows:
+---
 
-1. **AI Check-out** - Measure Tape `T005` detected at approximately 99% confidence.
-2. **Live Availability** - `T005` available quantity updates after confirmed checkout.
-3. **Mixed-item Bulk Return** - one scene contains Beaker 250ml, Screwdriver, and Measure Tape.
-4. **Failure & Recovery** - the detector initially produced Qty 3 for one physical Screwdriver due to overlapping detections. Human Review corrected Qty 3 to Qty 1.
-5. **Final Verified Return** - Beaker 250ml x1, Screwdriver x1, Measure Tape x1.
-6. **Offline-first** - a transaction can be saved locally while offline and synchronized after reconnect.
+## Confidence-Aware Vision Flow
 
-Existing evidence:
+```text
+Image / Camera
+      ↓
+YOLO11n Detector
+      ↓
+OCR Evidence
+      ↓
+Confidence + SKU Mapping
+      ↓
+Ready / Review Needed / Unknown
+      ↓
+Human Review when required
+      ↓
+Confirmed Transaction
+      ↓
+Inventory + Activity Audit
+```
 
-![Real detection evidence](docs/performance/evidence/real-detection.jpg)
+The prototype uses confidence-aware routing so uncertain detections remain reviewable before stock is changed.
 
-![Mixed-item bulk return evidence](docs/performance/evidence/multi-object-demo.jpg)
+Recorded local CPU scan performance is approximately **2.0 seconds end-to-end** in the measured run. The existing 20-run `/api/scans` benchmark recorded a mean of **1.46 s** and P95 of **2.31 s**. See `docs/performance/` for the recorded evidence and context.
 
-![Review needed evidence](docs/performance/evidence/review-needed.jpg)
+---
 
-Additional reproducible records are in [`docs/performance/evidence/`](docs/performance/evidence/) and [`docs/performance/performance-report.md`](docs/performance/performance-report.md).
+## Offline-First Design
+
+ORBIT AI is designed for storeroom operations where connectivity may be unstable.
+
+```text
+Browser Local Queue
+      ↓
+Reconnect
+      ↓
+/api/sync
+      ↓
+Idempotent Transaction Processing
+      ↓
+Inventory + Audit Trail
+```
+
+A `client_transaction_id` and payload checks protect against accidental duplicate inventory changes when a queued request is retried.
+
+---
+
+## Finals Demo Flow
+
+### A. Inventory Operations
+
+1. Capture or upload an item image.
+2. Run real detection.
+3. Confirm high-confidence results or review uncertain ones.
+4. Checkout or bulk-return items.
+5. Verify the inventory quantity change.
+6. Verify the signed delta and before → after quantity in Activity.
+7. Demonstrate manual fallback for an out-of-scope item when needed.
+
+### B. Programme Twin
+
+1. Enter a stakeholder brief with multiple themes/objectives.
+2. Review ORBIT's interpretation of the request.
+3. Build the programme from the official catalogue.
+4. Inspect the recommended journey, feasibility checks, unknowns, and trade-offs.
+5. Save a favourite programme/activity.
+6. Export the programme report.
+7. Connect the approved plan back to the existing inventory execution layer.
+
+---
 
 ## Architecture
 
-```text
-Browser UI
-  -> FastAPI
-  -> YOLO11n detection
-  -> RapidOCR evidence
-  -> confidence / SKU mapping
-  -> human review when needed
-  -> transaction layer
-  -> SQLite inventory
-  -> activity audit trail
-```
+### Application
 
-Offline path:
-
-```text
-Browser local queue
-  -> reconnect
-  -> /api/sync
-  -> idempotent transaction processing
-```
-
-AI proposes. Human users confirm uncertain cases. Transactions mutate inventory. Raw AI predictions alone do not mutate inventory.
-
-## Responsible AI
-
-AI recommends. Humans remain in control. Every inventory decision is traceable.
-
-- Low-confidence results require review.
-- Duplicate or overlapping detections can be corrected before return.
-- Invalid returns are blocked by inventory rules.
-- OCR does not blindly override confident visual detections.
-- Prototype limitations are disclosed: the current real model is validated on five classes, not all 109 catalogue items.
-
-## Tech Stack
-
-| Area | Stack |
+| Layer | Technology |
 |---|---|
 | Frontend | Next.js / React / TypeScript |
 | Backend | FastAPI / Python |
 | Computer Vision | Ultralytics YOLO11n / PyTorch |
 | OCR | RapidOCR / ONNX Runtime |
-| Database | SQLite |
-| Offline | Browser local queue + idempotent sync |
+| Database | SQLite (WAL) |
+| Offline | Browser queue + idempotent sync |
+| Programme Twin | Grounded catalogue reasoning + constraint / feasibility engine |
+
+### Main Operational APIs
+
+| Method | Path | Purpose |
+|---|---|---|
+| GET | `/api/health` | Database, detector, and OCR status |
+| GET | `/api/inventory` | Search/filter inventory |
+| GET | `/api/inventory/{item_id}` | Item detail and history |
+| GET | `/api/stores` | Store connectivity |
+| POST | `/api/scans` | Checkout / return scan |
+| GET | `/api/scans/{scan_id}` | Restore scan state |
+| POST | `/api/scans/{scan_id}/reviews/{detection_id}` | Human review |
+| POST | `/api/transactions/checkout` | Atomic idempotent checkout |
+| POST | `/api/transactions/returns` | Atomic reviewed return |
+| GET | `/api/activity` | Audit history |
+| POST | `/api/sync` | Offline replay / synchronization |
+
+### Programme APIs
+
+| Method | Path | Purpose |
+|---|---|---|
+| GET | `/api/programmes/offerings` | Official programme offerings |
+| GET | `/api/programmes/themes` | Supported theme information |
+| POST | `/api/programmes/consult` | Build grounded programme recommendation |
+
+---
 
 ## Quick Start
 
-These commands are for local Windows development from the repository root.
+Commands below assume Windows and repository root.
 
-### 1. Install base dependencies
+### 1. Install
 
 ```powershell
 python -m venv .venv
@@ -135,108 +234,123 @@ pnpm install --frozen-lockfile
 .\.venv\Scripts\python.exe backend\scripts\reset_demo.py
 ```
 
-### 2. Run in Mock mode
+### 2. Run Backend
 
-Mock mode starts quickly and does not require YOLO/OCR packages.
+Mock / lightweight mode:
 
 ```powershell
 .\.venv\Scripts\python.exe -m uvicorn app.main:app --app-dir backend --reload --port 8000
 ```
 
-In a second terminal:
-
-```powershell
-pnpm dev
-```
-
-Open `http://localhost:3000`. API documentation is available at `http://127.0.0.1:8000/docs`.
-
-### 3. Run Real YOLO + OCR mode
-
-Install the validated CPU ML/OCR stacks:
+Real YOLO + OCR mode:
 
 ```powershell
 .\.venv\Scripts\python.exe -m pip install -r backend\requirements-ml.txt
 .\.venv\Scripts\python.exe -m pip install -r backend\requirements-ocr.txt
-```
 
-Start the backend with real detection:
-
-```powershell
 $env:ORBIT_DETECTOR_MODE="real"
 $env:ORBIT_MODEL_WEIGHTS="backend/models/orbit_ai_5class_yolo11n_best.pt"
 $env:ORBIT_OCR_ENABLED="true"
 .\.venv\Scripts\python.exe -m uvicorn app.main:app --app-dir backend --port 8000
 ```
 
-Useful local checks:
+### 3. Run Frontend
+
+Development:
 
 ```powershell
-curl http://127.0.0.1:8000/api/health
-.\.venv\Scripts\python.exe -m pytest backend\tests -q
-pnpm.cmd exec next build --webpack
+pnpm dev
 ```
 
-## API Surface
+Production-style local finals build:
 
-| Method | Path | Purpose |
-|---|---|---|
-| GET | `/api/health` | Database, detector, and OCR status |
-| GET | `/api/inventory` | Search, filter, and paginate inventory |
-| GET | `/api/inventory/{item_id}` | Item detail, unit rules, store, and recent transactions |
-| GET | `/api/stores` | Stable store IDs and connectivity |
-| POST | `/api/scans` | Multipart image or raw JPEG/PNG scan |
-| GET | `/api/scans/{scan_id}` | Restore a scan after refresh |
-| POST | `/api/scans/{scan_id}/reviews/{detection_id}` | Confirm, choose another, rescan, or reject |
-| POST | `/api/transactions/checkout` | Atomic idempotent checkout |
-| POST | `/api/transactions/returns` | Atomic idempotent reviewed return |
-| GET | `/api/activity` | Transaction audit history |
-| POST | `/api/sync` | Offline replay and conflict-safe synchronization |
+```powershell
+pnpm build --webpack
+pnpm start
+```
 
-## Testing
+Open:
 
-Current validation evidence includes:
+- App: `http://localhost:3000`
+- Programme Twin: `http://localhost:3000/programme`
+- API docs: `http://127.0.0.1:8000/docs`
 
-- Backend tests: **20 passed**
-- Independent 5-class computer-vision evaluation
-- Real checkout end-to-end test
+---
+
+## Validation
+
+Finals integration validation includes:
+
+- **214 / 214 Programme Twin checks passing**
+- **22 / 22 backend tests passing**
+- TypeScript validation: `pnpm typecheck`
+- Production build: `pnpm build --webpack`
+- Programme route generated successfully
+- Real checkout flow
 - Mixed-item bulk return
-- Human review flow
-- Quantity correction
-- Offline/reconnect behavior
-- Inventory integrity guard
-- Production build evidence in [`docs/performance/evidence/production-build.txt`](docs/performance/evidence/production-build.txt)
-- TypeScript validation evidence in [`docs/performance/evidence/typecheck.txt`](docs/performance/evidence/typecheck.txt)
+- Human review and quantity correction
+- Manual fallback
+- Offline/reconnect behaviour
+- Inventory integrity guards
+- Activity audit trail with quantity deltas
 
-## Important Project Data
+Useful commands:
 
-- Normalized operational catalogue: [`backend/data/inventory_catalog.json`](backend/data/inventory_catalog.json)
-- Five-class model weights: [`backend/models/orbit_ai_5class_yolo11n_best.pt`](backend/models/orbit_ai_5class_yolo11n_best.pt)
-- Detector/OCR model card: [`docs/model-card.md`](docs/model-card.md)
-- Local CPU performance report: [`docs/performance/performance-report.md`](docs/performance/performance-report.md)
-- Data audit: [`docs/data-audit/audit-report.md`](docs/data-audit/audit-report.md)
-- Backend integration report: [`docs/backend-integration-report.md`](docs/backend-integration-report.md)
-- Phase completion report: [`docs/phase-completion-report.md`](docs/phase-completion-report.md)
+```powershell
+node tests\programmes\run-b6-tests.cjs
+.\.venv\Scripts\python.exe -m pytest backend\tests -q
+pnpm typecheck
+pnpm build --webpack
+git diff --check
+```
 
-## Limitations & Next Steps
+---
+
+## Evidence & Project Data
+
+- Inventory catalogue: `backend/data/inventory_catalog.json`
+- Five-class model weights: `backend/models/orbit_ai_5class_yolo11n_best.pt`
+- Model card: `docs/model-card.md`
+- Performance report: `docs/performance/performance-report.md`
+- Performance evidence: `docs/performance/evidence/`
+- Data audit: `docs/data-audit/audit-report.md`
+- Backend integration report: `docs/backend-integration-report.md`
+- Phase completion report: `docs/phase-completion-report.md`
+
+Existing Stage 1 visual evidence:
+
+![Real detection evidence](docs/performance/evidence/real-detection.jpg)
+
+![Mixed-item bulk return evidence](docs/performance/evidence/multi-object-demo.jpg)
+
+![Review needed evidence](docs/performance/evidence/review-needed.jpg)
+
+---
+
+## Responsible AI & Limitations
+
+ORBIT AI is designed to expose uncertainty instead of hiding it.
 
 Current limitations:
 
-- Real CV is validated on five classes, not all 109 catalogue items.
-- LED classes are more challenging.
-- Real-world clutter, overlap, lighting, and small items can reduce confidence.
+- Real CV is trained on five classes, not all 109 inventory items.
+- Recognition can degrade with clutter, overlap, lighting, or very small objects.
+- Programme Twin is grounded to the available official catalogue data; it cannot verify facts that are absent from that data.
+- Current inventory quantity is not treated as guaranteed future programme availability.
+- Staffing, rooms, safety approval, utilities, and future material availability may still require operational verification.
+- Saved favourites are browser-local and are not synchronized across devices.
 - Public cloud deployment is not currently provided.
 
-Next steps:
+Next steps include expanding the vision dataset, strengthening small-item recognition, connecting approved programme plans more deeply to future resource reservation, and packaging local inference for offline deployment.
 
-- Expand the dataset toward all 109 operational classes.
-- Collect more real Petrosains imagery.
-- Improve duplicate suppression and quantity estimation.
-- Strengthen small-item recognition.
-- Package local inference for offline stores.
+---
 
 ## Credits / AI Usage
 
 ORBIT AI uses Ultralytics YOLO11n, PyTorch, RapidOCR, ONNX Runtime, FastAPI, SQLite, Next.js, and React.
 
 OpenAI ChatGPT / Codex assisted with coding, debugging, testing, documentation, and presentation preparation. Generated suggestions were reviewed and validated by the team.
+
+---
+
+**ORBIT AI — from seeing inventory to planning programmes with operational truth.**

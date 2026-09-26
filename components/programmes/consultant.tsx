@@ -13,7 +13,7 @@ import type {ConsultationResult} from '@/lib/programmes/consultation'
 import {ProgrammeResults, Understanding} from './results'
 import {cn} from '@/lib/utils'
 
-const inputClass = 'mt-2 w-full min-w-0 rounded-xl border border-white/15 bg-background/80 px-3 py-2.5 text-sm text-foreground outline-none transition focus-visible:ring-2 focus-visible:ring-cyan'
+const inputClass = 'mt-2 w-full min-w-0 rounded-2xl border border-white/15 bg-background/80 px-4 py-3 text-base text-foreground outline-none transition hover:border-cyan/25 focus-visible:ring-2 focus-visible:ring-cyan'
 const initial = {brief:'',audienceType:'',ages:'',participants:'',durationMin:'',eventStart:'',venue:'unknown',internet:'unknown',electricity:'unknown',water:'unknown',budgetBand:'unknown',accessibility:'',accessMode:'unknown',format:''}
 type Draft = typeof initial
 type Stage = 'request' | 'review' | 'programme'
@@ -40,7 +40,7 @@ function rowsToGoals(rows: RequirementRow[]): Goal[] {
 function StepProgress({stage}: {stage: Stage}) {
   const current = stepMeta.findIndex((s) => s.id === stage)
   return (
-    <div className="grid gap-2 text-xs sm:grid-cols-3 sm:text-sm">
+    <div className="grid gap-3 text-sm sm:grid-cols-3">
       {stepMeta.map((step, index) => {
         const complete = index < current
         const active = index === current
@@ -48,18 +48,18 @@ function StepProgress({stage}: {stage: Stage}) {
           <div
             key={step.id}
             className={cn(
-              'flex items-center gap-3 rounded-2xl border px-4 py-3 transition-all',
+              'flex items-center gap-3 rounded-3xl border px-5 py-4 transition-all duration-300',
               active
-                ? 'border-cyan/45 bg-cyan/10 text-foreground shadow-[0_0_34px_-22px_var(--cyan)]'
+                ? 'scale-[1.01] border-cyan/45 bg-cyan/10 text-foreground shadow-[0_0_38px_-22px_var(--cyan)]'
                 : complete
                   ? 'border-success/30 bg-success/10 text-success'
                   : 'border-white/10 bg-white/[0.03] text-muted-foreground',
             )}
           >
-            <span className={cn('grid h-7 w-7 place-items-center rounded-full border text-xs font-semibold', active ? 'border-cyan text-cyan' : complete ? 'border-success bg-success text-primary-foreground' : 'border-white/15')}>
+            <span className={cn('grid h-9 w-9 place-items-center rounded-full border text-xs font-semibold', active ? 'border-cyan text-cyan' : complete ? 'border-success bg-success text-primary-foreground' : 'border-white/15')}>
               {complete ? <Check className="size-3.5" /> : step.eyebrow}
             </span>
-            <span className="font-medium">{step.label}</span>
+            <span className="font-semibold">{step.label}</span>
           </div>
         )
       })}
@@ -68,7 +68,7 @@ function StepProgress({stage}: {stage: Stage}) {
 }
 
 function Field({label, children}: {label: string; children: React.ReactNode}) {
-  return <label className="block min-w-0 text-sm font-medium">{label}{children}</label>
+  return <label className="block min-w-0 text-base font-semibold">{label}{children}</label>
 }
 
 function SectionTitle({eyebrow, title, subtitle}: {eyebrow: string; title: string; subtitle: string}) {
@@ -76,8 +76,8 @@ function SectionTitle({eyebrow, title, subtitle}: {eyebrow: string; title: strin
     <div className="mb-5 flex flex-wrap items-start justify-between gap-3">
       <div>
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan">{eyebrow}</p>
-        <h2 className="mt-1 font-display text-xl font-semibold tracking-tight">{title}</h2>
-        <p className="mt-1 max-w-2xl text-sm text-muted-foreground">{subtitle}</p>
+        <h2 className="mt-1 font-display text-2xl font-semibold tracking-tight sm:text-3xl">{title}</h2>
+        <p className="mt-2 max-w-2xl text-base leading-7 text-muted-foreground">{subtitle}</p>
       </div>
     </div>
   )
@@ -192,12 +192,12 @@ export function ProgrammeConsultant() {
     const addLabel = kind === 'theme' ? '+ Add another theme' : '+ Add another objective'
     const filledCount = rows.filter((row) => row.value.trim().length > 0).length
     return (
-      <div className="min-w-0 rounded-2xl border border-white/10 bg-white/[0.025] p-4">
+      <div className="min-w-0 rounded-3xl border border-white/10 bg-white/[0.035] p-5">
         <div className="flex items-center justify-between gap-3">
-          <p className="text-sm font-semibold">{title}</p>
-          <span className="text-xs text-muted-foreground">{filledCount}/8</span>
+          <p className="text-lg font-semibold">{title}</p>
+          <span className="rounded-full border border-cyan/20 bg-cyan/10 px-3 py-1 text-sm font-semibold text-cyan">{filledCount}/8</span>
         </div>
-        <div className="mt-3 space-y-2">
+        <div className="mt-4 space-y-3">
           {rows.map((row, index) => (
             <div key={row.id} className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_minmax(13rem,auto)_auto]">
               <input
@@ -222,7 +222,7 @@ export function ProgrammeConsultant() {
               <button
                 type="button"
                 onClick={() => removeRequirementRow(kind, row.id)}
-                className="grid size-10 place-items-center rounded-xl border border-white/10 bg-white/[0.03] text-muted-foreground transition hover:border-danger/35 hover:text-danger focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danger/70"
+                className="grid size-12 place-items-center rounded-2xl border border-white/10 bg-white/[0.04] text-muted-foreground transition hover:border-danger/35 hover:bg-danger/10 hover:text-danger focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danger/70"
                 aria-label={`Remove ${kind} row ${index + 1}`}
                 title="Remove"
               >
@@ -234,7 +234,7 @@ export function ProgrammeConsultant() {
         {rows.length < 8 && (
           <button
             type="button"
-            className="mt-3 text-sm font-medium text-cyan transition hover:text-cyan/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan"
+            className="mt-4 rounded-full border border-cyan/25 bg-cyan/10 px-4 py-2 text-sm font-semibold text-cyan transition hover:-translate-y-0.5 hover:border-cyan/45 hover:bg-cyan/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan"
             onClick={() => addRequirementRow(kind)}
           >
             {addLabel}
@@ -353,16 +353,16 @@ export function ProgrammeConsultant() {
 
       <StepProgress stage={stage} />
 
-      <div aria-live="polite" className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
-        <span>{catalogueStatus}</span>
+      <div aria-live="polite" className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
+        <span className="rounded-full border border-cyan/20 bg-cyan/10 px-3 py-1 text-cyan">{catalogueStatus}</span>
         {catalogueError && <Button variant="outline" className="!h-8" onClick={() => void loadCatalogue()}>Retry catalogue</Button>}
       </div>
 
       {stage === 'request' && (
         <form onSubmit={(e) => { e.preventDefault(); reviewRequest() }} className="space-y-5">
-          <GlassCard strong className="animate-rise overflow-hidden p-5 sm:p-7">
-            <SectionTitle eyebrow="1 · Tell us what you need" title="Start with the essentials" subtitle="Start with the essentials. You can leave anything unknown." />
-            <div className="grid gap-4 xl:grid-cols-2">
+          <GlassCard strong className="animate-rise overflow-hidden p-6 shadow-[0_26px_90px_-60px_var(--cyan)] sm:p-9">
+            <SectionTitle eyebrow="1 · Tell us what you need" title="Start with the essentials" subtitle="Choose the programme goals, then add only the constraints you know. ORBIT will handle unknowns honestly in the review step." />
+            <div className="grid gap-5 xl:grid-cols-2">
               {requirementRows('theme', themeRows)}
               {requirementRows('objective', objectiveRows)}
             </div>
@@ -382,7 +382,7 @@ export function ProgrammeConsultant() {
               </Field>
               <p className="mt-2 text-xs text-muted-foreground">Optional context only — structured fields drive the evaluation.</p>
             </div>
-            <details className="group mt-5 rounded-2xl border border-white/10 bg-white/[0.02] p-4">
+            <details className="group mt-6 rounded-3xl border border-white/10 bg-white/[0.025] p-5">
               <summary className="flex cursor-pointer list-none items-center justify-between gap-3 font-medium">
                 More details & constraints
                 <ChevronDown className="size-4 transition-transform group-open:rotate-180" />
@@ -415,8 +415,8 @@ export function ProgrammeConsultant() {
               </details>
             </details>
             {error && <p role="alert" className="mt-4 rounded-xl border border-danger/30 bg-danger/10 p-4 text-sm text-danger">{error}</p>}
-            <div className="mt-6 flex flex-wrap items-center gap-4">
-              <button type="submit" className="cta-sheen inline-flex items-center justify-center gap-2 rounded-xl px-6 py-3.5 text-sm font-semibold text-primary-foreground transition-all hover:shadow-[0_0_34px_-4px_var(--violet)]">
+            <div className="mt-8 flex flex-wrap items-center gap-4">
+              <button type="submit" className="cta-sheen inline-flex items-center justify-center gap-2 rounded-2xl px-7 py-4 text-base font-semibold text-primary-foreground transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_0_38px_-4px_var(--violet)] active:translate-y-0">
                 Review Request <ArrowRight className="size-4" />
               </button>
             </div>
@@ -426,8 +426,13 @@ export function ProgrammeConsultant() {
 
       {stage === 'review' && (
         <div ref={reviewRef} tabIndex={-1} className="outline-none">
-          <GlassCard strong className="animate-rise p-5 sm:p-7">
-            <SectionTitle eyebrow="2 · ORBIT understood" title="Check the request before we build the programme" subtitle="Missing information stays visible. ORBIT will not treat unknowns as approvals." />
+          <GlassCard strong className="animate-rise overflow-hidden p-6 sm:p-9">
+            <div className="mb-7 flex flex-wrap items-center gap-5">
+              <span className="grid size-16 animate-pulse place-items-center rounded-full border border-success/40 bg-success/15 text-success shadow-[0_0_48px_-20px_var(--success)]">
+                <Check className="size-7" />
+              </span>
+              <SectionTitle eyebrow="2 · ORBIT understood" title="Check before we build the programme" subtitle="Confirm the request summary. Unknowns stay visible and will not be treated as approvals." />
+            </div>
             <Understanding request={requestSummary} compactUnknowns={unknownPrimary} />
             <div className="mt-5 flex flex-wrap gap-5 text-sm">
               <label className="flex items-center gap-2"><input type="checkbox" checked={localMode} onChange={(e) => { invalidate(); setLocalMode(e.target.checked) }}/>Use loaded-page local calculation</label>
@@ -435,9 +440,9 @@ export function ProgrammeConsultant() {
             </div>
             {(!online || localMode) && <p className="mt-3 flex gap-2 text-sm text-warning"><WifiOff className="size-4 shrink-0"/>Local computation uses the loaded catalogue. Inventory and operational evidence stay Unknown.</p>}
             {error && <p role="alert" className="mt-4 rounded-xl border border-danger/30 bg-danger/10 p-4 text-sm text-danger">{error}</p>}
-            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Button type="button" variant="outline" onClick={() => setStage('request')}><ArrowLeft className="size-4"/>Edit request</Button>
-              <Button type="button" size="lg" disabled={!bundle || busy} onClick={() => void evaluate()}>{busy ? <RefreshCw className="size-4 animate-spin"/> : <ArrowRight className="size-4"/>}{busy ? 'Building programme' : 'Build Programme'}</Button>
+              <Button type="button" size="lg" className="transition hover:-translate-y-0.5 active:translate-y-0" disabled={!bundle || busy} onClick={() => void evaluate()}>{busy ? <RefreshCw className="size-4 animate-spin"/> : <ArrowRight className="size-4"/>}{busy ? 'Building programme' : 'Build Programme'}</Button>
             </div>
           </GlassCard>
         </div>
