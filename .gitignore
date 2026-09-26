@@ -39,6 +39,8 @@ yarn-error.log*
 /backend/data/*.db-wal
 /backend/data/.ultralytics/
 /.benchmark-inputs/
+/aiic-final-day/
+/datasets/aiic-final-day*/
 
 # vercel
 .vercel
