@@ -1,0 +1,2 @@
+# B1 import/test tooling only; not required by Stage 1 or the runtime JSON consumer.
+openpyxl==3.1.5

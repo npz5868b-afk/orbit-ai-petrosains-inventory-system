@@ -1,0 +1,352 @@
+{
+  "schema": "B6-scenarios-v1",
+  "usage": "TEST INPUTS ONLY; never page defaults or operational evidence",
+  "cases": [
+    {
+      "id": "S1-original",
+      "scenario": 1,
+      "class": "A",
+      "label": "Original missing age + judge teamwork",
+      "inputSource": "Main Work Package five scenarios / B6 instruction; literal brief retained",
+      "explicitScenarioSettings": [
+        "Both themes critical, teamwork preference are explicit test priorities.",
+        "Limited internet represented as unstable; no inference of none or stable."
+      ],
+      "evidencePolicy": "Original B1 unchanged; no approved operational reviews. Successful raw HTTP inventory is not a physical count or future availability.",
+      "payload": {
+        "request": {
+          "brief": "200 secondary students; Sustainability + Robotics; indoor; 180 minutes; limited internet; medium budget. Judge variant adds teamwork.",
+          "audienceType": "Secondary school",
+          "ages": null,
+          "participants": 200,
+          "durationMin": 180,
+          "venue": "indoor",
+          "internet": "unstable",
+          "budgetBand": "Medium",
+          "themes": [
+            {
+              "text": "Sustainability",
+              "priority": "critical"
+            },
+            {
+              "text": "Robotics",
+              "priority": "critical"
+            }
+          ],
+          "objectives": [
+            {
+              "text": "Teamwork",
+              "priority": "preference"
+            }
+          ]
+        },
+        "search": {
+          "maxActivities": 2
+        }
+      }
+    },
+    {
+      "id": "S1-age-and-judge",
+      "scenario": 1,
+      "class": "A",
+      "label": "Explicit age and judge electricity, forced combination diagnostic",
+      "inputSource": "Main Work Package five scenarios / B6 instruction; literal brief retained",
+      "explicitScenarioSettings": [
+        "Age 12-14 is a scenario setting, not inferred from school type.",
+        "Electricity yes is the judge-brief variant; raw scenario has it unknown.",
+        "Selected ACT-001 + ACT-019 is a diagnostic, not a preselected correct answer."
+      ],
+      "evidencePolicy": "Original B1 unchanged; no approved operational reviews. Successful raw HTTP inventory is not a physical count or future availability.",
+      "payload": {
+        "request": {
+          "brief": "200 secondary students; Sustainability + Robotics; indoor; 180 minutes; limited internet; medium budget. Judge variant adds teamwork.",
+          "audienceType": "Secondary school",
+          "ages": "12-14",
+          "participants": 200,
+          "durationMin": 180,
+          "venue": "indoor",
+          "internet": "unstable",
+          "budgetBand": "Medium",
+          "themes": [
+            {
+              "text": "Sustainability",
+              "priority": "critical"
+            },
+            {
+              "text": "Robotics",
+              "priority": "critical"
+            }
+          ],
+          "objectives": [
+            {
+              "text": "Teamwork",
+              "priority": "preference"
+            }
+          ],
+          "electricity": "yes"
+        },
+        "search": {
+          "maxActivities": 2
+        },
+        "plan": {
+          "offeringIds": [
+            "ACT-001",
+            "ACT-019"
+          ]
+        }
+      }
+    },
+    {
+      "id": "S2-original",
+      "scenario": 2,
+      "class": "A",
+      "label": "Original primary input",
+      "inputSource": "Main Work Package five scenarios / B6 instruction; literal brief retained",
+      "explicitScenarioSettings": [
+        "Water critical / Creative Science preference explicitly chosen for this scenario."
+      ],
+      "evidencePolicy": "Original B1 unchanged; no approved operational reviews. Successful raw HTTP inventory is not a physical count or future availability.",
+      "payload": {
+        "request": {
+          "brief": "40 primary students; Water + Creative Science; no electricity; 90 minutes.",
+          "audienceType": "Primary school",
+          "ages": null,
+          "participants": 40,
+          "durationMin": 90,
+          "electricity": "no",
+          "themes": [
+            {
+              "text": "Water",
+              "priority": "critical"
+            },
+            {
+              "text": "Creative Science",
+              "priority": "preference"
+            }
+          ]
+        },
+        "search": {
+          "maxActivities": 2
+        }
+      }
+    },
+    {
+      "id": "S2-age",
+      "scenario": 2,
+      "class": "A",
+      "label": "Explicit primary age setting",
+      "inputSource": "Main Work Package five scenarios / B6 instruction; literal brief retained",
+      "explicitScenarioSettings": [
+        "Age 7-11 supplied only as a scenario setting."
+      ],
+      "evidencePolicy": "Original B1 unchanged; no approved operational reviews. Successful raw HTTP inventory is not a physical count or future availability.",
+      "payload": {
+        "request": {
+          "brief": "40 primary students; Water + Creative Science; no electricity; 90 minutes.",
+          "audienceType": "Primary school",
+          "ages": "7-11",
+          "participants": 40,
+          "durationMin": 90,
+          "electricity": "no",
+          "themes": [
+            {
+              "text": "Water",
+              "priority": "critical"
+            },
+            {
+              "text": "Creative Science",
+              "priority": "preference"
+            }
+          ]
+        },
+        "search": {
+          "maxActivities": 2
+        }
+      }
+    },
+    {
+      "id": "S3-original",
+      "scenario": 3,
+      "class": "A",
+      "label": "Short duration remains unknown",
+      "inputSource": "Main Work Package five scenarios / B6 instruction; literal brief retained",
+      "explicitScenarioSettings": [
+        "Literal Spectacular Chemistry is critical; not silently rewritten to Chemistry."
+      ],
+      "evidencePolicy": "Original B1 unchanged; no approved operational reviews. Successful raw HTTP inventory is not a physical count or future availability.",
+      "payload": {
+        "request": {
+          "brief": "500 public participants; Spectacular Chemistry; short duration; large audience.",
+          "audienceType": "Public",
+          "ages": null,
+          "participants": 500,
+          "durationMin": null,
+          "themes": [
+            {
+              "text": "Spectacular Chemistry",
+              "priority": "critical"
+            }
+          ]
+        },
+        "search": {
+          "maxActivities": 2
+        }
+      }
+    },
+    {
+      "id": "S3-30-min",
+      "scenario": 3,
+      "class": "A",
+      "label": "Explicit 30-minute stress window",
+      "inputSource": "Main Work Package five scenarios / B6 instruction; literal brief retained",
+      "explicitScenarioSettings": [
+        "30 minutes is a test setting, not a parsed meaning of short.",
+        "ACT-017 is explicitly selected to inspect known timing and audience constraints."
+      ],
+      "evidencePolicy": "Original B1 unchanged; no approved operational reviews. Successful raw HTTP inventory is not a physical count or future availability.",
+      "payload": {
+        "request": {
+          "brief": "500 public participants; Spectacular Chemistry; short duration; large audience.",
+          "audienceType": "Public",
+          "ages": null,
+          "participants": 500,
+          "durationMin": 30,
+          "themes": [
+            {
+              "text": "Spectacular Chemistry",
+              "priority": "critical"
+            }
+          ]
+        },
+        "search": {
+          "maxActivities": 2
+        },
+        "plan": {
+          "offeringIds": [
+            "ACT-017"
+          ]
+        }
+      }
+    },
+    {
+      "id": "S4-original",
+      "scenario": 4,
+      "class": "A",
+      "label": "Original preschool label, unknown age",
+      "inputSource": "Main Work Package five scenarios / B6 instruction; literal brief retained",
+      "explicitScenarioSettings": [
+        "IoT architecture critical is an explicit test interpretation grounded in ACT-011 Suitable_Objectives, not automatic free-text parsing."
+      ],
+      "evidencePolicy": "Original B1 unchanged; no approved operational reviews. Successful raw HTTP inventory is not a physical count or future availability.",
+      "payload": {
+        "request": {
+          "brief": "Preschool / very young learners requesting Arduino 300-like technical outcomes.",
+          "audienceType": "Preschool",
+          "ages": null,
+          "themes": [
+            {
+              "text": "Internet of Things",
+              "priority": "preference"
+            }
+          ],
+          "objectives": [
+            {
+              "text": "Introduce IoT architecture",
+              "priority": "critical"
+            }
+          ]
+        },
+        "search": {
+          "maxActivities": 2
+        },
+        "plan": {
+          "offeringIds": [
+            "ACT-011"
+          ]
+        }
+      }
+    },
+    {
+      "id": "S4-age",
+      "scenario": 4,
+      "class": "A",
+      "label": "Explicit young ages with retained technical objective",
+      "inputSource": "Main Work Package five scenarios / B6 instruction; literal brief retained",
+      "explicitScenarioSettings": [
+        "Age 3-5, 20 participants, 300 minutes are explicit test values.",
+        "Technical objective remains critical; a colourful activity is not an equivalent alternative."
+      ],
+      "evidencePolicy": "Original B1 unchanged; no approved operational reviews. Successful raw HTTP inventory is not a physical count or future availability.",
+      "payload": {
+        "request": {
+          "brief": "Preschool / very young learners requesting Arduino 300-like technical outcomes.",
+          "audienceType": "Preschool",
+          "ages": "3-5",
+          "themes": [
+            {
+              "text": "Internet of Things",
+              "priority": "preference"
+            }
+          ],
+          "objectives": [
+            {
+              "text": "Introduce IoT architecture",
+              "priority": "critical"
+            }
+          ],
+          "participants": 20,
+          "durationMin": 300
+        },
+        "search": {
+          "maxActivities": 2
+        },
+        "plan": {
+          "offeringIds": [
+            "ACT-011"
+          ]
+        }
+      }
+    },
+    {
+      "id": "S5-unapproved",
+      "scenario": 5,
+      "class": "A",
+      "label": "No real outage attestation supplied",
+      "inputSource": "Main Work Package five scenarios / B6 instruction; literal brief retained",
+      "explicitScenarioSettings": [
+        "All numeric values and age are scenario settings; both themes critical.",
+        "Do not promote a narrative outage claim to verified operational evidence. Class B separately supplies explicit synthetic outage facts."
+      ],
+      "evidencePolicy": "Original B1 unchanged; no approved operational reviews. Successful raw HTTP inventory is not a physical count or future availability.",
+      "payload": {
+        "request": {
+          "brief": "Multi-theme programme with a reported unavailable resource; no approved outage record has been supplied in class A.",
+          "audienceType": "Mixed test group",
+          "ages": "14-16",
+          "participants": 30,
+          "durationMin": 600,
+          "venue": "indoor",
+          "themes": [
+            {
+              "text": "Sustainability",
+              "priority": "critical"
+            },
+            {
+              "text": "Robotics",
+              "priority": "critical"
+            }
+          ]
+        },
+        "search": {
+          "maxActivities": 2
+        },
+        "plan": {
+          "offeringIds": [
+            "ACT-001",
+            "ACT-019"
+          ]
+        }
+      }
+    }
+  ]
+}

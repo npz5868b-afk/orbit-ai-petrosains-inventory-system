@@ -9,6 +9,7 @@ import {
   Boxes,
   Home,
   ScanLine,
+  Compass,
   Settings2,
   Wifi,
   WifiOff,
@@ -22,6 +23,7 @@ const NAV = [
   { href: '/', label: 'Home', icon: Home },
   { href: '/scan', label: 'Scan', icon: ScanLine },
   { href: '/inventory', label: 'Inventory', icon: Boxes },
+  { href: '/programme', label: 'Programme', icon: Compass },
   { href: '/activity', label: 'Activity', icon: Activity },
   { href: '/system', label: 'System', icon: Settings2 },
 ]

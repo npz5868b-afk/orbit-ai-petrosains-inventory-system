@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "lib": ["ES2022"],
+    "types": [],
+    "strict": true,
+    "noEmitOnError": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "forceConsistentCasingInFileNames": true,
+    "rootDir": "../../lib/programmes",
+    "outDir": "../../.test-tmp/programmes-core"
+  },
+  "include": ["../../lib/programmes/**/*.ts"],
+  "exclude": ["../../lib/programmes/server"]
+}
