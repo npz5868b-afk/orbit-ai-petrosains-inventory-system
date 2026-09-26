@@ -81,6 +81,13 @@ export async function fetchInventoryFromApi(): Promise<InventoryItem[]> {
   return response.items.map(mapApiInventoryItem)
 }
 
+export async function fetchInventoryForStoreFromApi(storeId: string): Promise<InventoryItem[]> {
+  const response = await request<{ items: ApiInventoryItem[] }>(
+    `/inventory?limit=250&store_id=${encodeURIComponent(storeId)}`,
+  )
+  return response.items.map(mapApiInventoryItem)
+}
+
 export async function fetchInventoryItemFromApi(itemId: string): Promise<InventoryItem> {
   return mapApiInventoryItem(await request<ApiInventoryItem>(`/inventory/${encodeURIComponent(itemId)}`))
 }
@@ -201,14 +208,29 @@ export function resolveScanReview(
   detectionId: string,
   selectedItemId: string,
   quantity: number,
+  action: 'confirm' | 'choose_another' = 'confirm',
 ) {
   return request<ApiScan>(`/scans/${encodeURIComponent(scanId)}/reviews/${encodeURIComponent(detectionId)}`, {
     method: 'POST',
     body: JSON.stringify({
-      action: 'confirm',
+      action,
       selected_item_id: selectedItemId,
       quantity,
-      reason: 'Confirmed in ORBIT AI review screen',
+      reason: action === 'choose_another'
+        ? 'Selected manually from the verified inventory catalogue'
+        : 'Confirmed in ORBIT AI review screen',
+      reviewed_by: 'Demo User',
+    }),
+  })
+}
+
+export function addManualReturnItem(scanId: string, selectedItemId: string, quantity: number) {
+  return request<ApiScan>(`/scans/${encodeURIComponent(scanId)}/manual-items`, {
+    method: 'POST',
+    body: JSON.stringify({
+      selected_item_id: selectedItemId,
+      quantity,
+      reason: 'Added manually from the verified inventory catalogue',
       reviewed_by: 'Demo User',
     }),
   })

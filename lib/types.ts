@@ -6,7 +6,7 @@ export type ActivityType = 'check-out' | 'return' | 'issue'
 export type ActivityStatus = 'synced' | 'offline' | 'review'
 export type StoreConnectionStatus = 'online' | 'offline'
 export type SyncStatus = 'online' | 'offline' | 'saved-offline' | 'syncing' | 'restored' | 'up-to-date' | 'failed'
-export type DetectionStatus = 'ready' | 'review' | 'reviewed'
+export type DetectionStatus = 'ready' | 'review' | 'reviewed' | 'manual'
 
 export type InventoryItem = {
   id: string

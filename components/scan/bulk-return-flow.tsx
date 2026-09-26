@@ -8,6 +8,8 @@ import {
   previewBulkReturnStockUpdate,
 } from '@/lib/services/scan-service'
 import {
+  addManualReturnItem,
+  fetchInventoryForStoreFromApi,
   notifyInventoryUpdated,
   resolveScanReview,
   startBulkScan,
@@ -16,7 +18,8 @@ import {
   type TransactionResponse,
 } from '@/lib/api-client'
 import { submitOrQueue } from '@/lib/offline-queue'
-import type { BulkReturnItem, ReviewCandidate } from '@/lib/types'
+import { getInventory } from '@/lib/services/inventory-service'
+import type { BulkReturnItem, InventoryItem, ReviewCandidate } from '@/lib/types'
 import { cn } from '@/lib/utils'
 import {
   ArrowRight,
@@ -25,7 +28,9 @@ import {
   ChevronDown,
   Clock3,
   PackageCheck,
+  Plus,
   RefreshCw,
+  Search,
   Sparkles,
   TriangleAlert,
 } from 'lucide-react'
@@ -39,14 +44,23 @@ const BULK_RETURN_STATE_KEY = 'orbit-ai:bulk-return-state:v1'
 function scanItemsToBulkReturnItems(scan: ApiScan): BulkReturnItem[] {
   return scan.items
     .filter((item) => item.status !== 'rejected')
-    .map((item) => ({
-      id: item.detection_id,
-      itemCode: item.item?.sku ?? 'UNKNOWN',
-      itemName: item.item?.name ?? 'Unknown item',
-      quantity: item.quantity,
-      confidence: Math.round(item.confidence * 100),
-      status: item.status === 'review_needed' ? 'review' : item.status === 'resolved' ? 'reviewed' : 'ready',
-    }))
+    .map((item) => {
+      const manual = item.status === 'resolved' && item.confidence === 0
+      return {
+        id: item.detection_id,
+        itemCode: item.item?.sku ?? 'UNKNOWN',
+        itemName: item.item?.name ?? 'Unknown item',
+        quantity: item.quantity,
+        confidence: Math.round(item.confidence * 100),
+        status: manual
+          ? 'manual'
+          : item.status === 'review_needed'
+            ? 'review'
+            : item.status === 'resolved'
+              ? 'reviewed'
+              : 'ready',
+      }
+    })
 }
 
 function getReviewCandidatesForLine(
@@ -82,11 +96,23 @@ function aggregateReturnItemsBySku(items: BulkReturnItem[]): BulkReturnItem[] {
     }
     existing.quantity += item.quantity
     existing.confidence = Math.max(existing.confidence, item.confidence)
-    existing.status = existing.status === 'reviewed' || item.status === 'reviewed'
-      ? 'reviewed'
-      : existing.status
+    existing.status = mergeDetectionStatus(existing.status, item.status)
   }
   return Array.from(bySku.values())
+}
+
+function mergeDetectionStatus(
+  current: BulkReturnItem['status'],
+  next: BulkReturnItem['status'],
+): BulkReturnItem['status'] {
+  if (current === 'reviewed' || next === 'reviewed') return 'reviewed'
+  if (current === 'manual' || next === 'manual') return 'manual'
+  if (current === 'review' || next === 'review') return 'review'
+  return 'ready'
+}
+
+function storeOneInventoryFallback() {
+  return getInventory().filter((item) => item.location.toLowerCase().startsWith('store 1'))
 }
 
 export function BulkReturnFlow({
@@ -107,6 +133,11 @@ export function BulkReturnFlow({
   const [scanImageUrl, setScanImageUrl] = useState<string | null>(null)
   const [cameraLive, setCameraLive] = useState(false)
   const [cameraError, setCameraError] = useState<string | null>(null)
+  const [manualPickerOpen, setManualPickerOpen] = useState(false)
+  const [manualTargetDetectionId, setManualTargetDetectionId] = useState<string | null>(null)
+  const [manualInventory, setManualInventory] = useState<InventoryItem[]>([])
+  const [manualLoading, setManualLoading] = useState(false)
+  const [manualError, setManualError] = useState<string | null>(null)
   const [hydrated, setHydrated] = useState(false)
   const transactionId = useRef<string | null>(null)
   const videoRef = useRef<HTMLVideoElement | null>(null)
@@ -251,6 +282,8 @@ export function BulkReturnFlow({
     setStage('scanning')
     setRevealed(0)
     setError(null)
+    setManualPickerOpen(false)
+    setManualTargetDetectionId(null)
     try {
       const nextScan = await startBulkScan(image)
       setScan(nextScan)
@@ -288,6 +321,52 @@ export function BulkReturnFlow({
       setStage(nextItems.some((item) => item.status === 'review') ? 'review' : 'summary')
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Review could not be saved')
+    }
+  }
+
+  async function openManualPicker(detectionId: string | null = null) {
+    setManualTargetDetectionId(detectionId)
+    setManualPickerOpen(true)
+    setManualError(null)
+    if (manualInventory.length) return
+    setManualLoading(true)
+    try {
+      setManualInventory(await fetchInventoryForStoreFromApi('store-1'))
+    } catch {
+      setManualInventory(storeOneInventoryFallback())
+      setManualError('Showing the saved Store 1 catalogue while the live catalogue is unavailable.')
+    } finally {
+      setManualLoading(false)
+    }
+  }
+
+  async function addManualItem(item: InventoryItem, quantity: number) {
+    if (!scan) return
+    setError(null)
+    setManualError(null)
+    try {
+      const updated = manualTargetDetectionId
+        ? await resolveScanReview(
+            scan.scan_session_id,
+            manualTargetDetectionId,
+            item.id,
+            quantity,
+            'choose_another',
+          )
+        : await addManualReturnItem(scan.scan_session_id, item.id, quantity)
+      const nextItems = scanItemsToBulkReturnItems(updated)
+      setScan(updated)
+      setDetectedItems(nextItems)
+      setManualPickerOpen(false)
+      setManualTargetDetectionId(null)
+      setRevealed(nextItems.length)
+      if (manualTargetDetectionId) {
+        setStage(nextItems.some((line) => line.status === 'review') ? 'review' : 'summary')
+      } else {
+        setStage('found')
+      }
+    } catch (cause) {
+      setManualError(cause instanceof Error ? cause.message : 'Manual item could not be added')
     }
   }
 
@@ -464,6 +543,16 @@ export function BulkReturnFlow({
                     </p>
                   </div>
                 </div>
+              ) : detectedItems.length === 0 && stage === 'found' ? (
+                <div className="grid min-h-[250px] flex-1 place-items-center rounded-xl border border-warning/25 bg-warning/[0.045] py-10 text-center">
+                  <div className="max-w-xs px-4">
+                    <TriangleAlert className="mx-auto h-6 w-6 text-warning" />
+                    <p className="mt-2 text-sm font-medium">No trained item detected.</p>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      No inventory changes were made. Add the returned item from the verified catalogue.
+                    </p>
+                  </div>
+                </div>
               ) : (
                 detectedItems.slice(0, revealedCount).map((item, i) => (
                   <div
@@ -472,7 +561,9 @@ export function BulkReturnFlow({
                       'animate-rise premium-hover rounded-2xl border p-3.5',
                       item.status === 'ready'
                         ? 'border-success/18 bg-success/[0.045]'
-                        : 'border-warning/30 bg-warning/[0.055]',
+                        : item.status === 'manual'
+                          ? 'border-cyan/25 bg-cyan/[0.055]'
+                          : 'border-warning/30 bg-warning/[0.055]',
                     )}
                     style={{ animationDelay: `${i * 70}ms` }}
                   >
@@ -482,10 +573,12 @@ export function BulkReturnFlow({
                           'grid h-10 w-10 shrink-0 place-items-center rounded-xl',
                           item.status === 'ready'
                             ? 'bg-success/15 text-success'
-                            : 'bg-warning/15 text-warning',
+                            : item.status === 'manual'
+                              ? 'bg-cyan/15 text-cyan'
+                              : 'bg-warning/15 text-warning',
                         )}
                       >
-                        {item.status === 'ready' ? (
+                        {item.status === 'ready' || item.status === 'manual' ? (
                           <Check className="h-4 w-4" />
                         ) : (
                           <TriangleAlert className="h-4 w-4" />
@@ -500,8 +593,8 @@ export function BulkReturnFlow({
                             </p>
                           </div>
                           <StatusPill
-                            label={item.status === 'ready' ? 'Ready' : 'Review Needed'}
-                            tone={item.status === 'ready' ? 'success' : 'warning'}
+                            label={item.status === 'ready' ? 'Ready' : item.status === 'manual' ? 'Manual' : 'Review Needed'}
+                            tone={item.status === 'ready' ? 'success' : item.status === 'manual' ? 'cyan' : 'warning'}
                           />
                         </div>
                         <div className="mt-3 grid grid-cols-2 gap-2">
@@ -514,10 +607,14 @@ export function BulkReturnFlow({
                             <p
                               className={cn(
                                 'font-display text-lg font-semibold',
-                                item.status === 'ready' ? 'text-success' : 'text-warning',
+                                item.status === 'ready'
+                                  ? 'text-success'
+                                  : item.status === 'manual'
+                                    ? 'text-cyan'
+                                    : 'text-warning',
                               )}
                             >
-                              {item.confidence}%
+                              {item.status === 'manual' ? 'Manual' : `${item.confidence}%`}
                             </p>
                           </div>
                         </div>
@@ -529,13 +626,34 @@ export function BulkReturnFlow({
             </div>
 
             {stage === 'found' && (
-              <button
-                onClick={() => setStage(reviewItems.length ? 'review' : 'summary')}
-                className="cta-sheen-cyan mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold text-primary-foreground transition-all hover:shadow-[0_0_30px_-4px_var(--cyan)]"
-              >
-                {reviewItems.length ? `Review ${reviewItems.length} item` : 'Continue to Summary'}
-                <ArrowRight className="h-4 w-4" />
-              </button>
+              <div className="mt-4 flex flex-col gap-2">
+                {detectedItems.length === 0 ? (
+                  <button
+                    onClick={() => void openManualPicker()}
+                    className="cta-sheen-cyan inline-flex w-full items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold text-primary-foreground transition-all hover:shadow-[0_0_30px_-4px_var(--cyan)]"
+                  >
+                    <Plus className="h-4 w-4" />
+                    Add Item Manually
+                  </button>
+                ) : (
+                  <>
+                    <button
+                      onClick={() => setStage(reviewItems.length ? 'review' : 'summary')}
+                      className="cta-sheen-cyan inline-flex w-full items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold text-primary-foreground transition-all hover:shadow-[0_0_30px_-4px_var(--cyan)]"
+                    >
+                      {reviewItems.length ? `Review ${reviewItems.length} item` : 'Continue to Summary'}
+                      <ArrowRight className="h-4 w-4" />
+                    </button>
+                    <button
+                      onClick={() => void openManualPicker()}
+                      className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-border bg-secondary/60 px-5 py-3 text-sm font-medium transition-colors hover:text-cyan"
+                    >
+                      <Plus className="h-4 w-4" />
+                      Add Item Manually
+                    </button>
+                  </>
+                )}
+              </div>
             )}
           </GlassCard>
         </div>
@@ -550,16 +668,33 @@ export function BulkReturnFlow({
           reviewIndex={Math.min(reviewedCount + 1, reviewTotal)}
           reviewTotal={reviewTotal}
           onConfirm={(candidate, quantity) => confirmReview(currentReviewItem.id, candidate, quantity)}
+          onAddManually={() => void openManualPicker(currentReviewItem.id)}
           onScanAgain={() => {
             stopCameraStream()
             clearScanTimers()
             localStorage.removeItem(BULK_RETURN_STATE_KEY)
             setScan(null)
+            setManualPickerOpen(false)
+            setManualTargetDetectionId(null)
             setRevealed(0)
             setStage('camera')
           }}
           imageUrl={scanImageUrl}
-/>
+        />
+      )}
+
+      {manualPickerOpen && scan && stage !== 'updated' && (
+        <ManualItemPicker
+          items={manualInventory}
+          loading={manualLoading}
+          error={manualError}
+          replacing={Boolean(manualTargetDetectionId)}
+          onAdd={(item, quantity) => void addManualItem(item, quantity)}
+          onClose={() => {
+            setManualPickerOpen(false)
+            setManualTargetDetectionId(null)
+          }}
+        />
       )}
 
       {stage === 'summary' && (
@@ -635,6 +770,7 @@ function ReviewNeeded({
   reviewIndex,
   reviewTotal,
   onConfirm,
+  onAddManually,
   onScanAgain,
   imageUrl,
 }: {
@@ -644,6 +780,7 @@ function ReviewNeeded({
   reviewIndex: number
   reviewTotal: number
   onConfirm: (candidate: ReviewCandidate, quantity: number) => void | Promise<void>
+  onAddManually: () => void
   onScanAgain: () => void
   imageUrl?: string | null
 }) {
@@ -816,7 +953,7 @@ function ReviewNeeded({
             </ul>
           )}
 
-          <div className="mt-5 grid gap-2.5 sm:grid-cols-3">
+          <div className="mt-5 grid gap-2.5 sm:grid-cols-2 lg:grid-cols-4">
             <button
               onClick={() => onConfirm(selected, quantity)}
               className="cta-sheen-cyan inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold text-primary-foreground transition-all hover:shadow-[0_0_30px_-4px_var(--cyan)]"
@@ -831,6 +968,13 @@ function ReviewNeeded({
               Choose Another Item
             </button>
             <button
+              onClick={onAddManually}
+              className="inline-flex items-center justify-center gap-2 rounded-xl border border-border bg-secondary/60 px-5 py-3 text-sm font-medium transition-colors hover:text-cyan"
+            >
+              <Plus className="h-4 w-4" />
+              Add Manually
+            </button>
+            <button
               onClick={onScanAgain}
               className="inline-flex items-center justify-center gap-2 rounded-xl border border-border bg-secondary/60 px-5 py-3 text-sm font-medium transition-colors hover:text-cyan"
             >
@@ -839,6 +983,162 @@ function ReviewNeeded({
             </button>
           </div>
         </div>
+      </div>
+    </GlassCard>
+  )
+}
+
+function ManualItemPicker({
+  items,
+  loading,
+  error,
+  replacing,
+  onAdd,
+  onClose,
+}: {
+  items: InventoryItem[]
+  loading: boolean
+  error: string | null
+  replacing: boolean
+  onAdd: (item: InventoryItem, quantity: number) => void | Promise<void>
+  onClose: () => void
+}) {
+  const [query, setQuery] = useState('')
+  const [quantity, setQuantity] = useState(1)
+  const [selectedId, setSelectedId] = useState('')
+  const filtered = items
+    .filter((item) => {
+      const term = query.trim().toLowerCase()
+      return !term || item.name.toLowerCase().includes(term) || item.code.toLowerCase().includes(term)
+    })
+    .slice(0, 8)
+  const selected = items.find((item) => item.id === selectedId) ?? filtered[0] ?? null
+  const safeQuantity = Math.max(1, quantity)
+
+  return (
+    <GlassCard strong className="mx-auto mt-5 max-w-4xl animate-rise p-5">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h3 className="font-display text-base font-semibold">Add Item Manually</h3>
+          <p className="text-sm text-muted-foreground">
+            {replacing
+              ? 'Select the correct catalogue item for this review.'
+              : 'Use this when the trained AI classes do not detect the returned item.'}
+          </p>
+        </div>
+        <StatusPill label="Verified catalogue only" tone="cyan" />
+      </div>
+
+      <div className="mt-4 grid gap-3 md:grid-cols-[1fr_auto]">
+        <label className="relative block">
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <input
+            value={query}
+            onChange={(event) => {
+              setQuery(event.target.value)
+              setSelectedId('')
+            }}
+            placeholder="Search item or SKU..."
+            className="h-11 w-full rounded-xl border border-border bg-secondary/45 pl-10 pr-3 text-sm outline-none transition focus:border-cyan/50"
+          />
+        </label>
+        <div className="flex items-center rounded-xl border border-border bg-secondary/45 p-1">
+          <button
+            type="button"
+            onClick={() => setQuantity((value) => Math.max(1, value - 1))}
+            aria-label="Decrease manual quantity"
+            className="grid h-9 w-9 place-items-center rounded-lg text-lg font-semibold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+          >
+            -
+          </button>
+          <input
+            type="number"
+            min={1}
+            value={safeQuantity}
+            onChange={(event) => {
+              const parsed = Number.parseInt(event.target.value, 10)
+              setQuantity(Number.isFinite(parsed) ? Math.max(1, parsed) : 1)
+            }}
+            aria-label="Manual quantity"
+            className="h-9 w-14 bg-transparent text-center font-display text-base font-semibold text-foreground outline-none"
+          />
+          <button
+            type="button"
+            onClick={() => setQuantity((value) => value + 1)}
+            aria-label="Increase manual quantity"
+            className="grid h-9 w-9 place-items-center rounded-lg text-lg font-semibold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+          >
+            +
+          </button>
+        </div>
+      </div>
+
+      {error && (
+        <p className="mt-3 rounded-xl border border-warning/30 bg-warning/10 px-3 py-2 text-xs text-warning">
+          {error}
+        </p>
+      )}
+
+      <div className="mt-4 grid gap-2">
+        {loading ? (
+          <div className="rounded-xl border border-border bg-secondary/30 p-4 text-sm text-muted-foreground">
+            Loading verified inventory catalogue...
+          </div>
+        ) : filtered.length ? (
+          filtered.map((item) => (
+            <button
+              key={item.id}
+              type="button"
+              onClick={() => setSelectedId(item.id)}
+              className={cn(
+                'rounded-xl border p-3 text-left transition-all',
+                selected?.id === item.id
+                  ? 'border-cyan/50 bg-cyan/10'
+                  : 'border-border bg-secondary/35 hover:border-cyan/30',
+              )}
+            >
+              <div className="flex items-center justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-semibold">{item.name}</p>
+                  <p className="mt-0.5 font-mono text-[11px] text-muted-foreground">
+                    {item.code} · {item.rack}
+                  </p>
+                </div>
+                <span
+                  className={cn(
+                    'grid h-5 w-5 shrink-0 place-items-center rounded-full border',
+                    selected?.id === item.id ? 'border-cyan bg-cyan text-primary-foreground' : 'border-border',
+                  )}
+                >
+                  {selected?.id === item.id && <Check className="h-3 w-3" />}
+                </span>
+              </div>
+            </button>
+          ))
+        ) : (
+          <div className="rounded-xl border border-border bg-secondary/30 p-4 text-sm text-muted-foreground">
+            No inventory item found. Try another SKU or item name.
+          </div>
+        )}
+      </div>
+
+      <div className="mt-4 flex flex-col gap-2 sm:flex-row">
+        <button
+          type="button"
+          disabled={!selected || loading}
+          onClick={() => selected && void onAdd(selected, safeQuantity)}
+          className="cta-sheen-cyan inline-flex flex-1 items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold text-primary-foreground transition-all enabled:hover:shadow-[0_0_30px_-4px_var(--cyan)] disabled:opacity-40"
+        >
+          <Plus className="h-4 w-4" />
+          Add Selected Item
+        </button>
+        <button
+          type="button"
+          onClick={onClose}
+          className="inline-flex flex-1 items-center justify-center rounded-xl border border-border bg-secondary/60 px-5 py-3 text-sm font-medium transition-colors hover:text-cyan"
+        >
+          Cancel
+        </button>
       </div>
     </GlassCard>
   )
@@ -856,6 +1156,7 @@ function ReturnSummary({
   submitting: boolean
 }) {
   const reviewedCount = items.filter((item) => item.status === 'reviewed').length
+  const manualCount = items.filter((item) => item.status === 'manual').length
 
   return (
     <GlassCard strong className="mx-auto max-w-2xl animate-rise overflow-hidden p-6">
@@ -864,7 +1165,10 @@ function ReturnSummary({
           <h3 className="font-display text-lg font-semibold">Return Summary</h3>
           <p className="text-sm text-muted-foreground">Review before you confirm the return.</p>
         </div>
-        {reviewedCount > 0 && <StatusPill label={`${reviewedCount} reviewed`} tone="warning" />}
+        <div className="flex flex-wrap gap-2">
+          {reviewedCount > 0 && <StatusPill label={`${reviewedCount} reviewed`} tone="warning" />}
+          {manualCount > 0 && <StatusPill label={`${manualCount} manual`} tone="cyan" />}
+        </div>
       </div>
 
       <div className="mt-5 flex flex-col gap-2.5">
@@ -875,7 +1179,9 @@ function ReturnSummary({
               'flex items-center justify-between gap-4 rounded-xl border p-3.5',
               item.status === 'reviewed'
                 ? 'border-warning/25 bg-warning/[0.045]'
-                : 'border-border bg-secondary/40',
+                : item.status === 'manual'
+                  ? 'border-cyan/25 bg-cyan/[0.045]'
+                  : 'border-border bg-secondary/40',
             )}
           >
             <div className="min-w-0">
@@ -883,6 +1189,11 @@ function ReturnSummary({
               {item.status === 'reviewed' && (
                 <span className="mt-0.5 block text-xs text-warning">
                   Reviewed · {item.confidence}%
+                </span>
+              )}
+              {item.status === 'manual' && (
+                <span className="mt-0.5 block text-xs text-cyan">
+                  Added manually
                 </span>
               )}
             </div>

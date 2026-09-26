@@ -16,6 +16,7 @@ from .config import Settings, get_settings
 from .database import connect
 from .detectors import build_detector
 from .domain import (
+    add_manual_detection,
     apply_checkout,
     apply_return,
     canonical_hash,
@@ -29,7 +30,7 @@ from .domain import (
     resolve_review,
 )
 from .errors import OrbitError, orbit_error_handler
-from .schemas import CheckoutRequest, ReturnRequest, ReviewRequest, ScanRequest, SyncRequest
+from .schemas import CheckoutRequest, ManualDetectionRequest, ReturnRequest, ReviewRequest, ScanRequest, SyncRequest
 from .seed import seed_database
 
 
@@ -216,6 +217,10 @@ def create_app(settings: Settings | None = None, detector=None) -> FastAPI:
     @app.post("/api/scans/{scan_session_id}/reviews/{detection_id}")
     def scans_review(scan_session_id: str, detection_id: str, payload: ReviewRequest):
         return resolve_review(settings.database_path, scan_session_id, detection_id, payload)
+
+    @app.post("/api/scans/{scan_session_id}/manual-items")
+    def scans_manual_item(scan_session_id: str, payload: ManualDetectionRequest):
+        return add_manual_detection(settings.database_path, scan_session_id, payload)
 
     @app.post("/api/transactions/checkout")
     def checkout(payload: CheckoutRequest):

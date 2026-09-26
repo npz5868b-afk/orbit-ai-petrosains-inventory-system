@@ -123,6 +123,35 @@ def test_unknown_can_be_rejected_and_empty_scan_is_safe(client):
     assert empty["summary"]["detected_quantity"] == 0
 
 
+def test_empty_scan_can_add_verified_manual_item_before_return(client):
+    scan = start_scan(client, "empty")
+    before = client.get("/api/inventory/item-t003").json()["available_quantity"]
+
+    manual = client.post(
+        f"/api/scans/{scan['scan_session_id']}/manual-items",
+        json={
+            "selected_item_id": "item-t003",
+            "quantity": 1,
+            "reason": "Manual fallback selected after no trained item detection",
+            "reviewed_by": "Demo User",
+        },
+    )
+    assert manual.status_code == 200, manual.text
+    body = manual.json()
+    assert body["status"] == "ready"
+    assert body["summary"]["detected_quantity"] == 1
+    assert body["items"][0]["item"]["sku"] == "T003"
+    assert body["items"][0]["status"] == "resolved"
+    assert body["items"][0]["confidence"] == 0
+    assert body["items"][0]["why"] == ["Added manually from the verified inventory catalogue"]
+
+    payload = return_payload(body, "manual-return-001")
+    response = client.post("/api/transactions/returns", json=payload)
+    assert response.status_code == 200, response.text
+    assert response.json()["total_items_returned"] == 1
+    assert client.get("/api/inventory/item-t003").json()["available_quantity"] == before + 1
+
+
 def test_detector_and_upload_failures_do_not_change_inventory(client):
     before = client.get("/api/inventory/item-t003").json()["available_quantity"]
     unavailable = client.post("/api/scans", json={"store_id": "store-1", "fixture": "unavailable"})

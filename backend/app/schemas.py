@@ -51,6 +51,13 @@ class ReviewRequest(StrictModel):
     reviewed_by: str | None = Field(default=None, max_length=120)
 
 
+class ManualDetectionRequest(StrictModel):
+    selected_item_id: str
+    quantity: int = Field(gt=0)
+    reason: str | None = Field(default=None, max_length=500)
+    reviewed_by: str | None = Field(default=None, max_length=120)
+
+
 class SyncOperation(StrictModel):
     client_transaction_id: str
     type: Literal["checkout", "return"]

@@ -13,7 +13,7 @@ from .config import Settings
 from .database import connect, json_value, transaction
 from .detectors.base import Detector
 from .errors import OrbitError, bad_request, conflict, not_found
-from .schemas import CheckoutRequest, ReturnRequest, ReviewRequest, ScanRequest
+from .schemas import CheckoutRequest, ManualDetectionRequest, ReturnRequest, ReviewRequest, ScanRequest
 
 
 def utc_now() -> str:
@@ -427,6 +427,71 @@ def resolve_review(db_path: Path, scan_id: str, detection_id: str, request: Revi
         )
         unresolved = db.execute(
             "SELECT COUNT(*) FROM detections WHERE scan_session_id = ? AND status IN ('review','unknown')", (scan_id,)
+        ).fetchone()[0]
+        db.execute("UPDATE scan_sessions SET status = ? WHERE id = ?", ("review" if unresolved else "ready", scan_id))
+        return _scan_response(db, scan_id)
+
+
+def add_manual_detection(db_path: Path, scan_id: str, request: ManualDetectionRequest) -> dict:
+    with transaction(db_path) as db:
+        scan = db.execute("SELECT * FROM scan_sessions WHERE id = ?", (scan_id,)).fetchone()
+        if not scan:
+            raise not_found("SCAN_NOT_FOUND", f"Scan session {scan_id!r} was not found")
+        if scan["status"] == "confirmed" or scan["confirmed_transaction_id"]:
+            raise conflict("SCAN_ALREADY_CONFIRMED", "This scan has already updated inventory")
+        if scan["mode"] != "bulk_return":
+            raise bad_request("INVALID_REQUEST", "Manual return items can only be added to a Bulk Return scan")
+        if scan["expires_at"] < utc_now():
+            db.execute("UPDATE scan_sessions SET status = 'expired' WHERE id = ?", (scan_id,))
+            raise OrbitError(410, "SCAN_EXPIRED", "This scan expired. Please scan the items again.")
+
+        item = db.execute(
+            "SELECT id FROM inventory_items WHERE id = ? AND store_id = ? AND is_active = 1",
+            (request.selected_item_id, scan["store_id"]),
+        ).fetchone()
+        if not item:
+            raise not_found(
+                "ITEM_NOT_FOUND",
+                f"Inventory item {request.selected_item_id!r} was not found for this store",
+            )
+
+        detection_id = new_id("det")
+        metadata = {
+            "source": "manual_catalog_selection",
+            "inventory_changed": False,
+        }
+        db.execute(
+            """
+            INSERT INTO detections (id, scan_session_id, predicted_class, inventory_item_id,
+                quantity, confidence, bbox, status, possible_matches, why, raw_metadata)
+            VALUES (?, ?, 'manual', ?, ?, 0, NULL, 'resolved', '[]', ?, ?)
+            """,
+            (
+                detection_id,
+                scan_id,
+                request.selected_item_id,
+                request.quantity,
+                json.dumps(["Added manually from the verified inventory catalogue"]),
+                json.dumps(metadata),
+            ),
+        )
+        db.execute(
+            """
+            INSERT INTO review_decisions (id, detection_id, selected_item_id, action, original_confidence,
+                reason, reviewed_by, created_at) VALUES (?, ?, ?, 'choose_another', 0, ?, ?, ?)
+            """,
+            (
+                new_id("review"),
+                detection_id,
+                request.selected_item_id,
+                request.reason or "Added manually from the verified inventory catalogue",
+                request.reviewed_by,
+                utc_now(),
+            ),
+        )
+        unresolved = db.execute(
+            "SELECT COUNT(*) FROM detections WHERE scan_session_id = ? AND status IN ('review','unknown')",
+            (scan_id,),
         ).fetchone()[0]
         db.execute("UPDATE scan_sessions SET status = ? WHERE id = ?", ("review" if unresolved else "ready", scan_id))
         return _scan_response(db, scan_id)
