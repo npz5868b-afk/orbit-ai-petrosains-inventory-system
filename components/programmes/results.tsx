@@ -28,6 +28,10 @@ function statusText(status: string) {
   return 'Needs verification'
 }
 
+function priorityLabel(priority: 'critical' | 'preference') {
+  return priority === 'critical' ? 'Critical' : 'Preference'
+}
+
 export function Understanding({request: r, compactUnknowns = []}: {request: Request; compactUnknowns?: string[]}) {
   const cards = [
     ['Participants', r.participants],
@@ -35,8 +39,8 @@ export function Understanding({request: r, compactUnknowns = []}: {request: Requ
     ['Duration', r.durationMin === null ? null : `${r.durationMin} min`],
   ]
   const tags = [
-    ...r.themes.map((g) => g.text),
-    ...r.objectives.map((g) => g.text),
+    ...r.themes.map((g) => `Theme: ${g.text} (${priorityLabel(g.priority)})`),
+    ...r.objectives.map((g) => `Objective: ${g.text} (${priorityLabel(g.priority)})`),
     r.venue !== 'unknown' ? shown(r.venue) : '',
     r.internet !== 'unknown' ? `Internet: ${shown(r.internet)}` : '',
   ].filter(Boolean)

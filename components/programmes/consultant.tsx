@@ -28,6 +28,10 @@ function formatAge(ages: ReturnType<typeof normalizeRequest>['request']['ages'])
   return ages ? `${ages.min}${ages.max === null ? '+' : `–${ages.max}`}` : 'Unknown'
 }
 
+function priorityLabel(priority: Goal['priority']) {
+  return priority === 'critical' ? 'Critical' : 'Preference'
+}
+
 function StepProgress({stage}: {stage: Stage}) {
   const current = stepMeta.findIndex((s) => s.id === stage)
   return (
@@ -168,11 +172,12 @@ export function ProgrammeConsultant() {
               title="Remove"
             >
               {goal.text}
+              <span className="ml-1 text-[10px] font-semibold uppercase tracking-wide opacity-75">· {priorityLabel(goal.priority)}</span>
             </button>
           ))}
           {values.length === 0 && <span className="text-xs text-muted-foreground">Unknown until added</span>}
         </div>
-        <div className="mt-3 grid gap-2 sm:grid-cols-[1fr_auto_auto]">
+        <div className="mt-3 grid gap-2 sm:grid-cols-[minmax(0,1fr)_minmax(10rem,auto)_auto]">
           <input
             list={id}
             className={inputClass + ' !mt-0'}
@@ -182,14 +187,18 @@ export function ProgrammeConsultant() {
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addGoal(kind) } }}
           />
-          <select
-            aria-label={`${kind} priority`}
-            className={inputClass + ' !mt-0 !px-2'}
-            value={kind === 'theme' ? themePriority : objectivePriority}
-            onChange={(event) => kind === 'theme' ? setThemePriority(event.target.value as Goal['priority']) : setObjectivePriority(event.target.value as Goal['priority'])}
-          >
-            <option value="preference">Preference</option>
-          </select>
+          <label className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+            Priority
+            <select
+              aria-label={`${kind} priority`}
+              className={inputClass + ' !mt-1 !px-2'}
+              value={kind === 'theme' ? themePriority : objectivePriority}
+              onChange={(event) => kind === 'theme' ? setThemePriority(event.target.value as Goal['priority']) : setObjectivePriority(event.target.value as Goal['priority'])}
+            >
+              <option value="critical">Critical — must be satisfied</option>
+              <option value="preference">Preference — trade-offs allowed</option>
+            </select>
+          </label>
           <Button type="button" variant="outline" disabled={values.length >= 8} onClick={() => addGoal(kind)}>+ Add</Button>
         </div>
       </div>
